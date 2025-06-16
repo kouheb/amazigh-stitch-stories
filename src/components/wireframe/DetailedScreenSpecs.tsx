@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,7 +10,7 @@ import {
   Palette,
   Layout,
   Type,
-  Spacing
+  Settings
 } from "lucide-react";
 
 export const DetailedScreenSpecs = () => {
@@ -740,7 +739,7 @@ export const DetailedScreenSpecs = () => {
         {/* Interactions */}
         <Card className="p-6 bg-white">
           <div className="flex items-center gap-2 mb-4">
-            <Spacing className="h-5 w-5 text-orange-600" />
+            <Settings className="h-5 w-5 text-orange-600" />
             <h4 className="font-semibold text-gray-800">Interactions & Behaviors</h4>
           </div>
           <ul className="space-y-2">
