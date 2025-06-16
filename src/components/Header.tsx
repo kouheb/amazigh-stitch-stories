@@ -24,6 +24,12 @@ export const Header = () => {
               <span>Fashion Collection Tool</span>
             </div>
             
+            <Link to="/wireframe">
+              <Button variant="outline" className="border-orange-200 hover:bg-orange-50">
+                App Wireframe
+              </Button>
+            </Link>
+            
             <Link to="/membership">
               <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
                 <Users className="h-4 w-4 mr-2" />
