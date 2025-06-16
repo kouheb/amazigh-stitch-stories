@@ -83,8 +83,11 @@ export const Canvas = ({ selectedSymbol, patternColor, showGrid }: CanvasProps) 
       gridLines.push(line);
     }
     
-    gridLines.forEach(line => fabricCanvas.add(line));
-    fabricCanvas.sendToBack(...gridLines);
+    // Add grid lines to canvas and send each to back individually
+    gridLines.forEach(line => {
+      fabricCanvas.add(line);
+      fabricCanvas.sendObjectToBack(line);
+    });
     fabricCanvas.renderAll();
   };
 
