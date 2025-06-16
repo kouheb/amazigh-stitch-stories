@@ -9,11 +9,12 @@ import { EventsCommunity } from "@/components/wireframe/EventsCommunity";
 import { ServicesMarketplace } from "@/components/wireframe/ServicesMarketplace";
 import { MobileAppFeatures } from "@/components/wireframe/MobileAppFeatures";
 import { ScreenFlowDesign } from "@/components/wireframe/ScreenFlowDesign";
+import { DetailedScreenSpecs } from "@/components/wireframe/DetailedScreenSpecs";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 const Wireframe = () => {
-  const [currentView, setCurrentView] = useState<'overview' | 'screenflow'>('overview');
+  const [currentView, setCurrentView] = useState<'overview' | 'screenflow' | 'detailed'>('overview');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-orange-50">
@@ -36,6 +37,12 @@ const Wireframe = () => {
           >
             Complete Screen Flow
           </Button>
+          <Button
+            variant={currentView === 'detailed' ? 'default' : 'outline'}
+            onClick={() => setCurrentView('detailed')}
+          >
+            Detailed Figma Specs
+          </Button>
         </div>
 
         {currentView === 'overview' ? (
@@ -51,8 +58,10 @@ const Wireframe = () => {
               <MobileAppFeatures />
             </div>
           </>
-        ) : (
+        ) : currentView === 'screenflow' ? (
           <ScreenFlowDesign />
+        ) : (
+          <DetailedScreenSpecs />
         )}
 
         {/* Footer */}
