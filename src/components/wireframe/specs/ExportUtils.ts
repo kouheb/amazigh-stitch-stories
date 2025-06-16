@@ -1,42 +1,53 @@
 
 export const exportToJSON = (data: any, filename: string) => {
-  const jsonString = JSON.stringify(data, null, 2);
-  const blob = new Blob([jsonString], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `${filename}.json`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  try {
+    const jsonString = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${filename}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    console.log('JSON export completed successfully');
+  } catch (error) {
+    console.error('Error exporting JSON:', error);
+  }
 };
 
 export const exportToCSV = (components: any[], filename: string) => {
-  const headers = ['Element', 'Specs', 'Position', 'Styling'];
-  const csvContent = [
-    headers.join(','),
-    ...components.map(comp => [
-      `"${comp.element}"`,
-      `"${comp.specs}"`,
-      `"${comp.position}"`,
-      `"${comp.styling}"`
-    ].join(','))
-  ].join('\n');
-  
-  const blob = new Blob([csvContent], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `${filename}.csv`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  try {
+    const headers = ['Element', 'Specs', 'Position', 'Styling'];
+    const csvContent = [
+      headers.join(','),
+      ...components.map(comp => [
+        `"${comp.element}"`,
+        `"${comp.specs}"`,
+        `"${comp.position}"`,
+        `"${comp.styling}"`
+      ].join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${filename}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    console.log('CSV export completed successfully');
+  } catch (error) {
+    console.error('Error exporting CSV:', error);
+  }
 };
 
 export const exportToMarkdown = (screen: any, filename: string) => {
-  const markdown = `# ${screen.title}
+  try {
+    const markdown = `# ${screen.title}
 
 **Category:** ${screen.category}
 **Description:** ${screen.description}
@@ -60,13 +71,17 @@ ${screen.components.map((comp: any, index: number) => `
 ${screen.interactions.map((interaction: string) => `- ${interaction}`).join('\n')}
 `;
 
-  const blob = new Blob([markdown], { type: 'text/markdown' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `${filename}.md`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+    const blob = new Blob([markdown], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${filename}.md`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    console.log('Markdown export completed successfully');
+  } catch (error) {
+    console.error('Error exporting Markdown:', error);
+  }
 };

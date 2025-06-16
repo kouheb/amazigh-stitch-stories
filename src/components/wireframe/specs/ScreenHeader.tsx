@@ -64,43 +64,44 @@ export const ScreenHeader = ({ screen, screenIndex, onCopySpecs }: ScreenHeaderP
             size="sm" 
             variant="outline" 
             onClick={() => setShowExportMenu(!showExportMenu)}
+            className="relative"
           >
             <Download className="h-4 w-4 mr-2" />
             Export
             <ChevronDown className="h-4 w-4 ml-2" />
           </Button>
           {showExportMenu && (
-            <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50">
-              <div className="py-1">
-                <button
-                  onClick={() => handleExport('json')}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >
-                  Export as JSON
-                </button>
-                <button
-                  onClick={() => handleExport('csv')}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >
-                  Export Components as CSV
-                </button>
-                <button
-                  onClick={() => handleExport('markdown')}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >
-                  Export as Markdown
-                </button>
+            <>
+              <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50 overflow-hidden">
+                <div className="py-1">
+                  <button
+                    onClick={() => handleExport('json')}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    Export as JSON
+                  </button>
+                  <button
+                    onClick={() => handleExport('csv')}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    Export Components as CSV
+                  </button>
+                  <button
+                    onClick={() => handleExport('markdown')}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    Export as Markdown
+                  </button>
+                </div>
               </div>
-            </div>
+              <div 
+                className="fixed inset-0 z-40" 
+                onClick={() => setShowExportMenu(false)}
+              />
+            </>
           )}
         </div>
       </div>
-      {showExportMenu && (
-        <div 
-          className="fixed inset-0 z-40" 
-          onClick={() => setShowExportMenu(false)}
-        ></div>
-      )}
     </div>
   );
 };
