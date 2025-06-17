@@ -10,11 +10,12 @@ import { ServicesMarketplace } from "@/components/wireframe/ServicesMarketplace"
 import { MobileAppFeatures } from "@/components/wireframe/MobileAppFeatures";
 import { ScreenFlowDesign } from "@/components/wireframe/ScreenFlowDesign";
 import { DetailedScreenSpecs } from "@/components/wireframe/DetailedScreenSpecs";
+import ProfileCreationScreen from "@/components/wireframe/ProfileCreationScreen";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 const Wireframe = () => {
-  const [currentView, setCurrentView] = useState<'overview' | 'screenflow' | 'detailed'>('overview');
+  const [currentView, setCurrentView] = useState<'overview' | 'screenflow' | 'detailed' | 'profile'>('overview');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-orange-50">
@@ -24,7 +25,7 @@ const Wireframe = () => {
         <EnhancedWireframeHeader />
 
         {/* View Toggle */}
-        <div className="flex justify-center gap-4 mb-8">
+        <div className="flex justify-center gap-4 mb-8 flex-wrap">
           <Button
             variant={currentView === 'overview' ? 'default' : 'outline'}
             onClick={() => setCurrentView('overview')}
@@ -43,6 +44,12 @@ const Wireframe = () => {
           >
             Detailed Figma Specs
           </Button>
+          <Button
+            variant={currentView === 'profile' ? 'default' : 'outline'}
+            onClick={() => setCurrentView('profile')}
+          >
+            Profile Creation
+          </Button>
         </div>
 
         {currentView === 'overview' ? (
@@ -60,8 +67,10 @@ const Wireframe = () => {
           </>
         ) : currentView === 'screenflow' ? (
           <ScreenFlowDesign />
-        ) : (
+        ) : currentView === 'detailed' ? (
           <DetailedScreenSpecs />
+        ) : (
+          <ProfileCreationScreen />
         )}
 
         {/* Footer */}
