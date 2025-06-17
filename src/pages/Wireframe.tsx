@@ -11,11 +11,12 @@ import { MobileAppFeatures } from "@/components/wireframe/MobileAppFeatures";
 import { ScreenFlowDesign } from "@/components/wireframe/ScreenFlowDesign";
 import { DetailedScreenSpecs } from "@/components/wireframe/DetailedScreenSpecs";
 import ProfileCreationScreen from "@/components/wireframe/ProfileCreationScreen";
+import { HirePaymentFlow } from "@/components/wireframe/HirePaymentFlow";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 const Wireframe = () => {
-  const [currentView, setCurrentView] = useState<'overview' | 'screenflow' | 'detailed' | 'profile'>('overview');
+  const [currentView, setCurrentView] = useState<'overview' | 'screenflow' | 'detailed' | 'profile' | 'hire-payment'>('overview');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-orange-50">
@@ -50,6 +51,12 @@ const Wireframe = () => {
           >
             Profile Creation
           </Button>
+          <Button
+            variant={currentView === 'hire-payment' ? 'default' : 'outline'}
+            onClick={() => setCurrentView('hire-payment')}
+          >
+            Hire & Payment Flow
+          </Button>
         </div>
 
         {currentView === 'overview' ? (
@@ -69,8 +76,10 @@ const Wireframe = () => {
           <ScreenFlowDesign />
         ) : currentView === 'detailed' ? (
           <DetailedScreenSpecs />
-        ) : (
+        ) : currentView === 'profile' ? (
           <ProfileCreationScreen />
+        ) : (
+          <HirePaymentFlow />
         )}
 
         {/* Footer */}
