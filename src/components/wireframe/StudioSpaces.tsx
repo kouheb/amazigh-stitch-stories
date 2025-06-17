@@ -3,8 +3,24 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Search, Plus, Building, MapPin } from "lucide-react";
+import { useState } from "react";
+import { StudioBookingModal } from "./StudioBookingModal";
 
 export const StudioSpaces = () => {
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [selectedStudio, setSelectedStudio] = useState<any>(null);
+
+  const studios = [
+    { name: "Creative Loft Studio", type: "Embroidery Workshop", price: "$25/hour" },
+    { name: "Artisan Collective", type: "Shared Beading Space", price: "$300/month" },
+    { name: "Traditional Craft Center", type: "Teaching Studio", price: "$40/hour" }
+  ];
+
+  const handleBookStudio = (studio: any) => {
+    setSelectedStudio(studio);
+    setIsBookingModalOpen(true);
+  };
+
   return (
     <section>
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Art Studios & Workshop Spaces</h2>
@@ -22,11 +38,7 @@ export const StudioSpaces = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[
-            { name: "Creative Loft Studio", type: "Embroidery Workshop", price: "$25/hour" },
-            { name: "Artisan Collective", type: "Shared Beading Space", price: "$300/month" },
-            { name: "Traditional Craft Center", type: "Teaching Studio", price: "$40/hour" }
-          ].map((studio, index) => (
+          {studios.map((studio, index) => (
             <Card key={index} className="p-4 border">
               <div className="h-32 bg-gray-200 rounded mb-3 flex items-center justify-center">
                 <Building className="h-8 w-8 text-gray-400" />
@@ -35,7 +47,9 @@ export const StudioSpaces = () => {
               <p className="text-sm text-gray-600 mb-2">{studio.type}</p>
               <div className="flex items-center justify-between">
                 <span className="font-bold text-green-600">{studio.price}</span>
-                <Button size="sm">Book Now</Button>
+                <Button size="sm" onClick={() => handleBookStudio(studio)}>
+                  Book Now
+                </Button>
               </div>
               <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
                 <MapPin className="h-3 w-3" />
@@ -45,6 +59,14 @@ export const StudioSpaces = () => {
           ))}
         </div>
       </Card>
+
+      {selectedStudio && (
+        <StudioBookingModal
+          isOpen={isBookingModalOpen}
+          onClose={() => setIsBookingModalOpen(false)}
+          studio={selectedStudio}
+        />
+      )}
     </section>
   );
 };
