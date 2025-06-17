@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
-import { Calendar, Clock, Users, AlertTriangle, FileText, CreditCard } from "lucide-react";
+import { Calendar, Clock, Users, AlertTriangle, FileText, CreditCard, Shield } from "lucide-react";
 
 interface StudioBookingModalProps {
   isOpen: boolean;
@@ -34,6 +34,33 @@ export const StudioBookingModal = ({ isOpen, onClose, studio }: StudioBookingMod
     cancellation: false,
     equipment: false,
   });
+
+  const generalRules = [
+    {
+      icon: <Shield className="h-5 w-5 text-purple-500" />,
+      title: "General Studio Rules",
+      rules: [
+        "All users must be 18+ or accompanied by an adult",
+        "Valid photo ID required for check-in",
+        "No smoking, vaping, or illegal substances permitted",
+        "Respect other users and maintain appropriate noise levels",
+        "Studio access limited to booked time slots only",
+        "Lost or forgotten items held for 30 days maximum"
+      ]
+    },
+    {
+      icon: <Users className="h-5 w-5 text-indigo-500" />,
+      title: "Conduct & Safety",
+      rules: [
+        "Follow all posted safety guidelines and instructions",
+        "Use protective equipment when required",
+        "Report accidents or equipment malfunctions immediately",
+        "No harassment, discrimination, or inappropriate behavior",
+        "Children under 16 must be supervised at all times",
+        "Emergency exits must remain clear and accessible"
+      ]
+    }
+  ];
 
   const businessRules = [
     {
@@ -198,12 +225,35 @@ export const StudioBookingModal = ({ isOpen, onClose, studio }: StudioBookingMod
         {/* Step 2: Business Rules & Agreements */}
         {step === 2 && (
           <div className="space-y-6">
-            {/* Business Rules */}
+            {/* General Rules */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <FileText className="h-5 w-5" />
-                Studio Policies & Requirements
+                General Rules & Policies
               </h3>
+              <div className="grid gap-4">
+                {generalRules.map((section, index) => (
+                  <Card key={index} className="p-4">
+                    <h4 className="font-medium mb-3 flex items-center gap-2">
+                      {section.icon}
+                      {section.title}
+                    </h4>
+                    <ul className="space-y-2">
+                      {section.rules.map((rule, ruleIndex) => (
+                        <li key={ruleIndex} className="text-sm text-gray-600 flex items-start gap-2">
+                          <span className="w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 flex-shrink-0" />
+                          {rule}
+                        </li>
+                      ))}
+                    </ul>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* Studio-Specific Business Rules */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Studio-Specific Requirements</h3>
               <div className="grid gap-4">
                 {businessRules.map((section, index) => (
                   <Card key={index} className="p-4">
