@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,7 +13,7 @@ import {
   Clock, 
   Shield, 
   CreditCard,
-  PayPal,
+  Wallet,
   Smartphone,
   Check,
   MessageSquare,
@@ -274,7 +273,7 @@ export const HirePaymentFlow = () => {
                     onClick={() => setPaymentMethod("paypal")}
                     className="flex items-center gap-2"
                   >
-                    <PayPal className="h-4 w-4" />
+                    <Wallet className="h-4 w-4" />
                     PayPal
                   </Button>
                   <Button
@@ -323,7 +322,7 @@ export const HirePaymentFlow = () => {
 
                 {paymentMethod === "paypal" && (
                   <Card className="p-8 text-center">
-                    <PayPal className="h-12 w-12 mx-auto mb-4 text-blue-600" />
+                    <Wallet className="h-12 w-12 mx-auto mb-4 text-blue-600" />
                     <p className="text-gray-600 mb-4">You'll be redirected to PayPal to complete your payment</p>
                     <Button className="w-full bg-blue-600 hover:bg-blue-700">
                       Continue with PayPal
