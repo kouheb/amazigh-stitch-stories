@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,56 +14,81 @@ const ProfileCreationScreen = () => {
 
   const roleCategories = [
     {
-      category: "Creator/Artisan Roles",
+      category: "Fashion Design",
       roles: [
-        "Traditional Craftsperson",
-        "Contemporary Designer", 
-        "Textile Artist",
-        "Jewelry Maker",
-        "Ceramicist/Potter",
-        "Leather Worker",
-        "Metalsmith",
-        "Musician/Performer"
-      ]
-    },
-    {
-      category: "Cultural/Educational Roles",
-      roles: [
-        "Cultural Researcher",
-        "Historian",
-        "Language Preservationist",
-        "Storyteller",
-        "Cultural Educator",
-        "Documentary Filmmaker"
-      ]
-    },
-    {
-      category: "Business/Professional Roles", 
-      roles: [
-        "Cultural Entrepreneur",
-        "Event Organizer",
-        "Gallery Owner/Curator",
-        "Tourism Guide",
         "Fashion Designer",
-        "Interior Designer"
+        "Textile Designer", 
+        "Pattern Maker",
+        "Fashion Stylist",
+        "Costume Designer",
+        "Accessories Designer",
+        "Sustainable Fashion Designer",
+        "Haute Couture Designer"
       ]
     },
     {
-      category: "Community/Advocacy Roles",
+      category: "Artisan & Crafts",
       roles: [
-        "Community Leader",
-        "Cultural Activist", 
-        "Youth Mentor",
-        "Cultural Consultant"
+        "Artisan",
+        "Traditional Craftsperson",
+        "Seamstress/Tailor",
+        "Embroidery Artist",
+        "Weaver",
+        "Leather Worker",
+        "Jewelry Maker",
+        "Beadwork Artist"
       ]
     },
     {
-      category: "Media/Technology Roles",
+      category: "Visual Arts", 
       roles: [
-        "Content Creator",
-        "Photographer",
+        "Artist",
+        "Textile Artist",
+        "Fashion Illustrator",
         "Digital Artist",
-        "App Developer"
+        "Print Designer",
+        "Surface Pattern Designer",
+        "Color Specialist",
+        "Art Director"
+      ]
+    },
+    {
+      category: "Fashion Photography & Media",
+      roles: [
+        "Fashion Photographer",
+        "Fashion Videographer",
+        "Content Creator",
+        "Fashion Blogger",
+        "Social Media Manager",
+        "Fashion Journalist",
+        "Brand Photographer",
+        "Editorial Photographer"
+      ]
+    },
+    {
+      category: "Modeling & Performance",
+      roles: [
+        "Fashion Model",
+        "Runway Model",
+        "Plus Size Model",
+        "Cultural Model",
+        "Brand Ambassador",
+        "Fit Model",
+        "Fashion Show Coordinator",
+        "Performance Artist"
+      ]
+    },
+    {
+      category: "Business & Education",
+      roles: [
+        "Fashion Entrepreneur",
+        "Fashion Educator",
+        "Fashion Consultant",
+        "Brand Manager",
+        "Fashion Buyer",
+        "Fashion Merchandiser",
+        "Workshop Instructor",
+        "Cultural Fashion Consultant"
       ]
     }
   ];
@@ -103,8 +127,8 @@ const ProfileCreationScreen = () => {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Create Your Cultural Profile</h1>
-          <p className="text-gray-600">Join the Amazigh Nations community and share your cultural journey</p>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Create Your Fashion & Arts Profile</h1>
+          <p className="text-gray-600">Join the Amazigh Nations community of fashion designers, artists, and artisans</p>
         </div>
 
         <Card className="p-8 bg-white shadow-lg border border-orange-200">
@@ -172,7 +196,7 @@ const ProfileCreationScreen = () => {
 
             {/* Roles and Expertise */}
             <div>
-              <Label className="text-base font-medium mb-4 block">Your Roles & Expertise *</Label>
+              <Label className="text-base font-medium mb-4 block">Your Fashion & Arts Expertise *</Label>
               <p className="text-sm text-gray-600 mb-4">Select all that apply to you</p>
               
               <div className="space-y-6">
@@ -221,7 +245,7 @@ const ProfileCreationScreen = () => {
               <Label htmlFor="bio">About You *</Label>
               <Textarea 
                 id="bio"
-                placeholder="Tell us about yourself, your cultural background, your work, and what you hope to contribute to the Amazigh Nations community..."
+                placeholder="Tell us about your creative journey, your work in fashion/arts, and what you hope to contribute to the Amazigh Nations community..."
                 className="mt-1 min-h-[120px]"
               />
               <p className="text-xs text-gray-500 mt-1">Minimum 50 characters</p>
@@ -231,7 +255,7 @@ const ProfileCreationScreen = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <Label htmlFor="website">Website/Portfolio</Label>
-                <Input id="website" placeholder="https://yourwebsite.com" className="mt-1" />
+                <Input id="website" placeholder="https://yourportfolio.com" className="mt-1" />
               </div>
               <div>
                 <Label htmlFor="social">Social Media Handle</Label>
@@ -244,16 +268,16 @@ const ProfileCreationScreen = () => {
               <Label className="text-base font-medium mb-4 block">What are you looking for? *</Label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {[
-                  "Learn traditional crafts",
-                  "Share my knowledge", 
-                  "Find collaborators",
-                  "Sell my products",
-                  "Attend workshops",
+                  "Showcase my work",
+                  "Find collaborators", 
+                  "Learn new techniques",
+                  "Sell my designs",
+                  "Attend fashion shows",
                   "Organize events",
-                  "Preserve culture",
-                  "Research heritage",
-                  "Connect with community",
-                  "Mentor others"
+                  "Network with artists",
+                  "Cultural fashion research",
+                  "Mentorship opportunities",
+                  "Brand partnerships"
                 ].map((goal) => (
                   <div key={goal} className="flex items-center space-x-2">
                     <Checkbox id={goal} />
@@ -274,7 +298,7 @@ const ProfileCreationScreen = () => {
               <div className="flex items-start space-x-2">
                 <Checkbox id="newsletter" />
                 <Label htmlFor="newsletter" className="text-sm">
-                  I would like to receive updates about cultural events, workshops, and community news
+                  I would like to receive updates about fashion events, exhibitions, and community news
                 </Label>
               </div>
             </div>
