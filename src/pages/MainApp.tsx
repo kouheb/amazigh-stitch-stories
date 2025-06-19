@@ -8,7 +8,7 @@ import { ProfilePage } from "./ProfilePage";
 import { MessagingPage } from "./MessagingPage";
 import { MarketplacePage } from "./MarketplacePage";
 import { ArtisanDashboard } from "@/components/dashboard/ArtisanDashboard";
-import { Membership } from "./Membership";
+import Membership from "./Membership";
 
 export const MainApp = () => {
   const [activeTab, setActiveTab] = useState("home");
