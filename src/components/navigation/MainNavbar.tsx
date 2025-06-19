@@ -48,10 +48,10 @@ export const MainNavbar = ({ isAuthenticated = false, onMenuToggle }: MainNavbar
             
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">A</span>
+                <span className="text-white font-bold text-sm">F</span>
               </div>
               <span className="font-bold text-xl text-gray-800 hidden sm:block">
-                ArtNect
+                Fil et Toile Studio
               </span>
             </div>
           </div>
