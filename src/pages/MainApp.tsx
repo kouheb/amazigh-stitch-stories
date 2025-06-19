@@ -7,6 +7,7 @@ import { LearningPage } from "./LearningPage";
 import { EventsPage } from "./EventsPage";
 import { ProfilePage } from "./ProfilePage";
 import { MessagingPage } from "./MessagingPage";
+import { MarketplacePage } from "./MarketplacePage";
 import { ArtisanDashboard } from "@/components/dashboard/ArtisanDashboard";
 
 export const MainApp = () => {
@@ -24,6 +25,8 @@ export const MainApp = () => {
         return <EventsPage />;
       case "messages":
         return <MessagingPage />;
+      case "marketplace":
+        return <MarketplacePage />;
       case "profile":
         return <ArtisanDashboard />;
       case "enhanced-profile":
