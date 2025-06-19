@@ -1,41 +1,54 @@
 
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
-import { 
-  Search, 
-  Send, 
-  Phone, 
-  Video, 
-  MoreVertical,
-  Paperclip,
-  Smile,
-  Plus
-} from "lucide-react";
-import { ChatMessage } from "@/components/messaging/ChatMessage";
-import { ConversationList } from "@/components/messaging/ConversationList";
-import { MessageInput } from "@/components/messaging/MessageInput";
+import { Badge } from "@/components/ui/badge";
+import { Search, Plus, MoreVertical } from "lucide-react";
+import { ChatWindow } from "@/components/messaging/ChatWindow";
+import { ChatList } from "@/components/messaging/ChatList";
+
+interface Conversation {
+  id: string;
+  participant: {
+    name: string;
+    avatar: string;
+    status: "online" | "offline";
+    lastSeen: string;
+  };
+  lastMessage: {
+    text: string;
+    timestamp: string;
+    isRead: boolean;
+  };
+  unreadCount: number;
+}
+
+interface Message {
+  id: string;
+  senderId: string;
+  text: string;
+  timestamp: string;
+  isRead: boolean;
+}
 
 export const MessagingPage = () => {
-  const [selectedConversation, setSelectedConversation] = useState("1");
+  const [selectedConversationId, setSelectedConversationId] = useState<string>("1");
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Mock conversations data
-  const conversations = [
+  // Mock data - in real app this would come from your backend
+  const conversations: Conversation[] = [
     {
       id: "1",
       participant: {
-        name: "Fatima El Mansouri",
+        name: "Fatima Al-Maghribi",
         avatar: "/api/placeholder/40/40",
-        status: "online" as const,
-        lastSeen: "Active now"
+        status: "online",
+        lastSeen: "now"
       },
       lastMessage: {
-        text: "I'd love to discuss the embroidery project details",
+        text: "I'd love to learn more about traditional Zardozi techniques",
         timestamp: "2m ago",
         isRead: false
       },
@@ -44,13 +57,13 @@ export const MessagingPage = () => {
     {
       id: "2",
       participant: {
-        name: "Ahmed Benali",
+        name: "Ahmed Ben Hassan",
         avatar: "/api/placeholder/40/40",
-        status: "offline" as const,
-        lastSeen: "Last seen 1h ago"
+        status: "offline",
+        lastSeen: "1h ago"
       },
       lastMessage: {
-        text: "The pottery workshop sounds interesting!",
+        text: "The beading workshop was amazing, thank you!",
         timestamp: "1h ago",
         isRead: true
       },
@@ -59,13 +72,13 @@ export const MessagingPage = () => {
     {
       id: "3",
       participant: {
-        name: "Zahra Oudghiri",
+        name: "Aicha Berber",
         avatar: "/api/placeholder/40/40",
-        status: "online" as const,
-        lastSeen: "Active now"
+        status: "online",
+        lastSeen: "now"
       },
       lastMessage: {
-        text: "When can we schedule the weaving lesson?",
+        text: "When is the next cultural event?",
         timestamp: "3h ago",
         isRead: true
       },
@@ -73,44 +86,48 @@ export const MessagingPage = () => {
     }
   ];
 
-  // Mock messages for selected conversation
-  const messages = [
+  const messages: Message[] = [
     {
       id: "1",
       senderId: "other",
-      text: "Hello! I saw your beautiful embroidery work on your profile.",
+      text: "Hello! I saw your profile and I'm really interested in learning traditional Amazigh crafts.",
       timestamp: "10:30 AM",
       isRead: true
     },
     {
       id: "2",
       senderId: "me",
-      text: "Thank you so much! I'd be happy to discuss a custom piece for you.",
+      text: "That's wonderful! I'd be happy to help you get started. What specific techniques are you most interested in?",
       timestamp: "10:32 AM",
       isRead: true
     },
     {
       id: "3",
       senderId: "other",
-      text: "I'd love to discuss the embroidery project details. What's your availability this week?",
+      text: "I'd love to learn more about traditional Zardozi techniques",
       timestamp: "10:35 AM",
       isRead: false
     }
   ];
 
-  const currentConversation = conversations.find(c => c.id === selectedConversation);
+  const selectedConversation = conversations.find(c => c.id === selectedConversationId);
 
   return (
     <div className="h-screen flex bg-gray-50">
-      {/* Conversations Sidebar */}
+      {/* Sidebar */}
       <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
         {/* Header */}
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-xl font-semibold text-gray-800">Messages</h1>
-            <Button size="sm" className="bg-orange-600 hover:bg-orange-700">
-              <Plus className="h-4 w-4" />
-            </Button>
+            <h1 className="text-xl font-semibold text-gray-900">Messages</h1>
+            <div className="flex gap-2">
+              <Button size="sm" variant="ghost">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+              <Button size="sm" className="bg-orange-600 hover:bg-orange-700">
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
           
           {/* Search */}
@@ -125,82 +142,30 @@ export const MessagingPage = () => {
           </div>
         </div>
 
-        {/* Conversation List */}
-        <ConversationList 
+        {/* Conversations List */}
+        <ChatList
           conversations={conversations}
-          selectedId={selectedConversation}
-          onSelect={setSelectedConversation}
+          selectedId={selectedConversationId}
+          onSelect={setSelectedConversationId}
           searchQuery={searchQuery}
         />
       </div>
 
-      {/* Chat Area */}
+      {/* Chat Window */}
       <div className="flex-1 flex flex-col">
-        {currentConversation ? (
-          <>
-            {/* Chat Header */}
-            <div className="bg-white border-b border-gray-200 p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={currentConversation.participant.avatar} />
-                    <AvatarFallback>
-                      {currentConversation.participant.name.split(' ').map(n => n[0]).join('')}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h3 className="font-semibold text-gray-800">
-                      {currentConversation.participant.name}
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      {currentConversation.participant.lastSeen}
-                    </p>
-                  </div>
-                  {currentConversation.participant.status === "online" && (
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  )}
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <Button variant="ghost" size="sm">
-                    <Phone className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    <Video className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.map((message) => (
-                <ChatMessage 
-                  key={message.id}
-                  message={message}
-                  isOwn={message.senderId === "me"}
-                />
-              ))}
-            </div>
-
-            {/* Message Input */}
-            <MessageInput onSend={(text) => console.log("Send:", text)} />
-          </>
+        {selectedConversation ? (
+          <ChatWindow
+            conversation={selectedConversation}
+            messages={messages}
+          />
         ) : (
-          <div className="flex-1 flex items-center justify-center">
+          <div className="flex-1 flex items-center justify-center bg-gray-50">
             <div className="text-center">
-              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Send className="h-8 w-8 text-orange-600" />
+              <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Search className="h-8 w-8 text-gray-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                Start a conversation
-              </h3>
-              <p className="text-gray-600">
-                Select a conversation to start messaging
-              </p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No conversation selected</h3>
+              <p className="text-gray-500">Choose a conversation to start messaging</p>
             </div>
           </div>
         )}
