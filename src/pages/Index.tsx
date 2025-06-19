@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
@@ -399,5 +400,3 @@ const Index = () => {
 };
 
 export default Index;
-https://github.com/kouheb/amazigh-stitch-stories.git
-
