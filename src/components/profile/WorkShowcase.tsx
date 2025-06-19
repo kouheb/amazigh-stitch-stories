@@ -164,13 +164,28 @@ export const WorkShowcase = ({ isOwnProfile }: WorkShowcaseProps) => {
       // Add to featured
       newItems.featured = [showcaseWork, ...prev.featured];
       
-      // Add to appropriate category based on type
+      // Add to appropriate category based on type with proper type handling
       if (newWork.type === "video") {
-        newItems.videos = [showcaseWork, ...prev.videos];
+        const videoItem = {
+          ...showcaseWork,
+          duration: newWork.duration || "0:00"
+        };
+        newItems.videos = [videoItem, ...prev.videos];
       } else if (newWork.type === "project" || newWork.type === "image") {
-        newItems.projects = [showcaseWork, ...prev.projects];
+        const projectItem = {
+          ...showcaseWork,
+          status: newWork.status || "Completed",
+          client: newWork.client || "Personal Project",
+          views: showcaseWork.views || 0,
+          likes: showcaseWork.likes || 0
+        };
+        newItems.projects = [projectItem, ...prev.projects];
       } else if (newWork.type === "award") {
-        newItems.achievements = [showcaseWork, ...prev.achievements];
+        const achievementItem = {
+          ...showcaseWork,
+          organization: newWork.organization || "Unknown Organization"
+        };
+        newItems.achievements = [achievementItem, ...prev.achievements];
       }
       
       return newItems;
