@@ -15,7 +15,12 @@ export const AppLayout = ({ children, activeTab, onTabChange }: AppLayoutProps) 
 
   return (
     <div className="min-h-screen bg-gray-50 flex w-full">
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Sidebar 
+        isOpen={sidebarOpen} 
+        onClose={() => setSidebarOpen(false)}
+        activeTab={activeTab}
+        onTabChange={onTabChange}
+      />
       
       <div className="flex-1 flex flex-col">
         <MainNavbar 

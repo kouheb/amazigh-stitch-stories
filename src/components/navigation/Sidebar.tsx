@@ -16,9 +16,11 @@ import {
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  activeTab?: string;
+  onTabChange?: (tab: string) => void;
 }
 
-export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
+export const Sidebar = ({ isOpen, onClose, activeTab, onTabChange }: SidebarProps) => {
   const menuItems = [
     { id: "home", label: "Dashboard", icon: Home, badge: null },
     { id: "network", label: "Network", icon: Users, badge: "12" },
@@ -28,6 +30,13 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     { id: "studios", label: "Studios", icon: MapPin, badge: null },
     { id: "profile", label: "Profile", icon: User, badge: null },
   ];
+
+  const handleMenuClick = (itemId: string) => {
+    if (onTabChange) {
+      onTabChange(itemId);
+    }
+    onClose();
+  };
 
   return (
     <>
@@ -61,11 +70,17 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
           <div className="space-y-2">
             {menuItems.map((item) => {
               const IconComponent = item.icon;
+              const isActive = activeTab === item.id;
               return (
                 <Button
                   key={item.id}
                   variant="ghost"
-                  className="w-full justify-start gap-3 hover:bg-orange-50 hover:text-orange-700"
+                  onClick={() => handleMenuClick(item.id)}
+                  className={`w-full justify-start gap-3 ${
+                    isActive 
+                      ? 'bg-orange-50 text-orange-700 hover:bg-orange-100' 
+                      : 'hover:bg-orange-50 hover:text-orange-700'
+                  }`}
                 >
                   <IconComponent className="h-5 w-5" />
                   <span className="flex-1 text-left">{item.label}</span>

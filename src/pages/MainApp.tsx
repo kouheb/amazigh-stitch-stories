@@ -3,6 +3,7 @@ import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { HomePage } from "./HomePage";
 import { NetworkPage } from "./NetworkPage";
+import { LearningPage } from "./LearningPage";
 import { ArtisanDashboard } from "@/components/dashboard/ArtisanDashboard";
 
 export const MainApp = () => {
@@ -15,7 +16,7 @@ export const MainApp = () => {
       case "network":
         return <NetworkPage />;
       case "learn":
-        return <div className="p-6"><h1 className="text-2xl font-bold">Learning Platform</h1><p>Workshops and courses coming soon...</p></div>;
+        return <LearningPage />;
       case "events":
         return <div className="p-6"><h1 className="text-2xl font-bold">Events & Community</h1><p>Cultural events and community features coming soon...</p></div>;
       case "profile":
