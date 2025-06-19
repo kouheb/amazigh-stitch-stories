@@ -34,8 +34,8 @@ export const ProfilePage = () => {
     memberSince: "2022",
     website: "https://aichabenali.com",
     bio: "Master artisan specializing in traditional Zardozi embroidery with over 15 years of experience. I blend ancient Amazigh techniques with contemporary fashion design, creating unique pieces that honor our cultural heritage while meeting modern aesthetic needs.",
-    avatar: "/api/placeholder/150/150",
-    coverImage: "/api/placeholder/800/300",
+    avatar: "https://images.unsplash.com/photo-1494790108755-2616c163f505?w=150&h=150&fit=crop&crop=face",
+    coverImage: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=300&fit=crop",
     followers: 2847,
     following: 456,
     likes: 15420,
@@ -51,8 +51,13 @@ export const ProfilePage = () => {
     <div className="min-h-screen bg-gray-50 pb-8">
       {/* Cover Photo & Profile Header */}
       <div className="relative">
-        <div className="h-64 bg-gradient-to-r from-orange-400 via-red-400 to-pink-400">
-          {/* Cover image would go here */}
+        <div 
+          className="h-64 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${profileData.coverImage})`
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-orange-400/20 via-red-400/20 to-pink-400/20"></div>
         </div>
         
         <div className="absolute bottom-0 left-0 right-0 transform translate-y-1/2">

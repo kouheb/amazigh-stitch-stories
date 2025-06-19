@@ -11,11 +11,17 @@ export const ProfileImageUpload = ({ profileImage, setProfileImage }: ProfileIma
   return (
     <div className="text-center">
       <div className="relative inline-block">
-        <div className="w-32 h-32 rounded-full bg-gradient-to-br from-orange-100 to-red-100 border-4 border-orange-200 flex items-center justify-center mx-auto mb-4">
+        <div className="w-32 h-32 rounded-full bg-gradient-to-br from-orange-100 to-red-100 border-4 border-orange-200 flex items-center justify-center mx-auto mb-4 overflow-hidden">
           {profileImage ? (
             <img src={profileImage} alt="Profile" className="w-full h-full rounded-full object-cover" />
           ) : (
-            <Camera className="h-12 w-12 text-orange-400" />
+            <div className="w-full h-full flex items-center justify-center">
+              <img 
+                src="https://images.unsplash.com/photo-1494790108755-2616c163f505?w=128&h=128&fit=crop&crop=face" 
+                alt="Default Profile" 
+                className="w-full h-full rounded-full object-cover opacity-50"
+              />
+            </div>
           )}
         </div>
         <Button variant="outline" size="sm" className="absolute bottom-0 right-0">

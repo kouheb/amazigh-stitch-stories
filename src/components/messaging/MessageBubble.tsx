@@ -20,7 +20,7 @@ export const MessageBubble = ({ message, isOwn }: MessageBubbleProps) => {
     <div className={cn("flex gap-3 max-w-4xl", isOwn && "flex-row-reverse ml-auto")}>
       {!isOwn && (
         <Avatar className="h-8 w-8 flex-shrink-0">
-          <AvatarImage src="/api/placeholder/32/32" />
+          <AvatarImage src="https://images.unsplash.com/photo-1494790108755-2616c163f505?w=32&h=32&fit=crop&crop=face" />
           <AvatarFallback>FM</AvatarFallback>
         </Avatar>
       )}

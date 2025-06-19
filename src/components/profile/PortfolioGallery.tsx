@@ -29,7 +29,7 @@ export const PortfolioGallery = ({ isOwnProfile }: PortfolioGalleryProps) => {
       id: 1,
       title: "Traditional Kaftan Collection",
       category: "Fashion Design",
-      image: "👘",
+      image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&h=300&fit=crop",
       likes: 234,
       views: 1560,
       comments: 45,
@@ -41,7 +41,7 @@ export const PortfolioGallery = ({ isOwnProfile }: PortfolioGalleryProps) => {
       id: 2,
       title: "Berber Jewelry Redesign",
       category: "Jewelry Design",
-      image: "💍",
+      image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=300&fit=crop",
       likes: 189,
       views: 890,
       comments: 23,
@@ -53,7 +53,7 @@ export const PortfolioGallery = ({ isOwnProfile }: PortfolioGalleryProps) => {
       id: 3,
       title: "Textile Pattern Study",
       category: "Research",
-      image: "🧵",
+      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop",
       likes: 156,
       views: 670,
       comments: 18,
@@ -65,7 +65,7 @@ export const PortfolioGallery = ({ isOwnProfile }: PortfolioGalleryProps) => {
       id: 4,
       title: "Sustainable Fashion Line",
       category: "Fashion Design",
-      image: "🌱",
+      image: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&h=300&fit=crop",
       likes: 298,
       views: 2100,
       comments: 67,
@@ -143,8 +143,12 @@ export const PortfolioGallery = ({ isOwnProfile }: PortfolioGalleryProps) => {
           <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow">
             {viewMode === "grid" ? (
               <>
-                <div className="h-48 bg-gradient-to-br from-orange-100 to-red-100 flex items-center justify-center text-6xl">
-                  {item.image}
+                <div className="h-48 overflow-hidden">
+                  <img 
+                    src={item.image} 
+                    alt={item.title}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  />
                 </div>
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-2">
@@ -185,8 +189,12 @@ export const PortfolioGallery = ({ isOwnProfile }: PortfolioGalleryProps) => {
               </>
             ) : (
               <div className="p-4 flex gap-4">
-                <div className="w-20 h-20 bg-gradient-to-br from-orange-100 to-red-100 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
-                  {item.image}
+                <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                  <img 
+                    src={item.image} 
+                    alt={item.title}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-2">

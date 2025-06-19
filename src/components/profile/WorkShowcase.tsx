@@ -32,7 +32,7 @@ export const WorkShowcase = ({ isOwnProfile }: WorkShowcaseProps) => {
         type: "video",
         title: "Zardozi Embroidery Process",
         description: "Step-by-step demonstration of traditional Zardozi techniques",
-        thumbnail: "🎬",
+        thumbnail: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop",
         duration: "12:34",
         views: 2500,
         likes: 189,
@@ -43,7 +43,7 @@ export const WorkShowcase = ({ isOwnProfile }: WorkShowcaseProps) => {
         type: "image",
         title: "Award-Winning Kaftan Design",
         description: "Winner of the 2023 Amazigh Fashion Heritage Award",
-        thumbnail: "🏆",
+        thumbnail: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&h=300&fit=crop",
         views: 1800,
         likes: 234,
         date: "November 2023"
@@ -55,7 +55,7 @@ export const WorkShowcase = ({ isOwnProfile }: WorkShowcaseProps) => {
         type: "video",
         title: "Zardozi Embroidery Process",
         description: "Step-by-step demonstration of traditional Zardozi techniques",
-        thumbnail: "🎬",
+        thumbnail: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop",
         duration: "12:34",
         views: 2500,
         likes: 189,
@@ -66,7 +66,7 @@ export const WorkShowcase = ({ isOwnProfile }: WorkShowcaseProps) => {
         type: "video",
         title: "Traditional Pattern Making",
         description: "Creating geometric patterns inspired by Berber art",
-        thumbnail: "🎥",
+        thumbnail: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=300&fit=crop",
         duration: "8:42",
         views: 1200,
         likes: 145,
@@ -77,7 +77,7 @@ export const WorkShowcase = ({ isOwnProfile }: WorkShowcaseProps) => {
         type: "video",
         title: "Sustainable Dyeing Workshop",
         description: "Natural dye extraction and application techniques",
-        thumbnail: "🌿",
+        thumbnail: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&h=300&fit=crop",
         duration: "15:21",
         views: 980,
         likes: 87,
@@ -90,7 +90,7 @@ export const WorkShowcase = ({ isOwnProfile }: WorkShowcaseProps) => {
         type: "project",
         title: "Award-Winning Kaftan Design",
         description: "Winner of the 2023 Amazigh Fashion Heritage Award",
-        thumbnail: "🏆",
+        thumbnail: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&h=300&fit=crop",
         views: 1800,
         likes: 234,
         date: "November 2023",
@@ -102,7 +102,7 @@ export const WorkShowcase = ({ isOwnProfile }: WorkShowcaseProps) => {
         type: "project",
         title: "Berber Textile Documentation",
         description: "Comprehensive study of traditional weaving patterns",
-        thumbnail: "📚",
+        thumbnail: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop",
         views: 650,
         likes: 92,
         date: "December 2023",
@@ -116,7 +116,7 @@ export const WorkShowcase = ({ isOwnProfile }: WorkShowcaseProps) => {
         type: "award",
         title: "Amazigh Heritage Preservation Award",
         description: "Recognized for outstanding contribution to preserving traditional crafts",
-        thumbnail: "🏅",
+        thumbnail: "https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?w=400&h=300&fit=crop",
         date: "November 2023",
         organization: "Amazigh Cultural Foundation"
       },
@@ -125,7 +125,7 @@ export const WorkShowcase = ({ isOwnProfile }: WorkShowcaseProps) => {
         type: "certification",
         title: "Master Artisan Certificate",
         description: "Certified master in traditional Zardozi embroidery",
-        thumbnail: "📜",
+        thumbnail: "https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?w=400&h=300&fit=crop",
         date: "June 2022",
         organization: "Ministry of Handicrafts"
       }
@@ -135,8 +135,12 @@ export const WorkShowcase = ({ isOwnProfile }: WorkShowcaseProps) => {
   const renderShowcaseItem = (item: any) => (
     <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow">
       <div className="relative">
-        <div className="h-48 bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center text-6xl">
-          {item.thumbnail}
+        <div className="h-48 overflow-hidden">
+          <img 
+            src={item.thumbnail} 
+            alt={item.title}
+            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+          />
         </div>
         {item.type === "video" && (
           <div className="absolute inset-0 flex items-center justify-center">
