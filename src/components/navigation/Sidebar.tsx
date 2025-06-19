@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -7,6 +6,7 @@ import {
   GraduationCap, 
   Calendar, 
   User,
+  MessageSquare,
   Briefcase,
   MapPin,
   Settings,
@@ -24,6 +24,7 @@ export const Sidebar = ({ isOpen, onClose, activeTab, onTabChange }: SidebarProp
   const menuItems = [
     { id: "home", label: "Dashboard", icon: Home, badge: null },
     { id: "network", label: "Network", icon: Users, badge: "12" },
+    { id: "messages", label: "Messages", icon: MessageSquare, badge: "5" },
     { id: "learn", label: "Learning", icon: GraduationCap, badge: null },
     { id: "events", label: "Events", icon: Calendar, badge: "3" },
     { id: "enhanced-profile", label: "Enhanced Profile", icon: User, badge: "New" },
