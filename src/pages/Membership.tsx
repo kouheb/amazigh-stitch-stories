@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Crown, Star, Zap, Users, Calendar, BarChart3 } from "lucide-react";
 
-export const Membership = () => {
+const Membership = () => {
   const [currentPlan, setCurrentPlan] = useState<string>("free"); // free, artisan, master
   const [showUpgrade, setShowUpgrade] = useState(false);
 
@@ -189,3 +189,5 @@ export const Membership = () => {
     </div>
   );
 };
+
+export default Membership;
