@@ -31,7 +31,7 @@ export const MessagingPage = () => {
       participant: {
         name: "Fatima El Mansouri",
         avatar: "/api/placeholder/40/40",
-        status: "online",
+        status: "online" as const,
         lastSeen: "Active now"
       },
       lastMessage: {
@@ -46,7 +46,7 @@ export const MessagingPage = () => {
       participant: {
         name: "Ahmed Benali",
         avatar: "/api/placeholder/40/40",
-        status: "offline",
+        status: "offline" as const,
         lastSeen: "Last seen 1h ago"
       },
       lastMessage: {
@@ -61,7 +61,7 @@ export const MessagingPage = () => {
       participant: {
         name: "Zahra Oudghiri",
         avatar: "/api/placeholder/40/40",
-        status: "online",
+        status: "online" as const,
         lastSeen: "Active now"
       },
       lastMessage: {
