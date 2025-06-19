@@ -4,6 +4,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { HomePage } from "./HomePage";
 import { NetworkPage } from "./NetworkPage";
 import { LearningPage } from "./LearningPage";
+import { EventsPage } from "./EventsPage";
 import { ArtisanDashboard } from "@/components/dashboard/ArtisanDashboard";
 
 export const MainApp = () => {
@@ -18,7 +19,7 @@ export const MainApp = () => {
       case "learn":
         return <LearningPage />;
       case "events":
-        return <div className="p-6"><h1 className="text-2xl font-bold">Events & Community</h1><p>Cultural events and community features coming soon...</p></div>;
+        return <EventsPage />;
       case "profile":
         return <ArtisanDashboard />;
       default:
