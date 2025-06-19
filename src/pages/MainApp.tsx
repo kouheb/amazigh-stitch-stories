@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { HomePage } from "./HomePage";
@@ -22,6 +21,8 @@ export const MainApp = () => {
         return <EventsPage />;
       case "profile":
         return <ArtisanDashboard />;
+      case "enhanced-profile":
+        return <ProfilePage />;
       default:
         return <HomePage />;
     }

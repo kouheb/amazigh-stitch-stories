@@ -26,9 +26,10 @@ export const Sidebar = ({ isOpen, onClose, activeTab, onTabChange }: SidebarProp
     { id: "network", label: "Network", icon: Users, badge: "12" },
     { id: "learn", label: "Learning", icon: GraduationCap, badge: null },
     { id: "events", label: "Events", icon: Calendar, badge: "3" },
+    { id: "enhanced-profile", label: "Enhanced Profile", icon: User, badge: "New" },
     { id: "services", label: "Services", icon: Briefcase, badge: null },
     { id: "studios", label: "Studios", icon: MapPin, badge: null },
-    { id: "profile", label: "Profile", icon: User, badge: null },
+    { id: "profile", label: "Basic Profile", icon: User, badge: null },
   ];
 
   const handleMenuClick = (itemId: string) => {
