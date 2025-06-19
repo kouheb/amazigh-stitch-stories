@@ -1,13 +1,37 @@
-
 import { cn } from "@/lib/utils";
+import { MobileLogo } from "./MobileLogo";
 
 interface LogoProps {
   size?: "sm" | "md" | "lg" | "xl";
   showText?: boolean;
   className?: string;
+  mobile?: boolean;
 }
 
-export const Logo = ({ size = "md", showText = true, className }: LogoProps) => {
+export const Logo = ({ 
+  size = "md", 
+  showText = true, 
+  className,
+  mobile = false 
+}: LogoProps) => {
+  const sizeMap = {
+    sm: 24,
+    md: 32, 
+    lg: 40,
+    xl: 48
+  };
+
+  // Use mobile logo for better mobile app experience
+  if (mobile) {
+    return (
+      <MobileLogo 
+        size={sizeMap[size]} 
+        variant={showText ? "full" : "icon"}
+        className={className}
+      />
+    );
+  }
+
   const sizeClasses = {
     sm: "w-6 h-6",
     md: "w-8 h-8", 
