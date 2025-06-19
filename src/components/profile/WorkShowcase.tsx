@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -152,44 +151,38 @@ export const WorkShowcase = ({ isOwnProfile }: WorkShowcaseProps) => {
   const [showcaseItems, setShowcaseItems] = useState(initialShowcaseItems);
 
   const handleWorkAdded = (newWork: any) => {
-    const baseShowcaseWork: ShowcaseItem = {
-      ...newWork,
-      views: newWork.views || 0,
-      likes: newWork.likes || 0
-    };
-
     setShowcaseItems(prev => {
       const newItems = { ...prev };
       
-      // Add to featured with all required properties
-      const featuredItem: ShowcaseItem = {
-        ...baseShowcaseWork,
-        views: baseShowcaseWork.views || 0,
-        likes: baseShowcaseWork.likes || 0
+      // Add to featured
+      const featuredItem = {
+        ...newWork,
+        views: newWork.views || 0,
+        likes: newWork.likes || 0
       };
       newItems.featured = [featuredItem, ...prev.featured];
       
-      // Add to appropriate category based on type with proper type handling
+      // Add to appropriate category based on type
       if (newWork.type === "video") {
-        const videoItem: ShowcaseItem = {
-          ...baseShowcaseWork,
+        const videoItem = {
+          ...newWork,
           duration: newWork.duration || "0:00",
-          views: baseShowcaseWork.views || 0,
-          likes: baseShowcaseWork.likes || 0
+          views: newWork.views || 0,
+          likes: newWork.likes || 0
         };
         newItems.videos = [videoItem, ...prev.videos];
       } else if (newWork.type === "project" || newWork.type === "image") {
-        const projectItem: ShowcaseItem = {
-          ...baseShowcaseWork,
+        const projectItem = {
+          ...newWork,
           status: newWork.status || "Completed",
           client: newWork.client || "Personal Project",
-          views: baseShowcaseWork.views || 0,
-          likes: baseShowcaseWork.likes || 0
+          views: newWork.views || 0,
+          likes: newWork.likes || 0
         };
         newItems.projects = [projectItem, ...prev.projects];
       } else if (newWork.type === "award") {
-        const achievementItem: ShowcaseItem = {
-          ...baseShowcaseWork,
+        const achievementItem = {
+          ...newWork,
           organization: newWork.organization || "Unknown Organization"
         };
         newItems.achievements = [achievementItem, ...prev.achievements];
