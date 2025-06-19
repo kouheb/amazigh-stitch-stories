@@ -1,4 +1,5 @@
 
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -6,107 +7,71 @@ import {
   Users, 
   GraduationCap, 
   Calendar, 
-  User,
-  MessageSquare,
-  Briefcase,
-  MapPin,
-  Settings,
-  X,
-  ShoppingBag
+  MessageSquare, 
+  ShoppingBag, 
+  User, 
+  Crown,
+  Settings
 } from "lucide-react";
 
 interface SidebarProps {
-  isOpen: boolean;
-  onClose: () => void;
-  activeTab?: string;
-  onTabChange?: (tab: string) => void;
+  activeTab: string;
+  onTabChange: (tab: string) => void;
 }
 
-export const Sidebar = ({ isOpen, onClose, activeTab, onTabChange }: SidebarProps) => {
-  const menuItems = [
-    { id: "home", label: "Dashboard", icon: Home, badge: null },
-    { id: "marketplace", label: "Marketplace", icon: ShoppingBag, badge: "New" },
-    { id: "network", label: "Network", icon: Users, badge: "12" },
-    { id: "messages", label: "Messages", icon: MessageSquare, badge: "5" },
-    { id: "learn", label: "Learning", icon: GraduationCap, badge: null },
-    { id: "events", label: "Events", icon: Calendar, badge: "3" },
-    { id: "enhanced-profile", label: "Enhanced Profile", icon: User, badge: "New" },
-    { id: "services", label: "Services", icon: Briefcase, badge: null },
-    { id: "studios", label: "Studios", icon: MapPin, badge: null },
-    { id: "profile", label: "Basic Profile", icon: User, badge: null },
+export const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
+  const navigationItems = [
+    { id: "home", label: "Home", icon: Home },
+    { id: "network", label: "Network", icon: Users },
+    { id: "learn", label: "Learn", icon: GraduationCap },
+    { id: "events", label: "Events", icon: Calendar },
+    { id: "messages", label: "Messages", icon: MessageSquare },
+    { id: "marketplace", label: "Marketplace", icon: ShoppingBag },
+    { id: "profile", label: "Profile", icon: User },
+    { id: "membership", label: "Membership", icon: Crown, premium: true }
   ];
 
-  const handleMenuClick = (itemId: string) => {
-    if (onTabChange) {
-      onTabChange(itemId);
-    }
-    onClose();
-  };
-
   return (
-    <>
-      {/* Overlay */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" 
-          onClick={onClose}
-        />
-      )}
-      
-      {/* Sidebar */}
-      <div className={`
-        fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-50 transform transition-transform duration-300 ease-in-out
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-        lg:translate-x-0 lg:static lg:z-auto
-      `}>
-        <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">A</span>
-            </div>
-            <span className="font-bold text-xl text-gray-800">ArtNect</span>
-          </div>
-          <Button variant="ghost" size="sm" onClick={onClose} className="lg:hidden">
-            <X className="h-4 w-4" />
-          </Button>
+    <Card className="w-64 h-full p-4 border-r">
+      <div className="space-y-6">
+        <div className="text-center">
+          <h2 className="text-xl font-bold text-gray-800">Amazigh Nations</h2>
+          <p className="text-sm text-gray-600">Craft Community Platform</p>
         </div>
         
-        <nav className="p-4">
-          <div className="space-y-2">
-            {menuItems.map((item) => {
-              const IconComponent = item.icon;
-              const isActive = activeTab === item.id;
-              return (
-                <Button
-                  key={item.id}
-                  variant="ghost"
-                  onClick={() => handleMenuClick(item.id)}
-                  className={`w-full justify-start gap-3 ${
-                    isActive 
-                      ? 'bg-orange-50 text-orange-700 hover:bg-orange-100' 
-                      : 'hover:bg-orange-50 hover:text-orange-700'
-                  }`}
-                >
-                  <IconComponent className="h-5 w-5" />
-                  <span className="flex-1 text-left">{item.label}</span>
-                  {item.badge && (
-                    <Badge variant="secondary" className="ml-auto">
-                      {item.badge}
-                    </Badge>
-                  )}
-                </Button>
-              );
-            })}
-          </div>
-          
-          <div className="mt-8 pt-8 border-t border-gray-200">
-            <Button variant="ghost" className="w-full justify-start gap-3">
-              <Settings className="h-5 w-5" />
-              Settings
-            </Button>
-          </div>
+        <nav className="space-y-2">
+          {navigationItems.map((item) => {
+            const IconComponent = item.icon;
+            return (
+              <Button
+                key={item.id}
+                variant={activeTab === item.id ? "default" : "ghost"}
+                className={`w-full justify-start ${
+                  activeTab === item.id 
+                    ? "bg-orange-600 hover:bg-orange-700 text-white" 
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+                onClick={() => onTabChange(item.id)}
+              >
+                <IconComponent className="h-4 w-4 mr-3" />
+                {item.label}
+                {item.premium && (
+                  <Badge variant="secondary" className="ml-auto text-xs bg-orange-100 text-orange-800">
+                    Pro
+                  </Badge>
+                )}
+              </Button>
+            );
+          })}
         </nav>
+
+        <div className="pt-4 border-t">
+          <Button variant="ghost" className="w-full justify-start text-gray-600">
+            <Settings className="h-4 w-4 mr-3" />
+            Settings
+          </Button>
+        </div>
       </div>
-    </>
+    </Card>
   );
 };
