@@ -1,9 +1,11 @@
+
 import { useState } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { HomePage } from "./HomePage";
 import { NetworkPage } from "./NetworkPage";
 import { LearningPage } from "./LearningPage";
 import { EventsPage } from "./EventsPage";
+import { ProfilePage } from "./ProfilePage";
 import { ArtisanDashboard } from "@/components/dashboard/ArtisanDashboard";
 
 export const MainApp = () => {
