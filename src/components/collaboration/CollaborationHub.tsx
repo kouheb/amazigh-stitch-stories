@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,7 +14,8 @@ import {
   FileImage,
   Clock,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Calendar
 } from "lucide-react";
 
 interface CollaborationSession {
