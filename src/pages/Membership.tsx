@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MembershipPlans } from "@/components/MembershipPlans";
 import { SubscriptionManager } from "@/components/premium/SubscriptionManager";
 import { PremiumFeatureGate } from "@/components/premium/PremiumFeatureGate";
@@ -7,11 +7,38 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Crown, Star, Zap, Users, Calendar, BarChart3 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { Crown, Star, Zap, Users, Calendar, BarChart3, CheckCircle, XCircle } from "lucide-react";
 
 const Membership = () => {
-  const [currentPlan, setCurrentPlan] = useState<string>("free"); // free, artisan, master
+  const [currentPlan, setCurrentPlan] = useState<string>("free");
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const { toast } = useToast();
+
+  // Handle payment success/failure from URL params
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const success = urlParams.get('success');
+    const canceled = urlParams.get('canceled');
+    const sessionId = urlParams.get('session_id');
+
+    if (success === 'true') {
+      toast({
+        title: "Payment Successful!",
+        description: "Your membership has been upgraded successfully.",
+      });
+      // Clear URL params
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (canceled === 'true') {
+      toast({
+        title: "Payment Canceled",
+        description: "Your payment was canceled. You can try again anytime.",
+        variant: "destructive",
+      });
+      // Clear URL params
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [toast]);
 
   const handleUpgrade = () => {
     setShowUpgrade(true);
