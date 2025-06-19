@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,21 @@ import {
   Filter
 } from "lucide-react";
 
+interface ShowcaseItem {
+  id: number;
+  type: string;
+  title: string;
+  description: string;
+  thumbnail: string;
+  duration?: string;
+  views?: number;
+  likes?: number;
+  date: string;
+  status?: string;
+  client?: string;
+  organization?: string;
+}
+
 interface WorkShowcaseProps {
   isOwnProfile: boolean;
 }
@@ -26,7 +42,7 @@ export const WorkShowcase = ({ isOwnProfile }: WorkShowcaseProps) => {
   const [activeShowcaseTab, setActiveShowcaseTab] = useState("featured");
   const [isAddWorkModalOpen, setIsAddWorkModalOpen] = useState(false);
 
-  const showcaseItems = {
+  const initialShowcaseItems = {
     featured: [
       {
         id: 1,
@@ -131,6 +147,34 @@ export const WorkShowcase = ({ isOwnProfile }: WorkShowcaseProps) => {
         organization: "Ministry of Handicrafts"
       }
     ]
+  };
+
+  const [showcaseItems, setShowcaseItems] = useState(initialShowcaseItems);
+
+  const handleWorkAdded = (newWork: any) => {
+    const showcaseWork: ShowcaseItem = {
+      ...newWork,
+      views: newWork.views || 0,
+      likes: newWork.likes || 0
+    };
+
+    setShowcaseItems(prev => {
+      const newItems = { ...prev };
+      
+      // Add to featured
+      newItems.featured = [showcaseWork, ...prev.featured];
+      
+      // Add to appropriate category based on type
+      if (newWork.type === "video") {
+        newItems.videos = [showcaseWork, ...prev.videos];
+      } else if (newWork.type === "project" || newWork.type === "image") {
+        newItems.projects = [showcaseWork, ...prev.projects];
+      } else if (newWork.type === "award") {
+        newItems.achievements = [showcaseWork, ...prev.achievements];
+      }
+      
+      return newItems;
+    });
   };
 
   const renderShowcaseItem = (item: any) => (
@@ -271,6 +315,7 @@ export const WorkShowcase = ({ isOwnProfile }: WorkShowcaseProps) => {
       <AddWorkModal 
         isOpen={isAddWorkModalOpen}
         onClose={() => setIsAddWorkModalOpen(false)}
+        onWorkAdded={handleWorkAdded}
       />
     </>
   );

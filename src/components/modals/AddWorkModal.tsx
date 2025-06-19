@@ -9,18 +9,35 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Upload, X } from "lucide-react";
 
+interface WorkItem {
+  id: number;
+  title: string;
+  category: string;
+  description: string;
+  tags: string[];
+  image?: string;
+  thumbnail?: string;
+  type?: string;
+  date: string;
+  likes?: number;
+  views?: number;
+  comments?: number;
+}
+
 interface AddWorkModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onWorkAdded: (work: WorkItem) => void;
 }
 
-export const AddWorkModal = ({ isOpen, onClose }: AddWorkModalProps) => {
+export const AddWorkModal = ({ isOpen, onClose, onWorkAdded }: AddWorkModalProps) => {
   const [formData, setFormData] = useState({
     title: "",
     category: "",
     description: "",
     tags: [] as string[],
-    newTag: ""
+    newTag: "",
+    type: "project"
   });
 
   const categories = [
@@ -31,6 +48,13 @@ export const AddWorkModal = ({ isOpen, onClose }: AddWorkModalProps) => {
     "Research",
     "Traditional Crafts",
     "Contemporary Design"
+  ];
+
+  const workTypes = [
+    { value: "project", label: "Project" },
+    { value: "video", label: "Video" },
+    { value: "image", label: "Image Gallery" },
+    { value: "award", label: "Achievement/Award" }
   ];
 
   const handleAddTag = () => {
@@ -52,16 +76,38 @@ export const AddWorkModal = ({ isOpen, onClose }: AddWorkModalProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Work submitted:", formData);
-    // Here you would typically save to your backend
+    
+    if (!formData.title || !formData.category || !formData.description) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
+    const newWork: WorkItem = {
+      id: Date.now(),
+      title: formData.title,
+      category: formData.category,
+      description: formData.description,
+      tags: formData.tags,
+      type: formData.type,
+      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop", // Default placeholder
+      thumbnail: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop",
+      date: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+      likes: 0,
+      views: 0,
+      comments: 0
+    };
+
+    onWorkAdded(newWork);
     onClose();
+    
     // Reset form
     setFormData({
       title: "",
       category: "",
       description: "",
       tags: [],
-      newTag: ""
+      newTag: "",
+      type: "project"
     });
   };
 
@@ -74,7 +120,7 @@ export const AddWorkModal = ({ isOpen, onClose }: AddWorkModalProps) => {
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="title">Title</Label>
+            <Label htmlFor="title">Title *</Label>
             <Input
               id="title"
               value={formData.title}
@@ -85,7 +131,23 @@ export const AddWorkModal = ({ isOpen, onClose }: AddWorkModalProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="category">Category</Label>
+            <Label htmlFor="type">Work Type</Label>
+            <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select work type" />
+              </SelectTrigger>
+              <SelectContent>
+                {workTypes.map((type) => (
+                  <SelectItem key={type.value} value={type.value}>
+                    {type.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="category">Category *</Label>
             <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
               <SelectTrigger>
                 <SelectValue placeholder="Select a category" />
@@ -101,7 +163,7 @@ export const AddWorkModal = ({ isOpen, onClose }: AddWorkModalProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">Description *</Label>
             <Textarea
               id="description"
               value={formData.description}

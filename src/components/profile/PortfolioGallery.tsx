@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,19 @@ import {
   Plus
 } from "lucide-react";
 
+interface WorkItem {
+  id: number;
+  title: string;
+  category: string;
+  image: string;
+  likes: number;
+  views: number;
+  comments: number;
+  description: string;
+  tags: string[];
+  date: string;
+}
+
 interface PortfolioGalleryProps {
   isOwnProfile: boolean;
 }
@@ -25,7 +39,7 @@ export const PortfolioGallery = ({ isOwnProfile }: PortfolioGalleryProps) => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isAddWorkModalOpen, setIsAddWorkModalOpen] = useState(false);
 
-  const portfolioItems = [
+  const initialPortfolioItems: WorkItem[] = [
     {
       id: 1,
       title: "Traditional Kaftan Collection",
@@ -76,11 +90,21 @@ export const PortfolioGallery = ({ isOwnProfile }: PortfolioGalleryProps) => {
     }
   ];
 
-  const categories = ["all", "Fashion Design", "Jewelry Design", "Research", "Textiles"];
+  const [portfolioItems, setPortfolioItems] = useState<WorkItem[]>(initialPortfolioItems);
+
+  const categories = ["all", "Fashion Design", "Jewelry Design", "Research", "Textiles", "Traditional Crafts", "Contemporary Design"];
 
   const filteredItems = selectedCategory === "all" 
     ? portfolioItems 
     : portfolioItems.filter(item => item.category === selectedCategory);
+
+  const handleWorkAdded = (newWork: any) => {
+    const portfolioWork: WorkItem = {
+      ...newWork,
+      image: newWork.thumbnail || newWork.image
+    };
+    setPortfolioItems(prev => [portfolioWork, ...prev]);
+  };
 
   return (
     <>
@@ -241,6 +265,7 @@ export const PortfolioGallery = ({ isOwnProfile }: PortfolioGalleryProps) => {
       <AddWorkModal 
         isOpen={isAddWorkModalOpen}
         onClose={() => setIsAddWorkModalOpen(false)}
+        onWorkAdded={handleWorkAdded}
       />
     </>
   );
