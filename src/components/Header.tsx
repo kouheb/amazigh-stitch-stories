@@ -1,43 +1,86 @@
 
-import { Palette, Sparkles, Users } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Menu, X, Palette, Users, BookOpen, Calendar, MessageSquare, Crown, Shield } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const Header = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const navigation = [
+    { name: "Home", href: "/", icon: Palette },
+    { name: "Community", href: "/app", icon: Users },
+    { name: "Learning", href: "/app", icon: BookOpen },
+    { name: "Events", href: "/app", icon: Calendar },
+    { name: "Messages", href: "/app", icon: MessageSquare },
+    { name: "Membership", href: "/membership", icon: Crown },
+    { name: "Wireframe", href: "/wireframe", icon: BookOpen },
+    { name: "Admin", href: "/admin", icon: Shield },
+  ];
+
   return (
-    <header className="bg-white/80 backdrop-blur-sm border-b border-orange-200 sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg text-white">
-              <Sparkles className="h-6 w-6" />
+    <header className="bg-white shadow-lg border-b border-orange-100">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-orange-600 to-red-600 rounded-lg flex items-center justify-center">
+              <Palette className="h-6 w-6 text-white" />
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800">Amazigh Embroidery Designer</h1>
-              <p className="text-sm text-gray-600">Create beautiful patterns inspired by Berber traditions</p>
-            </div>
+            <span className="text-xl font-bold text-gray-900">Amazigh Nations</span>
           </Link>
-          
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Palette className="h-4 w-4" />
-              <span>Fashion Collection Tool</span>
-            </div>
-            
-            <Link to="/wireframe">
-              <Button variant="outline" className="border-orange-200 hover:bg-orange-50">
-                App Wireframe
-              </Button>
-            </Link>
-            
-            <Link to="/membership">
-              <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
-                <Users className="h-4 w-4 mr-2" />
-                Join Community
-              </Button>
-            </Link>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-1">
+            {navigation.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-gray-600 hover:text-orange-600 hover:bg-orange-50 transition-colors"
+                >
+                  <Icon className="h-4 w-4" />
+                  <span>{item.name}</span>
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-gray-600 hover:text-orange-600"
+            >
+              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </Button>
           </div>
         </div>
+
+        {/* Mobile Navigation */}
+        {isMenuOpen && (
+          <div className="md:hidden py-4 border-t border-gray-100">
+            <nav className="space-y-1">
+              {navigation.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className="flex items-center space-x-3 px-3 py-2 rounded-md text-gray-600 hover:text-orange-600 hover:bg-orange-50 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Icon className="h-5 w-5" />
+                    <span className="font-medium">{item.name}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+        )}
       </div>
     </header>
   );
