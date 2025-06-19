@@ -35,8 +35,8 @@ export const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
     <Card className="w-64 h-full p-4 border-r">
       <div className="space-y-6">
         <div className="text-center">
-          <h2 className="text-xl font-bold text-gray-800">Amazigh Nations</h2>
-          <p className="text-sm text-gray-600">Craft Community Platform</p>
+          <h2 className="text-xl font-bold text-gray-800">ArtNect</h2>
+          <p className="text-sm text-gray-600">Artisan Community Platform</p>
         </div>
         
         <nav className="space-y-2">

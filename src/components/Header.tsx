@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Palette, Users, BookOpen, Calendar, MessageSquare, Crown, Shield } from "lucide-react";
@@ -27,7 +26,7 @@ export const Header = () => {
             <div className="w-10 h-10 bg-gradient-to-br from-orange-600 to-red-600 rounded-lg flex items-center justify-center">
               <Palette className="h-6 w-6 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">Amazigh Nations</span>
+            <span className="text-xl font-bold text-gray-900">ArtNect</span>
           </Link>
 
           {/* Desktop Navigation */}
