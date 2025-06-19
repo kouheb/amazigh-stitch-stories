@@ -1,9 +1,9 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AddWorkModal } from "@/components/modals/AddWorkModal";
 import { 
   Play, 
   Image, 
@@ -24,6 +24,7 @@ interface WorkShowcaseProps {
 
 export const WorkShowcase = ({ isOwnProfile }: WorkShowcaseProps) => {
   const [activeShowcaseTab, setActiveShowcaseTab] = useState("featured");
+  const [isAddWorkModalOpen, setIsAddWorkModalOpen] = useState(false);
 
   const showcaseItems = {
     featured: [
@@ -215,52 +216,62 @@ export const WorkShowcase = ({ isOwnProfile }: WorkShowcaseProps) => {
   );
 
   return (
-    <Card className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Work Showcase</h2>
-          <p className="text-gray-600">Featured works, videos, projects, and achievements</p>
+    <>
+      <Card className="p-6">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">Work Showcase</h2>
+            <p className="text-gray-600">Featured works, videos, projects, and achievements</p>
+          </div>
+          {isOwnProfile && (
+            <Button 
+              className="bg-orange-600 hover:bg-orange-700"
+              onClick={() => setIsAddWorkModalOpen(true)}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Content
+            </Button>
+          )}
         </div>
-        {isOwnProfile && (
-          <Button className="bg-orange-600 hover:bg-orange-700">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Content
-          </Button>
-        )}
-      </div>
 
-      <Tabs value={activeShowcaseTab} onValueChange={setActiveShowcaseTab}>
-        <TabsList className="grid w-full grid-cols-4 mb-6">
-          <TabsTrigger value="featured">Featured</TabsTrigger>
-          <TabsTrigger value="videos">Videos</TabsTrigger>
-          <TabsTrigger value="projects">Projects</TabsTrigger>
-          <TabsTrigger value="achievements">Awards</TabsTrigger>
-        </TabsList>
+        <Tabs value={activeShowcaseTab} onValueChange={setActiveShowcaseTab}>
+          <TabsList className="grid w-full grid-cols-4 mb-6">
+            <TabsTrigger value="featured">Featured</TabsTrigger>
+            <TabsTrigger value="videos">Videos</TabsTrigger>
+            <TabsTrigger value="projects">Projects</TabsTrigger>
+            <TabsTrigger value="achievements">Awards</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="featured">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {showcaseItems.featured.map(renderShowcaseItem)}
-          </div>
-        </TabsContent>
+          <TabsContent value="featured">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {showcaseItems.featured.map(renderShowcaseItem)}
+            </div>
+          </TabsContent>
 
-        <TabsContent value="videos">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {showcaseItems.videos.map(renderShowcaseItem)}
-          </div>
-        </TabsContent>
+          <TabsContent value="videos">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {showcaseItems.videos.map(renderShowcaseItem)}
+            </div>
+          </TabsContent>
 
-        <TabsContent value="projects">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {showcaseItems.projects.map(renderShowcaseItem)}
-          </div>
-        </TabsContent>
+          <TabsContent value="projects">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {showcaseItems.projects.map(renderShowcaseItem)}
+            </div>
+          </TabsContent>
 
-        <TabsContent value="achievements">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {showcaseItems.achievements.map(renderShowcaseItem)}
-          </div>
-        </TabsContent>
-      </Tabs>
-    </Card>
+          <TabsContent value="achievements">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {showcaseItems.achievements.map(renderShowcaseItem)}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </Card>
+
+      <AddWorkModal 
+        isOpen={isAddWorkModalOpen}
+        onClose={() => setIsAddWorkModalOpen(false)}
+      />
+    </>
   );
 };

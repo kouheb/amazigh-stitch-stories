@@ -1,8 +1,8 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { AddWorkModal } from "@/components/modals/AddWorkModal";
 import { 
   Upload, 
   Heart, 
@@ -23,6 +23,7 @@ interface PortfolioGalleryProps {
 export const PortfolioGallery = ({ isOwnProfile }: PortfolioGalleryProps) => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [isAddWorkModalOpen, setIsAddWorkModalOpen] = useState(false);
 
   const portfolioItems = [
     {
@@ -82,155 +83,165 @@ export const PortfolioGallery = ({ isOwnProfile }: PortfolioGalleryProps) => {
     : portfolioItems.filter(item => item.category === selectedCategory);
 
   return (
-    <Card className="p-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Portfolio</h2>
-          <p className="text-gray-600">{portfolioItems.length} works showcasing traditional and contemporary designs</p>
-        </div>
-        
-        <div className="flex items-center gap-3">
-          {/* Category Filter */}
-          <div className="flex gap-2">
-            {categories.map((category) => (
+    <>
+      <Card className="p-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">Portfolio</h2>
+            <p className="text-gray-600">{portfolioItems.length} works showcasing traditional and contemporary designs</p>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            {/* Category Filter */}
+            <div className="flex gap-2">
+              {categories.map((category) => (
+                <Button
+                  key={category}
+                  variant={selectedCategory === category ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSelectedCategory(category)}
+                  className={selectedCategory === category ? "bg-orange-600 hover:bg-orange-700" : ""}
+                >
+                  {category === "all" ? "All" : category}
+                </Button>
+              ))}
+            </div>
+
+            {/* View Mode Toggle */}
+            <div className="flex border rounded-lg">
               <Button
-                key={category}
-                variant={selectedCategory === category ? "default" : "outline"}
+                variant={viewMode === "grid" ? "default" : "ghost"}
                 size="sm"
-                onClick={() => setSelectedCategory(category)}
-                className={selectedCategory === category ? "bg-orange-600 hover:bg-orange-700" : ""}
+                onClick={() => setViewMode("grid")}
+                className="rounded-r-none"
               >
-                {category === "all" ? "All" : category}
+                <Grid3X3 className="h-4 w-4" />
               </Button>
-            ))}
-          </div>
+              <Button
+                variant={viewMode === "list" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("list")}
+                className="rounded-l-none"
+              >
+                <List className="h-4 w-4" />
+              </Button>
+            </div>
 
-          {/* View Mode Toggle */}
-          <div className="flex border rounded-lg">
-            <Button
-              variant={viewMode === "grid" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setViewMode("grid")}
-              className="rounded-r-none"
-            >
-              <Grid3X3 className="h-4 w-4" />
-            </Button>
-            <Button
-              variant={viewMode === "list" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setViewMode("list")}
-              className="rounded-l-none"
-            >
-              <List className="h-4 w-4" />
-            </Button>
+            {isOwnProfile && (
+              <Button 
+                className="bg-orange-600 hover:bg-orange-700"
+                onClick={() => setIsAddWorkModalOpen(true)}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Work
+              </Button>
+            )}
           </div>
-
-          {isOwnProfile && (
-            <Button className="bg-orange-600 hover:bg-orange-700">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Work
-            </Button>
-          )}
         </div>
-      </div>
 
-      {/* Portfolio Grid/List */}
-      <div className={viewMode === "grid" 
-        ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" 
-        : "space-y-6"
-      }>
-        {filteredItems.map((item) => (
-          <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-            {viewMode === "grid" ? (
-              <>
-                <div className="h-48 overflow-hidden">
-                  <img 
-                    src={item.image} 
-                    alt={item.title}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <div className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <Badge variant="outline">{item.category}</Badge>
-                    <span className="text-sm text-gray-500">{item.date}</span>
+        {/* Portfolio Grid/List */}
+        <div className={viewMode === "grid" 
+          ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" 
+          : "space-y-6"
+        }>
+          {filteredItems.map((item) => (
+            <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+              {viewMode === "grid" ? (
+                <>
+                  <div className="h-48 overflow-hidden">
+                    <img 
+                      src={item.image} 
+                      alt={item.title}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                    />
                   </div>
-                  <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
-                  <p className="text-gray-600 text-sm mb-4">{item.description}</p>
-                  
-                  <div className="flex flex-wrap gap-1 mb-4">
-                    {item.tags.map((tag, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
-                      <div className="flex items-center gap-1">
-                        <Heart className="h-4 w-4" />
-                        {item.likes}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Eye className="h-4 w-4" />
-                        {item.views}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <MessageSquare className="h-4 w-4" />
-                        {item.comments}
-                      </div>
-                    </div>
-                    <Button variant="ghost" size="sm">
-                      <Share className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div className="p-4 flex gap-4">
-                <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                  <img 
-                    src={item.image} 
-                    alt={item.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
+                  <div className="p-4">
+                    <div className="flex items-center justify-between mb-2">
                       <Badge variant="outline">{item.category}</Badge>
                       <span className="text-sm text-gray-500">{item.date}</span>
                     </div>
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
-                      <div className="flex items-center gap-1">
-                        <Heart className="h-4 w-4" />
-                        {item.likes}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Eye className="h-4 w-4" />
-                        {item.views}
+                    <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
+                    <p className="text-gray-600 text-sm mb-4">{item.description}</p>
+                    
+                    <div className="flex flex-wrap gap-1 mb-4">
+                      {item.tags.map((tag, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4 text-sm text-gray-600">
+                        <div className="flex items-center gap-1">
+                          <Heart className="h-4 w-4" />
+                          {item.likes}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Eye className="h-4 w-4" />
+                          {item.views}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <MessageSquare className="h-4 w-4" />
+                          {item.comments}
+                        </div>
                       </div>
                       <Button variant="ghost" size="sm">
                         <Share className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
-                  <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
-                  <p className="text-gray-600 text-sm mb-2">{item.description}</p>
-                  <div className="flex flex-wrap gap-1">
-                    {item.tags.map((tag, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
-                        {tag}
-                      </Badge>
-                    ))}
+                </>
+              ) : (
+                <div className="p-4 flex gap-4">
+                  <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                    <img 
+                      src={item.image} 
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline">{item.category}</Badge>
+                        <span className="text-sm text-gray-500">{item.date}</span>
+                      </div>
+                      <div className="flex items-center gap-4 text-sm text-gray-600">
+                        <div className="flex items-center gap-1">
+                          <Heart className="h-4 w-4" />
+                          {item.likes}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Eye className="h-4 w-4" />
+                          {item.views}
+                        </div>
+                        <Button variant="ghost" size="sm">
+                          <Share className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
+                    <p className="text-gray-600 text-sm mb-2">{item.description}</p>
+                    <div className="flex flex-wrap gap-1">
+                      {item.tags.map((tag, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-          </Card>
-        ))}
-      </div>
-    </Card>
+              )}
+            </Card>
+          ))}
+        </div>
+      </Card>
+
+      <AddWorkModal 
+        isOpen={isAddWorkModalOpen}
+        onClose={() => setIsAddWorkModalOpen(false)}
+      />
+    </>
   );
 };
