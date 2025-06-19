@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +14,7 @@ export const EnhancedWireframeHeader = () => {
         </Badge>
         
         <h1 className="text-5xl font-bold text-gray-800 mb-4 bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-          Amazigh Nations App
+          ArtNect App
         </h1>
         
         <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">

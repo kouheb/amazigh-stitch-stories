@@ -51,7 +51,7 @@ export const MainNavbar = ({ isAuthenticated = false, onMenuToggle }: MainNavbar
                 <span className="text-white font-bold text-sm">A</span>
               </div>
               <span className="font-bold text-xl text-gray-800 hidden sm:block">
-                Amazigh Nations
+                ArtNect
               </span>
             </div>
           </div>
