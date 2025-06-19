@@ -1,7 +1,7 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Logo } from "@/components/ui/Logo";
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -46,14 +46,7 @@ export const MainNavbar = ({ isAuthenticated = false, onMenuToggle }: MainNavbar
               </Button>
             )}
             
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">F</span>
-              </div>
-              <span className="font-bold text-xl text-gray-800 hidden sm:block">
-                Fil et Toile Studio
-              </span>
-            </div>
+            <Logo size="md" showText={true} />
           </div>
 
           {/* Center Section - Search */}

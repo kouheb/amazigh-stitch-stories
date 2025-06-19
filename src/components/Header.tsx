@@ -1,6 +1,6 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/ui/Logo";
 import { Menu, X, Palette, Users, BookOpen, Calendar, MessageSquare, Crown, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -23,11 +23,8 @@ export const Header = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-orange-600 to-red-600 rounded-lg flex items-center justify-center">
-              <Palette className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-xl font-bold text-gray-900">Fil et Toile Studio</span>
+          <Link to="/" className="flex items-center">
+            <Logo size="md" showText={true} />
           </Link>
 
           {/* Desktop Navigation */}

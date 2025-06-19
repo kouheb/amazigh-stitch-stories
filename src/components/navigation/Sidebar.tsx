@@ -1,7 +1,7 @@
-
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Logo } from "@/components/ui/Logo";
 import { 
   Home, 
   Users, 
@@ -35,8 +35,8 @@ export const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
     <Card className="w-64 h-full p-4 border-r">
       <div className="space-y-6">
         <div className="text-center">
-          <h2 className="text-xl font-bold text-gray-800">Fil et Toile Studio</h2>
-          <p className="text-sm text-gray-600">Thread & Canvas Community</p>
+          <Logo size="lg" showText={true} className="justify-center" />
+          <p className="text-sm text-gray-600 mt-2">Thread & Canvas Community</p>
         </div>
         
         <nav className="space-y-2">
