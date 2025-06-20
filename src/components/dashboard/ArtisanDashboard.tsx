@@ -9,8 +9,9 @@ import {
   MessageSquare, 
   TrendingUp, 
   Star,
-  Plus,
-  Eye
+  Eye,
+  UserCog,
+  Crown
 } from "lucide-react";
 
 export const ArtisanDashboard = () => {
@@ -27,6 +28,16 @@ export const ArtisanDashboard = () => {
     { title: "Beaded Evening Gown", status: "Completed", rating: 4.8 }
   ];
 
+  const handleCreateProfile = () => {
+    console.log("Navigate to profile creation");
+    // This would navigate to profile creation flow
+  };
+
+  const handleChooseMembership = () => {
+    console.log("Navigate to membership selection");
+    // This would navigate to membership page
+  };
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -34,10 +45,22 @@ export const ArtisanDashboard = () => {
           <h1 className="text-2xl font-bold text-gray-800">Welcome back, Sarah!</h1>
           <p className="text-gray-600">Here's what's happening with your artisan profile</p>
         </div>
-        <Button className="bg-orange-600 hover:bg-orange-700">
-          <Plus className="h-4 w-4 mr-2" />
-          Add New Work
-        </Button>
+        <div className="flex gap-3">
+          <Button 
+            onClick={handleCreateProfile}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            <UserCog className="h-4 w-4 mr-2" />
+            Create Profile
+          </Button>
+          <Button 
+            onClick={handleChooseMembership}
+            className="bg-orange-600 hover:bg-orange-700"
+          >
+            <Crown className="h-4 w-4 mr-2" />
+            Choose Membership
+          </Button>
+        </div>
       </div>
 
       {/* Stats Grid */}

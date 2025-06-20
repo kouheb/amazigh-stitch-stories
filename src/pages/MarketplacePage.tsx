@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,16 +12,19 @@ import {
   Clock,
   DollarSign,
   Heart,
-  MessageCircle
+  MessageCircle,
+  Plus
 } from "lucide-react";
 import { ServiceCard } from "@/components/marketplace/ServiceCard";
 import { BookingModal } from "@/components/marketplace/BookingModal";
+import { AddWorkModal } from "@/components/modals/AddWorkModal";
 
 export const MarketplacePage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedService, setSelectedService] = useState<any>(null);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [isAddWorkModalOpen, setIsAddWorkModalOpen] = useState(false);
 
   const categories = [
     { id: "all", name: "All Services", count: 127 },
@@ -107,13 +109,29 @@ export const MarketplacePage = () => {
     setIsBookingModalOpen(true);
   };
 
+  const handleWorkAdded = (work: any) => {
+    console.log("New work added:", work);
+    // You can add logic here to update the services list or refresh data
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Services Marketplace</h1>
-          <p className="text-gray-600">Discover and book authentic artisan services</p>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">Services Marketplace</h1>
+              <p className="text-gray-600">Discover and book authentic artisan services</p>
+            </div>
+            <Button 
+              onClick={() => setIsAddWorkModalOpen(true)}
+              className="bg-orange-600 hover:bg-orange-700"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add New Work
+            </Button>
+          </div>
         </div>
 
         {/* Search and Filters */}
@@ -196,6 +214,13 @@ export const MarketplacePage = () => {
           service={selectedService}
         />
       )}
+
+      {/* Add Work Modal */}
+      <AddWorkModal
+        isOpen={isAddWorkModalOpen}
+        onClose={() => setIsAddWorkModalOpen(false)}
+        onWorkAdded={handleWorkAdded}
+      />
     </div>
   );
 };
