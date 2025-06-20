@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { HomePage } from "./HomePage";
 import { NetworkPage } from "./NetworkPage";
@@ -13,7 +14,18 @@ import Membership from "./Membership";
 export const MainApp = () => {
   const [activeTab, setActiveTab] = useState("home");
 
+  const handleTabChange = (tab: string) => {
+    console.log(`Tab changed to: ${tab}`);
+    setActiveTab(tab);
+  };
+
+  useEffect(() => {
+    console.log(`Current active tab: ${activeTab}`);
+  }, [activeTab]);
+
   const renderContent = () => {
+    console.log(`Rendering content for tab: ${activeTab}`);
+    
     switch (activeTab) {
       case "home":
         return <HomePage />;
@@ -34,13 +46,16 @@ export const MainApp = () => {
       case "membership":
         return <Membership />;
       default:
+        console.log(`Unknown tab: ${activeTab}, defaulting to home`);
         return <HomePage />;
     }
   };
 
   return (
-    <AppLayout activeTab={activeTab} onTabChange={setActiveTab}>
-      {renderContent()}
+    <AppLayout activeTab={activeTab} onTabChange={handleTabChange}>
+      <div className="min-h-full">
+        {renderContent()}
+      </div>
     </AppLayout>
   );
 };

@@ -13,6 +13,20 @@ interface AppLayoutProps {
 export const AppLayout = ({ children, activeTab, onTabChange }: AppLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const handleTabChange = (tab: string) => {
+    console.log(`AppLayout handling tab change: ${tab}`);
+    onTabChange(tab);
+    // Close sidebar on mobile after navigation
+    if (window.innerWidth < 1024) {
+      setSidebarOpen(false);
+    }
+  };
+
+  const handleMenuToggle = () => {
+    console.log("Menu toggle clicked");
+    setSidebarOpen(!sidebarOpen);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex w-full">
       {/* Mobile sidebar overlay */}
@@ -32,24 +46,23 @@ export const AppLayout = ({ children, activeTab, onTabChange }: AppLayoutProps) 
       `}>
         <Sidebar 
           activeTab={activeTab}
-          onTabChange={(tab) => {
-            onTabChange(tab);
-            setSidebarOpen(false); // Close sidebar on mobile after selection
-          }}
+          onTabChange={handleTabChange}
         />
       </div>
       
       <div className="flex-1 flex flex-col lg:ml-0">
         <MainNavbar 
           isAuthenticated={true} 
-          onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
+          onMenuToggle={handleMenuToggle}
         />
         
-        <main className="flex-1 overflow-auto pb-16 md:pb-0">
-          {children}
+        <main className="flex-1 overflow-auto pb-16 md:pb-0 px-4 py-4">
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
         </main>
         
-        <BottomNavigation activeTab={activeTab} onTabChange={onTabChange} />
+        <BottomNavigation activeTab={activeTab} onTabChange={handleTabChange} />
       </div>
     </div>
   );

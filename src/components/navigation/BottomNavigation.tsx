@@ -22,6 +22,11 @@ export const BottomNavigation = ({ activeTab, onTabChange }: BottomNavigationPro
     { id: "profile", label: "Profile", icon: User }
   ];
 
+  const handleTabClick = (tabId: string) => {
+    console.log(`Bottom nav clicked: ${tabId}`);
+    onTabChange(tabId);
+  };
+
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 z-50 md:hidden">
       <div className="flex items-center justify-around">
@@ -33,13 +38,13 @@ export const BottomNavigation = ({ activeTab, onTabChange }: BottomNavigationPro
             <Button
               key={tab.id}
               variant="ghost"
-              onClick={() => onTabChange(tab.id)}
-              className={`flex flex-col items-center gap-1 h-auto py-2 px-3 ${
-                isActive ? 'text-orange-600' : 'text-gray-600'
+              onClick={() => handleTabClick(tab.id)}
+              className={`flex flex-col items-center gap-1 h-auto py-2 px-3 transition-colors ${
+                isActive ? 'text-orange-600 bg-orange-50' : 'text-gray-600 hover:text-orange-500 hover:bg-orange-50'
               }`}
             >
               <IconComponent className={`h-5 w-5 ${isActive ? 'text-orange-600' : 'text-gray-600'}`} />
-              <span className="text-xs">{tab.label}</span>
+              <span className="text-xs font-medium">{tab.label}</span>
             </Button>
           );
         })}
