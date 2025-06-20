@@ -17,6 +17,7 @@ import {
   AlertCircle,
   Calendar
 } from "lucide-react";
+import { toast } from "sonner";
 
 interface CollaborationSession {
   id: string;
@@ -124,6 +125,53 @@ export const CollaborationHub = () => {
     setSessions(mockSessions);
   }, []);
 
+  const handleStartSession = () => {
+    console.log("Starting new collaboration session");
+    
+    // Create a new session
+    const newSession: CollaborationSession = {
+      id: Date.now().toString(),
+      title: "New Collaboration Session",
+      type: "design_review",
+      participants: [
+        {
+          id: "1",
+          name: "You",
+          avatar: "/api/placeholder/32/32",
+          role: "owner",
+          status: "online"
+        }
+      ],
+      status: "active",
+      startTime: "Now",
+      duration: "Open"
+    };
+
+    setSessions(prev => [newSession, ...prev]);
+    setActiveTab('active');
+    toast.success("New collaboration session started!");
+  };
+
+  const handleJoinSession = (sessionId: string) => {
+    console.log(`Joining session: ${sessionId}`);
+    toast.success("Joined collaboration session!");
+  };
+
+  const handleRemindMe = (sessionId: string) => {
+    console.log(`Setting reminder for session: ${sessionId}`);
+    toast.success("Reminder set for scheduled session!");
+  };
+
+  const handleOpenChat = (sessionId: string) => {
+    console.log(`Opening chat for session: ${sessionId}`);
+    toast.info("Opening session chat...");
+  };
+
+  const handleShareSession = (sessionId: string) => {
+    console.log(`Sharing session: ${sessionId}`);
+    toast.success("Session link copied to clipboard!");
+  };
+
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'design_review':
@@ -185,7 +233,11 @@ export const CollaborationHub = () => {
           <Users className="h-5 w-5 text-orange-600" />
           <h3 className="font-semibold">Collaboration Hub</h3>
         </div>
-        <Button size="sm" className="bg-orange-600 hover:bg-orange-700">
+        <Button 
+          size="sm" 
+          className="bg-orange-600 hover:bg-orange-700"
+          onClick={handleStartSession}
+        >
           <Video className="h-4 w-4 mr-2" />
           Start Session
         </Button>
@@ -276,22 +328,38 @@ export const CollaborationHub = () => {
                 {/* Actions */}
                 <div className="flex gap-2">
                   {session.status === 'active' && (
-                    <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                    <Button 
+                      size="sm" 
+                      className="bg-green-600 hover:bg-green-700"
+                      onClick={() => handleJoinSession(session.id)}
+                    >
                       <Video className="h-3 w-3 mr-1" />
                       Join
                     </Button>
                   )}
                   {session.status === 'scheduled' && (
-                    <Button size="sm" variant="outline">
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handleRemindMe(session.id)}
+                    >
                       <Calendar className="h-3 w-3 mr-1" />
                       Remind Me
                     </Button>
                   )}
-                  <Button size="sm" variant="ghost">
+                  <Button 
+                    size="sm" 
+                    variant="ghost"
+                    onClick={() => handleOpenChat(session.id)}
+                  >
                     <MessageSquare className="h-3 w-3 mr-1" />
                     Chat
                   </Button>
-                  <Button size="sm" variant="ghost">
+                  <Button 
+                    size="sm" 
+                    variant="ghost"
+                    onClick={() => handleShareSession(session.id)}
+                  >
                     <Share2 className="h-3 w-3 mr-1" />
                     Share
                   </Button>
