@@ -1,11 +1,12 @@
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { ImageUpload } from "./ImageUpload";
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -16,16 +17,21 @@ interface EditProfileModalProps {
     location: string;
     website: string;
     bio: string;
+    avatar?: string;
+    coverImage?: string;
   };
+  onSave?: (updatedData: any) => void;
 }
 
-export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileModalProps) => {
+export const EditProfileModal = ({ isOpen, onClose, profileData, onSave }: EditProfileModalProps) => {
   const [formData, setFormData] = useState({
     name: profileData.name,
     title: profileData.title,
     location: profileData.location,
     website: profileData.website,
     bio: profileData.bio,
+    avatar: profileData.avatar || "",
+    coverImage: profileData.coverImage || "",
   });
 
   const handleInputChange = (field: string, value: string) => {
@@ -35,8 +41,18 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
     }));
   };
 
+  const handleImageChange = (field: string, imageUrl: string | null) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: imageUrl || ""
+    }));
+  };
+
   const handleSave = () => {
     console.log("Saving profile data:", formData);
+    if (onSave) {
+      onSave(formData);
+    }
     toast.success("Profile updated successfully!");
     onClose();
   };
@@ -48,6 +64,8 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
       location: profileData.location,
       website: profileData.website,
       bio: profileData.bio,
+      avatar: profileData.avatar || "",
+      coverImage: profileData.coverImage || "",
     });
     onClose();
   };
@@ -57,9 +75,42 @@ export const EditProfileModal = ({ isOpen, onClose, profileData }: EditProfileMo
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Profile</DialogTitle>
+          <DialogDescription>
+            Update your profile information and images
+          </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-6 py-4">
+          {/* Profile Images Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Profile Images</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <Label>Profile Picture</Label>
+                <div className="mt-2">
+                  <ImageUpload 
+                    currentImage={formData.avatar}
+                    onImageChange={(imageUrl) => handleImageChange('avatar', imageUrl)}
+                    size="md"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <Label>Cover Image</Label>
+                <div className="mt-2">
+                  <ImageUpload 
+                    currentImage={formData.coverImage}
+                    onImageChange={(imageUrl) => handleImageChange('coverImage', imageUrl)}
+                    size="lg"
+                    className="w-full"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Basic Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="name">Full Name</Label>

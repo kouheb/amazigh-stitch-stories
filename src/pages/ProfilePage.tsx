@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,7 +28,7 @@ export const ProfilePage = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // Mock profile data
-  const profileData = {
+  const [profileData, setProfileData] = useState({
     name: "Aicha Benali",
     title: "Traditional Zardozi Embroidery Artist & Fashion Designer",
     location: "Fes, Morocco",
@@ -47,7 +46,7 @@ export const ProfilePage = () => {
     verified: true,
     rating: 4.9,
     reviewCount: 127
-  };
+  });
 
   const handleEditProfile = () => {
     console.log("Edit Profile clicked");
@@ -56,6 +55,14 @@ export const ProfilePage = () => {
 
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false);
+  };
+
+  const handleSaveProfile = (updatedData: any) => {
+    console.log("Saving updated profile data:", updatedData);
+    setProfileData(prev => ({
+      ...prev,
+      ...updatedData
+    }));
   };
 
   return (
@@ -213,6 +220,7 @@ export const ProfilePage = () => {
         isOpen={isEditModalOpen}
         onClose={handleCloseEditModal}
         profileData={profileData}
+        onSave={handleSaveProfile}
       />
     </div>
   );
