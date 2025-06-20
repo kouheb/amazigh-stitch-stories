@@ -1,3 +1,4 @@
+
 import { cn } from "@/lib/utils";
 import { MobileLogo } from "./MobileLogo";
 
@@ -51,7 +52,7 @@ export const Logo = ({
       {/* Logo Image */}
       <div className={cn("relative rounded-lg overflow-hidden", sizeClasses[size])}>
         <img 
-          src="/lovable-uploads/8fba28bd-b27f-480b-9e50-31474582a243.png"
+          src="/lovable-uploads/c63d0b94-bbae-456c-882d-c8e15f02557d.png"
           alt="Fil et Toile"
           className="w-full h-full object-contain"
         />
