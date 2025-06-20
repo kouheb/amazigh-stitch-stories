@@ -61,15 +61,15 @@ export const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
                 variant={isActive ? "default" : "ghost"}
                 className={`w-full justify-start transition-all duration-200 ${
                   isActive 
-                    ? "bg-orange-600 hover:bg-orange-700 text-white shadow-md" 
-                    : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                    ? "bg-black hover:bg-gray-800 text-white shadow-md" 
+                    : "text-gray-700 hover:bg-gray-100 hover:text-black"
                 }`}
                 onClick={() => handleNavigationClick(item.id)}
               >
                 <IconComponent className="h-4 w-4 mr-3" />
                 {item.label}
                 {item.premium && (
-                  <Badge variant="secondary" className="ml-auto text-xs bg-orange-100 text-orange-800">
+                  <Badge variant="secondary" className="ml-auto text-xs bg-gray-200 text-gray-800">
                     Pro
                   </Badge>
                 )}
@@ -81,7 +81,7 @@ export const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
         <div className="pt-4 border-t">
           <Button 
             variant="ghost" 
-            className="w-full justify-start text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+            className="w-full justify-start text-gray-600 hover:bg-gray-100 hover:text-black"
             onClick={handleSettingsClick}
           >
             <Settings className="h-4 w-4 mr-3" />

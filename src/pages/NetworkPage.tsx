@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -83,7 +82,7 @@ export const NetworkPage = () => {
       {/* Header */}
       <div className="flex flex-col gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Discover Artisans</h1>
+          <h1 className="text-3xl font-bold text-black">Discover Artisans</h1>
           <p className="text-gray-600 mt-1">Connect with talented craftspeople from around the world</p>
         </div>
 
@@ -95,16 +94,16 @@ export const NetworkPage = () => {
               placeholder="Search artisans, skills, or locations..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 border-orange-300 focus:border-orange-500 focus:ring-orange-500"
+              className="pl-10 border-gray-400 focus:border-black focus:ring-gray-500"
             />
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="border-gray-300 text-gray-600 hover:bg-gray-100">
+            <Button variant="outline" size="sm" className="border-gray-400 text-gray-600 hover:bg-gray-100">
               <Filter className="h-4 w-4 mr-2" />
               Filters
             </Button>
             <select 
-              className="px-3 py-2 border border-orange-300 rounded-md text-sm focus:border-orange-500 focus:ring-orange-500"
+              className="px-3 py-2 border border-gray-400 rounded-md text-sm focus:border-black focus:ring-gray-500"
               value={selectedFilter}
               onChange={(e) => setSelectedFilter(e.target.value)}
             >
@@ -122,7 +121,7 @@ export const NetworkPage = () => {
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-600">{artisans.length} artisans found</p>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="border-gray-300 text-gray-600 hover:bg-gray-100">Grid</Button>
+          <Button variant="outline" size="sm" className="border-gray-400 text-gray-600 hover:bg-gray-100">Grid</Button>
           <Button variant="ghost" size="sm" className="text-gray-600 hover:bg-gray-100">List</Button>
         </div>
       </div>
@@ -130,19 +129,19 @@ export const NetworkPage = () => {
       {/* Artisans Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {artisans.map((artisan) => (
-          <Card key={artisan.id} className="p-6 hover:shadow-lg transition-shadow cursor-pointer border-orange-200 bg-white">
+          <Card key={artisan.id} className="p-6 hover:shadow-lg transition-shadow cursor-pointer border-gray-300 bg-white">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-orange-500 rounded-full flex items-center justify-center text-white font-medium">
+                  <div className="w-12 h-12 bg-gradient-to-r from-gray-600 to-black rounded-full flex items-center justify-center text-white font-medium">
                     {artisan.image}
                   </div>
                   {artisan.isOnline && (
-                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-gray-500 border-2 border-white rounded-full"></div>
                   )}
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-800">{artisan.name}</h3>
+                  <h3 className="font-semibold text-black">{artisan.name}</h3>
                   <p className="text-sm text-gray-600">{artisan.skill}</p>
                 </div>
               </div>
@@ -156,7 +155,7 @@ export const NetworkPage = () => {
 
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1">
-                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  <Star className="h-4 w-4 fill-gray-400 text-gray-400" />
                   <span className="font-medium">{artisan.rating}</span>
                   <span className="text-sm text-gray-600">({artisan.reviews})</span>
                 </div>
@@ -166,22 +165,22 @@ export const NetworkPage = () => {
 
               <div className="flex flex-wrap gap-1">
                 {artisan.specialties.map((specialty, index) => (
-                  <Badge key={index} variant="secondary" className="text-xs bg-orange-100 text-orange-700">
+                  <Badge key={index} variant="secondary" className="text-xs bg-gray-200 text-gray-800">
                     {specialty}
                   </Badge>
                 ))}
               </div>
 
               <div className="flex gap-2 pt-4">
-                <Button size="sm" className="flex-1 bg-orange-500 hover:bg-gray-600 text-white">
+                <Button size="sm" className="flex-1 bg-black hover:bg-gray-800 text-white">
                   <Users className="h-4 w-4 mr-1" />
                   Connect
                 </Button>
-                <Button size="sm" variant="outline" className="border-gray-300 text-gray-600 hover:bg-gray-100">
+                <Button size="sm" variant="outline" className="border-gray-400 text-gray-600 hover:bg-gray-100">
                   <MessageCircle className="h-4 w-4 mr-1" />
                   Message
                 </Button>
-                <Button size="sm" variant="outline" className="border-gray-300 text-gray-600 hover:bg-gray-100">
+                <Button size="sm" variant="outline" className="border-gray-400 text-gray-600 hover:bg-gray-100">
                   <Eye className="h-4 w-4" />
                 </Button>
               </div>

@@ -34,13 +34,13 @@ export const MobileLogo = ({
     return (
       <div className={cn("flex flex-col items-center", className)}>
         <span 
-          className="font-bold text-orange-600 leading-tight"
+          className="font-bold text-black leading-tight"
           style={{ fontSize: textSize * 3 }}
         >
           Fil et Toile
         </span>
         <span 
-          className="text-orange-500 leading-tight font-medium"
+          className="text-gray-600 leading-tight font-medium"
           style={{ fontSize: textSize * 2 }}
         >
           Studio
