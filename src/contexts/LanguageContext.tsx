@@ -238,12 +238,25 @@ const translations = {
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguage] = useState<Language>('en');
 
-  const t = (key: string): string => {
-    return translations[language][key as keyof typeof translations['en']] || key;
+  const handleLanguageChange = (lang: Language) => {
+    console.log(`Language changing from ${language} to ${lang}`);
+    setLanguage(lang);
+    console.log(`Language changed to: ${lang}`);
   };
 
+  const t = (key: string): string => {
+    const translation = translations[language][key as keyof typeof translations['en']];
+    if (!translation) {
+      console.warn(`Missing translation for key: ${key} in language: ${language}`);
+      return key;
+    }
+    return translation;
+  };
+
+  console.log(`Current language: ${language}`);
+
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage: handleLanguageChange, t }}>
       <div className={language === 'ar' ? 'rtl' : 'ltr'} dir={language === 'ar' ? 'rtl' : 'ltr'}>
         {children}
       </div>

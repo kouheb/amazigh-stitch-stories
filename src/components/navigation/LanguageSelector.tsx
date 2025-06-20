@@ -20,6 +20,11 @@ export const LanguageSelector = () => {
 
   const currentLanguage = languages.find(lang => lang.code === language);
 
+  const handleLanguageSelect = (langCode: string) => {
+    console.log(`Language selector clicked: ${langCode}`);
+    setLanguage(langCode as 'en' | 'ar' | 'fr');
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -33,8 +38,8 @@ export const LanguageSelector = () => {
         {languages.map((lang) => (
           <DropdownMenuItem
             key={lang.code}
-            onClick={() => setLanguage(lang.code as 'en' | 'ar' | 'fr')}
-            className={`flex items-center gap-3 ${language === lang.code ? 'bg-orange-50' : ''}`}
+            onClick={() => handleLanguageSelect(lang.code)}
+            className={`flex items-center gap-3 cursor-pointer ${language === lang.code ? 'bg-orange-50' : ''}`}
           >
             <span className="text-lg">{lang.flag}</span>
             <span>{lang.name}</span>
