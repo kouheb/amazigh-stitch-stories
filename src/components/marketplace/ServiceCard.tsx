@@ -52,12 +52,6 @@ export const ServiceCard = ({ service, onBook, onMessage, onFavorite }: ServiceC
           />
         </div>
         
-        {service.featured && (
-          <Badge className="absolute top-3 left-3 bg-black text-white hover:bg-gray-800">
-            Featured
-          </Badge>
-        )}
-        
         <Button
           variant="ghost"
           size="sm"
