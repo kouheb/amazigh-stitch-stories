@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -136,7 +137,7 @@ export const HomePage = () => {
               alt="Amazigh crafts background"
               className="w-full h-full object-cover opacity-20"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-orange-600/80 to-red-600/80"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-gray-800/80 to-black/80"></div>
           </div>
           <div className="relative p-8 text-white">
             <div className="flex items-center justify-between">
@@ -144,7 +145,7 @@ export const HomePage = () => {
                 <h1 className="text-3xl font-bold mb-2">
                   Welcome back, Sarah! 👋
                 </h1>
-                <p className="text-orange-100">
+                <p className="text-gray-200">
                   Continue your creative journey with personalized recommendations
                 </p>
               </div>
@@ -152,7 +153,7 @@ export const HomePage = () => {
                 variant="secondary" 
                 size="sm"
                 onClick={() => setShowNotifications(true)}
-                className="relative bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border-white/30"
+                className="relative bg-white/20 backdrop-blur-sm hover:bg-gray-300 text-white border-white/30 hover:text-black"
               >
                 <Bell className="h-4 w-4 mr-2" />
                 Notifications
@@ -166,65 +167,65 @@ export const HomePage = () => {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="p-4 hover:shadow-lg transition-shadow">
+          <Card className="p-4 hover:shadow-lg transition-shadow border-gray-300">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Users className="h-5 w-5 text-blue-600" />
+              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                <Users className="h-5 w-5 text-black" />
               </div>
               <div>
                 <p className="text-2xl font-bold">1,247</p>
                 <p className="text-sm text-gray-600">Network</p>
               </div>
             </div>
-            <div className="flex items-center gap-1 mt-2 text-green-600">
+            <div className="flex items-center gap-1 mt-2 text-gray-600">
               <TrendingUp className="h-3 w-3" />
               <span className="text-xs">+12% this week</span>
             </div>
           </Card>
 
-          <Card className="p-4 hover:shadow-lg transition-shadow">
+          <Card className="p-4 hover:shadow-lg transition-shadow border-gray-300">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <BookOpen className="h-5 w-5 text-green-600" />
+              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                <BookOpen className="h-5 w-5 text-black" />
               </div>
               <div>
                 <p className="text-2xl font-bold">23</p>
                 <p className="text-sm text-gray-600">Courses</p>
               </div>
             </div>
-            <div className="flex items-center gap-1 mt-2 text-green-600">
+            <div className="flex items-center gap-1 mt-2 text-gray-600">
               <TrendingUp className="h-3 w-3" />
               <span className="text-xs">3 in progress</span>
             </div>
           </Card>
 
-          <Card className="p-4 hover:shadow-lg transition-shadow">
+          <Card className="p-4 hover:shadow-lg transition-shadow border-gray-300">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Calendar className="h-5 w-5 text-purple-600" />
+              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                <Calendar className="h-5 w-5 text-black" />
               </div>
               <div>
                 <p className="text-2xl font-bold">8</p>
                 <p className="text-sm text-gray-600">Events</p>
               </div>
             </div>
-            <div className="flex items-center gap-1 mt-2 text-orange-600">
+            <div className="flex items-center gap-1 mt-2 text-gray-600">
               <Clock className="h-3 w-3" />
               <span className="text-xs">2 upcoming</span>
             </div>
           </Card>
 
-          <Card className="p-4 hover:shadow-lg transition-shadow">
+          <Card className="p-4 hover:shadow-lg transition-shadow border-gray-300">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                <MessageSquare className="h-5 w-5 text-orange-600" />
+              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                <MessageSquare className="h-5 w-5 text-black" />
               </div>
               <div>
                 <p className="text-2xl font-bold">156</p>
                 <p className="text-sm text-gray-600">Messages</p>
               </div>
             </div>
-            <div className="flex items-center gap-1 mt-2 text-blue-600">
+            <div className="flex items-center gap-1 mt-2 text-gray-600">
               <Bell className="h-3 w-3" />
               <span className="text-xs">5 unread</span>
             </div>
@@ -236,13 +237,13 @@ export const HomePage = () => {
           {/* Left Column */}
           <div className="lg:col-span-2 space-y-8">
             {/* Featured Artwork */}
-            <Card className="p-6">
+            <Card className="p-6 border-gray-300">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="font-semibold flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-orange-600" />
+                  <Sparkles className="h-5 w-5 text-black" />
                   Featured Artwork
                 </h3>
-                <Button variant="outline" size="sm">Explore All</Button>
+                <Button variant="outline" size="sm" className="border-gray-400 text-gray-600 hover:bg-gray-100 hover:text-black">Explore All</Button>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -276,10 +277,10 @@ export const HomePage = () => {
             </Card>
 
             {/* Recent Activity Feed */}
-            <Card className="p-6">
+            <Card className="p-6 border-gray-300">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="font-semibold">Recent Activity</h3>
-                <Button variant="ghost" size="sm">View All</Button>
+                <Button variant="ghost" size="sm" className="text-gray-600 hover:bg-gray-100 hover:text-black">View All</Button>
               </div>
               
               <div className="space-y-6">
@@ -308,7 +309,7 @@ export const HomePage = () => {
                       )}
                       
                       {activity.badge && (
-                        <Badge className="mb-2 bg-green-100 text-green-800">
+                        <Badge className="mb-2 bg-gray-100 text-gray-800 border-gray-300">
                           <Star className="h-3 w-3 mr-1" />
                           {activity.badge}
                         </Badge>
@@ -316,15 +317,15 @@ export const HomePage = () => {
                       
                       <div className="flex items-center gap-4 text-sm text-gray-500">
                         <span>{activity.time}</span>
-                        <Button variant="ghost" size="sm" className="h-auto p-1 hover:text-red-600">
+                        <Button variant="ghost" size="sm" className="h-auto p-1 hover:text-gray-700 hover:bg-gray-100">
                           <Heart className="h-3 w-3 mr-1" />
                           {activity.likes}
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-auto p-1 hover:text-blue-600">
+                        <Button variant="ghost" size="sm" className="h-auto p-1 hover:text-gray-700 hover:bg-gray-100">
                           <MessageSquare className="h-3 w-3 mr-1" />
                           {activity.comments}
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-auto p-1 hover:text-green-600">
+                        <Button variant="ghost" size="sm" className="h-auto p-1 hover:text-gray-700 hover:bg-gray-100">
                           <Share2 className="h-3 w-3" />
                         </Button>
                       </div>
@@ -344,12 +345,12 @@ export const HomePage = () => {
             <RecommendationEngine />
 
             {/* Quick Actions */}
-            <Card className="p-6">
+            <Card className="p-6 border-gray-300">
               <h3 className="font-semibold mb-4">Quick Actions</h3>
               <div className="space-y-3">
                 <Button 
                   variant="outline" 
-                  className="w-full justify-start hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200"
+                  className="w-full justify-start hover:bg-gray-100 hover:text-black hover:border-gray-400 border-gray-300"
                   onClick={handleCreateWork}
                 >
                   <Plus className="h-4 w-4 mr-2" />
@@ -357,7 +358,7 @@ export const HomePage = () => {
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="w-full justify-start hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200"
+                  className="w-full justify-start hover:bg-gray-100 hover:text-black hover:border-gray-400 border-gray-300"
                   onClick={handleStartLiveSession}
                 >
                   <Video className="h-4 w-4 mr-2" />
@@ -365,7 +366,7 @@ export const HomePage = () => {
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="w-full justify-start hover:bg-green-50 hover:text-green-600 hover:border-green-200"
+                  className="w-full justify-start hover:bg-gray-100 hover:text-black hover:border-gray-400 border-gray-300"
                   onClick={handleBrowseCourses}
                 >
                   <BookOpen className="h-4 w-4 mr-2" />
@@ -373,7 +374,7 @@ export const HomePage = () => {
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="w-full justify-start hover:bg-purple-50 hover:text-purple-600 hover:border-purple-200"
+                  className="w-full justify-start hover:bg-gray-100 hover:text-black hover:border-gray-400 border-gray-300"
                   onClick={handleJoinEvents}
                 >
                   <Calendar className="h-4 w-4 mr-2" />
@@ -383,7 +384,7 @@ export const HomePage = () => {
             </Card>
 
             {/* Trending Topics */}
-            <Card className="p-6">
+            <Card className="p-6 border-gray-300">
               <h3 className="font-semibold mb-4">Trending Now</h3>
               <div className="space-y-3">
                 {[
@@ -395,14 +396,14 @@ export const HomePage = () => {
                 ].map((trend) => (
                   <div key={trend.tag} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 cursor-pointer">
                     <div>
-                      <span className="text-sm font-medium text-orange-600 hover:underline">
+                      <span className="text-sm font-medium text-black hover:underline">
                         {trend.tag}
                       </span>
                       <p className="text-xs text-gray-500">{trend.posts} posts</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="text-xs">{trend.trend}</Badge>
-                      <TrendingUp className="h-3 w-3 text-green-600" />
+                      <Badge variant="secondary" className="text-xs bg-gray-200 text-gray-800">{trend.trend}</Badge>
+                      <TrendingUp className="h-3 w-3 text-gray-600" />
                     </div>
                   </div>
                 ))}
