@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/ui/Logo";
@@ -50,7 +51,7 @@ export const Header = () => {
               variant="ghost"
               size="sm"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-600 hover:text-orange-600"
+              className="text-gray-600 hover:text-orange-600 hover:bg-orange-50"
             >
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
@@ -59,7 +60,7 @@ export const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-100">
+          <div className="md:hidden py-4 border-t border-orange-100">
             <nav className="space-y-1">
               {navigation.map((item) => {
                 const Icon = item.icon;

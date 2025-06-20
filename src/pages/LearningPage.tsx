@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -95,13 +94,11 @@ export const LearningPage = () => {
 
   const handleFeaturedEnroll = () => {
     console.log("Enrolling in featured course: Traditional Amazigh Jewelry Making");
-    // Here you would typically navigate to a payment/enrollment page
     alert("Redirecting to enrollment page for Traditional Amazigh Jewelry Making - $249");
   };
 
   const handleFeaturedPreview = () => {
     console.log("Previewing featured course");
-    // Here you would typically open a modal or navigate to preview page
     alert("Opening course preview for Traditional Amazigh Jewelry Making");
   };
 
@@ -131,10 +128,10 @@ export const LearningPage = () => {
             placeholder="Search courses or instructors..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 border-orange-200 focus:border-orange-500"
           />
         </div>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" className="border-orange-200 text-orange-700 hover:bg-orange-50">
           <Filter className="h-4 w-4 mr-2" />
           Filters
         </Button>
@@ -148,7 +145,10 @@ export const LearningPage = () => {
             variant={activeCategory === category.id ? "default" : "outline"}
             size="sm"
             onClick={() => setActiveCategory(category.id)}
-            className={activeCategory === category.id ? "bg-orange-600 hover:bg-orange-700" : ""}
+            className={activeCategory === category.id ? 
+              "bg-orange-600 hover:bg-orange-700" : 
+              "border-orange-200 text-orange-700 hover:bg-orange-50"
+            }
           >
             {category.label}
           </Button>
@@ -159,7 +159,7 @@ export const LearningPage = () => {
       <Card className="p-8 bg-gradient-to-r from-orange-50 to-red-50 border-orange-200">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           <div>
-            <Badge className="mb-4 bg-orange-600">Featured Course</Badge>
+            <Badge className="mb-4 bg-orange-600 hover:bg-orange-700">Featured Course</Badge>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
               Traditional Amazigh Jewelry Making
             </h2>
@@ -192,6 +192,7 @@ export const LearningPage = () => {
               <Button 
                 variant="outline"
                 onClick={handleFeaturedPreview}
+                className="border-orange-300 text-orange-700 hover:bg-orange-100"
               >
                 Preview Course
               </Button>
@@ -212,21 +213,21 @@ export const LearningPage = () => {
             All Courses ({filteredCourses.length})
           </h2>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm">Most Popular</Button>
-            <Button variant="outline" size="sm">Newest</Button>
-            <Button variant="outline" size="sm">Price: Low to High</Button>
+            <Button variant="outline" size="sm" className="border-orange-200 text-orange-700 hover:bg-orange-50">Most Popular</Button>
+            <Button variant="outline" size="sm" className="border-orange-200 text-orange-700 hover:bg-orange-50">Newest</Button>
+            <Button variant="outline" size="sm" className="border-orange-200 text-orange-700 hover:bg-orange-50">Price: Low to High</Button>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCourses.map((course) => (
-            <Card key={course.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+            <Card key={course.id} className="overflow-hidden hover:shadow-lg transition-shadow border-orange-100">
               <div className="h-48 bg-gradient-to-br from-orange-100 to-red-100 flex items-center justify-center text-6xl">
                 {course.image}
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
-                  <Badge variant="outline">{course.level}</Badge>
+                  <Badge variant="outline" className="border-orange-200 text-orange-700">{course.level}</Badge>
                   <Badge variant="secondary">{course.duration}</Badge>
                 </div>
                 <h3 className="text-xl font-semibold text-gray-800 mb-2">{course.title}</h3>
@@ -265,10 +266,10 @@ export const LearningPage = () => {
       </div>
 
       {/* Upcoming Workshops */}
-      <Card className="p-6">
+      <Card className="p-6 border-orange-100">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-800">Upcoming Live Workshops</h2>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" className="border-orange-200 text-orange-700 hover:bg-orange-50">
             <Calendar className="h-4 w-4 mr-2" />
             View Calendar
           </Button>
@@ -279,7 +280,7 @@ export const LearningPage = () => {
             { title: "Leather Crafting Basics", date: "Dec 28", time: "10:00 AM EST", spots: 8 },
             { title: "Pottery & Ceramics", date: "Jan 2", time: "3:00 PM EST", spots: 15 }
           ].map((workshop, index) => (
-            <Card key={index} className="p-4 border">
+            <Card key={index} className="p-4 border border-orange-100">
               <h4 className="font-semibold mb-2">{workshop.title}</h4>
               <div className="text-sm text-gray-600 space-y-1">
                 <p>{workshop.date} at {workshop.time}</p>
@@ -287,7 +288,7 @@ export const LearningPage = () => {
               </div>
               <Button 
                 size="sm" 
-                className="w-full mt-3"
+                className="w-full mt-3 bg-orange-600 hover:bg-orange-700"
                 onClick={() => handleWorkshopReserve(workshop.title)}
               >
                 Reserve Spot

@@ -43,7 +43,7 @@ export const Logo = ({
   const textSizeClasses = {
     sm: "text-sm",
     md: "text-lg",
-    lg: "text-xl", 
+    lg: "text-xl",
     xl: "text-2xl"
   };
 
@@ -62,13 +62,13 @@ export const Logo = ({
       {showText && (
         <div className="flex flex-col">
           <span className={cn(
-            "font-bold text-gray-800 leading-tight",
+            "font-bold text-orange-600 leading-tight",
             textSizeClasses[size]
           )}>
             Fil et Toile
           </span>
           <span className={cn(
-            "text-gray-600 leading-tight",
+            "text-orange-500 leading-tight font-medium",
             size === "sm" ? "text-xs" : size === "md" ? "text-sm" : size === "lg" ? "text-base" : "text-lg"
           )}>
             Studio
