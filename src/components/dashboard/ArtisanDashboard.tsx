@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -34,29 +33,29 @@ export const ArtisanDashboard = ({ onTabChange }: ArtisanDashboardProps) => {
       key: 'profileViews',
       title: t('dashboard.profileViews'), 
       icon: Eye, 
-      color: "text-orange-600",
+      color: "text-orange-500",
       bgColor: "bg-orange-50" 
     },
     { 
       key: 'connections',
       title: t('dashboard.connections'), 
       icon: Users, 
-      color: "text-red-600",
-      bgColor: "bg-red-50" 
+      color: "text-orange-600",
+      bgColor: "bg-orange-100" 
     },
     { 
       key: 'bookings',
       title: t('dashboard.bookings'), 
       icon: Calendar, 
       color: "text-orange-700",
-      bgColor: "bg-orange-100" 
+      bgColor: "bg-orange-200" 
     },
     { 
       key: 'messages',
       title: t('dashboard.messages'), 
       icon: MessageSquare, 
-      color: "text-red-700",
-      bgColor: "bg-red-100" 
+      color: "text-orange-800",
+      bgColor: "bg-orange-100" 
     }
   ];
 
@@ -98,14 +97,14 @@ export const ArtisanDashboard = ({ onTabChange }: ArtisanDashboardProps) => {
         <div className="flex gap-3">
           <Button 
             onClick={handleCreateProfile}
-            className="bg-orange-600 hover:bg-orange-700"
+            className="bg-orange-500 hover:bg-orange-600 text-white"
           >
             <UserCog className="h-4 w-4 mr-2" />
             {t('dashboard.createProfile')}
           </Button>
           <Button 
             onClick={handleChooseMembership}
-            className="bg-red-600 hover:bg-red-700"
+            className="bg-orange-600 hover:bg-orange-700 text-white"
           >
             <Crown className="h-4 w-4 mr-2" />
             {t('dashboard.chooseMembership')}
@@ -115,15 +114,15 @@ export const ArtisanDashboard = ({ onTabChange }: ArtisanDashboardProps) => {
 
       {/* Error State */}
       {error && (
-        <Alert className="border-red-200 bg-red-50">
-          <AlertTriangle className="h-4 w-4 text-red-600" />
-          <AlertDescription className="text-red-800">
+        <Alert className="border-orange-200 bg-orange-50">
+          <AlertTriangle className="h-4 w-4 text-orange-600" />
+          <AlertDescription className="text-orange-800">
             Failed to load dashboard statistics. 
             <Button 
               variant="link" 
               size="sm" 
               onClick={handleRetry}
-              className="text-red-600 p-0 ml-2 h-auto"
+              className="text-orange-600 p-0 ml-2 h-auto"
             >
               <RefreshCw className="h-3 w-3 mr-1" />
               Try again
@@ -139,7 +138,7 @@ export const ArtisanDashboard = ({ onTabChange }: ArtisanDashboardProps) => {
           const statData = stats[index];
 
           return (
-            <Card key={config.key} className="p-4 border-orange-100">
+            <Card key={config.key} className="p-4 border-orange-200 bg-white hover:shadow-lg transition-shadow">
               {isLoading ? (
                 <div className="flex items-center gap-3">
                   <Skeleton className="h-8 w-8 rounded-lg" />
@@ -180,19 +179,19 @@ export const ArtisanDashboard = ({ onTabChange }: ArtisanDashboardProps) => {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Projects */}
-        <Card className="lg:col-span-2 p-6 border-orange-100">
+        <Card className="lg:col-span-2 p-6 border-orange-200 bg-white">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold">{t('dashboard.recentProjects')}</h3>
-            <Button variant="outline" size="sm" className="border-orange-200 text-orange-700 hover:bg-orange-50">{t('dashboard.viewAll')}</Button>
+            <Button variant="outline" size="sm" className="border-orange-300 text-orange-600 hover:bg-orange-50">{t('dashboard.viewAll')}</Button>
           </div>
           <div className="space-y-3">
             {recentProjects.map((project, index) => (
-              <div key={index} className="flex items-center justify-between p-3 border border-orange-100 rounded-lg">
+              <div key={index} className="flex items-center justify-between p-3 border border-orange-200 rounded-lg bg-orange-50/30">
                 <div className="flex-1">
                   <h4 className="font-medium">{project.title}</h4>
                   <Badge 
                     variant={project.status === t('status.completed') ? "default" : "secondary"}
-                    className={project.status === t('status.completed') ? "bg-orange-600 hover:bg-orange-700" : "mt-1"}
+                    className={project.status === t('status.completed') ? "bg-orange-500 hover:bg-orange-600 text-white" : "mt-1"}
                   >
                     {project.status}
                   </Badge>
@@ -209,22 +208,22 @@ export const ArtisanDashboard = ({ onTabChange }: ArtisanDashboardProps) => {
         </Card>
 
         {/* Quick Actions */}
-        <Card className="p-6 border-orange-100">
+        <Card className="p-6 border-orange-200 bg-white">
           <h3 className="text-lg font-semibold mb-4">{t('dashboard.quickActions')}</h3>
           <div className="space-y-3">
-            <Button variant="outline" className="w-full justify-start border-orange-200 text-orange-700 hover:bg-orange-50">
+            <Button variant="outline" className="w-full justify-start border-orange-300 text-orange-600 hover:bg-orange-50">
               <Calendar className="h-4 w-4 mr-2" />
               {t('dashboard.scheduleWorkshop')}
             </Button>
-            <Button variant="outline" className="w-full justify-start border-orange-200 text-orange-700 hover:bg-orange-50">
+            <Button variant="outline" className="w-full justify-start border-orange-300 text-orange-600 hover:bg-orange-50">
               <BookOpen className="h-4 w-4 mr-2" />
               {t('dashboard.createCourse')}
             </Button>
-            <Button variant="outline" className="w-full justify-start border-orange-200 text-orange-700 hover:bg-orange-50">
+            <Button variant="outline" className="w-full justify-start border-orange-300 text-orange-600 hover:bg-orange-50">
               <Users className="h-4 w-4 mr-2" />
               {t('dashboard.findCollaborators')}
             </Button>
-            <Button variant="outline" className="w-full justify-start border-orange-200 text-orange-700 hover:bg-orange-50">
+            <Button variant="outline" className="w-full justify-start border-orange-300 text-orange-600 hover:bg-orange-50">
               <TrendingUp className="h-4 w-4 mr-2" />
               {t('dashboard.viewAnalytics')}
             </Button>
@@ -233,25 +232,25 @@ export const ArtisanDashboard = ({ onTabChange }: ArtisanDashboardProps) => {
       </div>
 
       {/* Activity Feed */}
-      <Card className="p-6 border-orange-100">
+      <Card className="p-6 border-orange-200 bg-white">
         <h3 className="text-lg font-semibold mb-4">{t('dashboard.recentActivity')}</h3>
         <div className="space-y-4">
-          <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg border border-orange-100">
+          <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg border border-orange-200">
             <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
             <p className="text-sm">
               <span className="font-medium">Fatima Al-Zahra</span> liked your traditional embroidery work
             </p>
             <span className="text-xs text-gray-500 ml-auto">2h ago</span>
           </div>
-          <div className="flex items-center gap-3 p-3 bg-red-50 rounded-lg border border-red-100">
-            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+          <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg border border-orange-200">
+            <div className="w-2 h-2 bg-orange-600 rounded-full"></div>
             <p className="text-sm">
               New workshop booking for <span className="font-medium">Zardozi Techniques</span>
             </p>
             <span className="text-xs text-gray-500 ml-auto">5h ago</span>
           </div>
-          <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg border border-orange-100">
-            <div className="w-2 h-2 bg-orange-600 rounded-full"></div>
+          <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg border border-orange-200">
+            <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
             <p className="text-sm">
               <span className="font-medium">Ahmed Hassan</span> sent you a collaboration request
             </p>

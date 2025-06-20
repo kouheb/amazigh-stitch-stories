@@ -113,7 +113,7 @@ export const LearningPage = () => {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-8">
+    <div className="p-6 max-w-7xl mx-auto space-y-8 bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="text-center">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Learning Platform</h1>
@@ -128,10 +128,10 @@ export const LearningPage = () => {
             placeholder="Search courses or instructors..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 border-orange-200 focus:border-orange-500"
+            className="pl-10 border-orange-300 focus:border-orange-500 focus:ring-orange-500"
           />
         </div>
-        <Button variant="outline" size="sm" className="border-orange-200 text-orange-700 hover:bg-orange-50">
+        <Button variant="outline" size="sm" className="border-orange-300 text-orange-600 hover:bg-orange-50">
           <Filter className="h-4 w-4 mr-2" />
           Filters
         </Button>
@@ -146,8 +146,8 @@ export const LearningPage = () => {
             size="sm"
             onClick={() => setActiveCategory(category.id)}
             className={activeCategory === category.id ? 
-              "bg-orange-600 hover:bg-orange-700" : 
-              "border-orange-200 text-orange-700 hover:bg-orange-50"
+              "bg-orange-500 hover:bg-orange-600 text-white" : 
+              "border-orange-300 text-orange-600 hover:bg-orange-50"
             }
           >
             {category.label}
@@ -156,10 +156,10 @@ export const LearningPage = () => {
       </div>
 
       {/* Featured Course */}
-      <Card className="p-8 bg-gradient-to-r from-orange-50 to-red-50 border-orange-200">
+      <Card className="p-8 bg-gradient-to-r from-orange-50 to-orange-100 border-orange-300">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           <div>
-            <Badge className="mb-4 bg-orange-600 hover:bg-orange-700">Featured Course</Badge>
+            <Badge className="mb-4 bg-orange-500 hover:bg-orange-600 text-white">Featured Course</Badge>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
               Traditional Amazigh Jewelry Making
             </h2>
@@ -167,24 +167,10 @@ export const LearningPage = () => {
               Learn ancient silversmithing techniques passed down through generations. 
               Create authentic Amazigh jewelry pieces with master artisan Aicha Tafraout.
             </p>
-            <div className="flex items-center gap-6 mb-6">
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-gray-500" />
-                <span className="text-sm text-gray-600">8 weeks</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-gray-500" />
-                <span className="text-sm text-gray-600">45 students</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                <span className="text-sm text-gray-600">4.9 rating</span>
-              </div>
-            </div>
             <div className="flex items-center gap-4">
               <Button 
                 onClick={handleFeaturedEnroll}
-                className="bg-orange-600 hover:bg-orange-700"
+                className="bg-orange-500 hover:bg-orange-600 text-white"
               >
                 <Play className="h-4 w-4 mr-2" />
                 Enroll Now - $249
@@ -192,14 +178,14 @@ export const LearningPage = () => {
               <Button 
                 variant="outline"
                 onClick={handleFeaturedPreview}
-                className="border-orange-300 text-orange-700 hover:bg-orange-100"
+                className="border-orange-400 text-orange-600 hover:bg-orange-100"
               >
                 Preview Course
               </Button>
             </div>
           </div>
           <div className="text-center">
-            <div className="w-48 h-48 bg-gradient-to-br from-orange-400 to-red-400 rounded-full mx-auto flex items-center justify-center text-6xl">
+            <div className="w-48 h-48 bg-gradient-to-br from-orange-400 to-orange-400 rounded-full mx-auto flex items-center justify-center text-6xl">
               💍
             </div>
           </div>
@@ -213,28 +199,28 @@ export const LearningPage = () => {
             All Courses ({filteredCourses.length})
           </h2>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="border-orange-200 text-orange-700 hover:bg-orange-50">Most Popular</Button>
-            <Button variant="outline" size="sm" className="border-orange-200 text-orange-700 hover:bg-orange-50">Newest</Button>
-            <Button variant="outline" size="sm" className="border-orange-200 text-orange-700 hover:bg-orange-50">Price: Low to High</Button>
+            <Button variant="outline" size="sm" className="border-orange-300 text-orange-600 hover:bg-orange-50">Most Popular</Button>
+            <Button variant="outline" size="sm" className="border-orange-300 text-orange-600 hover:bg-orange-50">Newest</Button>
+            <Button variant="outline" size="sm" className="border-orange-300 text-orange-600 hover:bg-orange-50">Price: Low to High</Button>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCourses.map((course) => (
-            <Card key={course.id} className="overflow-hidden hover:shadow-lg transition-shadow border-orange-100">
-              <div className="h-48 bg-gradient-to-br from-orange-100 to-red-100 flex items-center justify-center text-6xl">
+            <Card key={course.id} className="overflow-hidden hover:shadow-lg transition-shadow border-orange-200 bg-white">
+              <div className="h-48 bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center text-6xl">
                 {course.image}
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
-                  <Badge variant="outline" className="border-orange-200 text-orange-700">{course.level}</Badge>
+                  <Badge variant="outline" className="border-orange-300 text-orange-600">{course.level}</Badge>
                   <Badge variant="secondary">{course.duration}</Badge>
                 </div>
                 <h3 className="text-xl font-semibold text-gray-800 mb-2">{course.title}</h3>
                 <p className="text-gray-600 text-sm mb-4">{course.description}</p>
                 
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center text-white font-medium text-sm">
+                  <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
                     {course.instructor.split(' ').map(n => n[0]).join('')}
                   </div>
                   <div>
@@ -253,7 +239,7 @@ export const LearningPage = () => {
                   </div>
                   <Button 
                     size="sm" 
-                    className="bg-orange-600 hover:bg-orange-700"
+                    className="bg-orange-500 hover:bg-orange-600 text-white"
                     onClick={() => handleCourseEnroll(course.id, course.price)}
                   >
                     Enroll Now
@@ -266,10 +252,10 @@ export const LearningPage = () => {
       </div>
 
       {/* Upcoming Workshops */}
-      <Card className="p-6 border-orange-100">
+      <Card className="p-6 border-orange-200 bg-white">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-800">Upcoming Live Workshops</h2>
-          <Button variant="outline" size="sm" className="border-orange-200 text-orange-700 hover:bg-orange-50">
+          <Button variant="outline" size="sm" className="border-orange-300 text-orange-600 hover:bg-orange-50">
             <Calendar className="h-4 w-4 mr-2" />
             View Calendar
           </Button>
@@ -280,7 +266,7 @@ export const LearningPage = () => {
             { title: "Leather Crafting Basics", date: "Dec 28", time: "10:00 AM EST", spots: 8 },
             { title: "Pottery & Ceramics", date: "Jan 2", time: "3:00 PM EST", spots: 15 }
           ].map((workshop, index) => (
-            <Card key={index} className="p-4 border border-orange-100">
+            <Card key={index} className="p-4 border border-orange-200">
               <h4 className="font-semibold mb-2">{workshop.title}</h4>
               <div className="text-sm text-gray-600 space-y-1">
                 <p>{workshop.date} at {workshop.time}</p>
@@ -288,7 +274,7 @@ export const LearningPage = () => {
               </div>
               <Button 
                 size="sm" 
-                className="w-full mt-3 bg-orange-600 hover:bg-orange-700"
+                className="w-full mt-3 bg-orange-500 hover:bg-orange-600 text-white"
                 onClick={() => handleWorkshopReserve(workshop.title)}
               >
                 Reserve Spot

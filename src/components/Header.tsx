@@ -20,7 +20,7 @@ export const Header = () => {
   ];
 
   return (
-    <header className="bg-white shadow-lg border-b border-orange-100">
+    <header className="bg-white shadow-lg border-b border-orange-200">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -36,7 +36,7 @@ export const Header = () => {
                 <Link
                   key={item.name}
                   to={item.href}
-                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-gray-600 hover:text-orange-600 hover:bg-orange-50 transition-colors"
+                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-gray-700 hover:text-orange-500 hover:bg-orange-50 transition-colors"
                 >
                   <Icon className="h-4 w-4" />
                   <span>{item.name}</span>
@@ -51,7 +51,7 @@ export const Header = () => {
               variant="ghost"
               size="sm"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-600 hover:text-orange-600 hover:bg-orange-50"
+              className="text-gray-700 hover:text-orange-500 hover:bg-orange-50"
             >
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
@@ -60,7 +60,7 @@ export const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-orange-100">
+          <div className="md:hidden py-4 border-t border-orange-200">
             <nav className="space-y-1">
               {navigation.map((item) => {
                 const Icon = item.icon;
@@ -68,7 +68,7 @@ export const Header = () => {
                   <Link
                     key={item.name}
                     to={item.href}
-                    className="flex items-center space-x-3 px-3 py-2 rounded-md text-gray-600 hover:text-orange-600 hover:bg-orange-50 transition-colors"
+                    className="flex items-center space-x-3 px-3 py-2 rounded-md text-gray-700 hover:text-orange-500 hover:bg-orange-50 transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <Icon className="h-5 w-5" />

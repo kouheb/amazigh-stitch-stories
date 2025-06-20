@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -79,7 +78,7 @@ export const NetworkPage = () => {
   ];
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="p-6 max-w-7xl mx-auto space-y-6 bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="flex flex-col gap-4">
         <div>
@@ -95,16 +94,16 @@ export const NetworkPage = () => {
               placeholder="Search artisans, skills, or locations..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 border-orange-300 focus:border-orange-500 focus:ring-orange-500"
             />
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="border-orange-300 text-orange-600 hover:bg-orange-50">
               <Filter className="h-4 w-4 mr-2" />
               Filters
             </Button>
             <select 
-              className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+              className="px-3 py-2 border border-orange-300 rounded-md text-sm focus:border-orange-500 focus:ring-orange-500"
               value={selectedFilter}
               onChange={(e) => setSelectedFilter(e.target.value)}
             >
@@ -122,19 +121,19 @@ export const NetworkPage = () => {
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-600">{artisans.length} artisans found</p>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">Grid</Button>
-          <Button variant="ghost" size="sm">List</Button>
+          <Button variant="outline" size="sm" className="border-orange-300 text-orange-600 hover:bg-orange-50">Grid</Button>
+          <Button variant="ghost" size="sm" className="text-orange-600 hover:bg-orange-50">List</Button>
         </div>
       </div>
 
       {/* Artisans Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {artisans.map((artisan) => (
-          <Card key={artisan.id} className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
+          <Card key={artisan.id} className="p-6 hover:shadow-lg transition-shadow cursor-pointer border-orange-200 bg-white">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-red-400 rounded-full flex items-center justify-center text-white font-medium">
+                  <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-orange-500 rounded-full flex items-center justify-center text-white font-medium">
                     {artisan.image}
                   </div>
                   {artisan.isOnline && (
@@ -166,22 +165,22 @@ export const NetworkPage = () => {
 
               <div className="flex flex-wrap gap-1">
                 {artisan.specialties.map((specialty, index) => (
-                  <Badge key={index} variant="secondary" className="text-xs">
+                  <Badge key={index} variant="secondary" className="text-xs bg-orange-100 text-orange-700">
                     {specialty}
                   </Badge>
                 ))}
               </div>
 
               <div className="flex gap-2 pt-4">
-                <Button size="sm" className="flex-1 bg-orange-600 hover:bg-orange-700">
+                <Button size="sm" className="flex-1 bg-orange-500 hover:bg-orange-600 text-white">
                   <Users className="h-4 w-4 mr-1" />
                   Connect
                 </Button>
-                <Button size="sm" variant="outline">
+                <Button size="sm" variant="outline" className="border-orange-300 text-orange-600 hover:bg-orange-50">
                   <MessageCircle className="h-4 w-4 mr-1" />
                   Message
                 </Button>
-                <Button size="sm" variant="outline">
+                <Button size="sm" variant="outline" className="border-orange-300 text-orange-600 hover:bg-orange-50">
                   <Eye className="h-4 w-4" />
                 </Button>
               </div>
