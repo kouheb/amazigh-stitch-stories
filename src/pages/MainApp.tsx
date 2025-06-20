@@ -40,7 +40,7 @@ export const MainApp = () => {
       case "marketplace":
         return <MarketplacePage />;
       case "profile":
-        return <ArtisanDashboard />;
+        return <ArtisanDashboard onTabChange={handleTabChange} />;
       case "enhanced-profile":
         return <ProfilePage />;
       case "membership":

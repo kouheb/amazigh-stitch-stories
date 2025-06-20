@@ -14,7 +14,11 @@ import {
   Crown
 } from "lucide-react";
 
-export const ArtisanDashboard = () => {
+interface ArtisanDashboardProps {
+  onTabChange?: (tab: string) => void;
+}
+
+export const ArtisanDashboard = ({ onTabChange }: ArtisanDashboardProps) => {
   const stats = [
     { title: "Profile Views", value: "1,234", icon: Eye, color: "text-blue-600" },
     { title: "Connections", value: "89", icon: Users, color: "text-green-600" },
@@ -30,12 +34,16 @@ export const ArtisanDashboard = () => {
 
   const handleCreateProfile = () => {
     console.log("Navigate to profile creation");
-    // This would navigate to profile creation flow
+    if (onTabChange) {
+      onTabChange("enhanced-profile");
+    }
   };
 
   const handleChooseMembership = () => {
     console.log("Navigate to membership selection");
-    // This would navigate to membership page
+    if (onTabChange) {
+      onTabChange("membership");
+    }
   };
 
   return (
