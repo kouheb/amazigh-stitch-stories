@@ -27,6 +27,27 @@ import { CollaborationHub } from "@/components/collaboration/CollaborationHub";
 export const HomePage = () => {
   const [showNotifications, setShowNotifications] = useState(false);
 
+  const handleCreateWork = () => {
+    console.log("Create button clicked - opening work creation modal");
+    // You can add modal opening logic here or navigation to create page
+    alert("Create work functionality - this would open a modal or navigate to create page");
+  };
+
+  const handleStartLiveSession = () => {
+    console.log("Start live session clicked");
+    alert("Live session functionality - this would start a live session");
+  };
+
+  const handleBrowseCourses = () => {
+    console.log("Browse courses clicked");
+    alert("Browse courses functionality - this would navigate to courses");
+  };
+
+  const handleJoinEvents = () => {
+    console.log("Join events clicked");
+    alert("Join events functionality - this would navigate to events");
+  };
+
   const featuredWork = [
     {
       id: 1,
@@ -326,19 +347,35 @@ export const HomePage = () => {
             <Card className="p-6">
               <h3 className="font-semibold mb-4">Quick Actions</h3>
               <div className="space-y-3">
-                <Button variant="outline" className="w-full justify-start hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200"
+                  onClick={handleCreateWork}
+                >
                   <Plus className="h-4 w-4 mr-2" />
                   Share Your Work
                 </Button>
-                <Button variant="outline" className="w-full justify-start hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200"
+                  onClick={handleStartLiveSession}
+                >
                   <Video className="h-4 w-4 mr-2" />
                   Start Live Session
                 </Button>
-                <Button variant="outline" className="w-full justify-start hover:bg-green-50 hover:text-green-600 hover:border-green-200">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start hover:bg-green-50 hover:text-green-600 hover:border-green-200"
+                  onClick={handleBrowseCourses}
+                >
                   <BookOpen className="h-4 w-4 mr-2" />
                   Browse Courses
                 </Button>
-                <Button variant="outline" className="w-full justify-start hover:bg-purple-50 hover:text-purple-600 hover:border-purple-200">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start hover:bg-purple-50 hover:text-purple-600 hover:border-purple-200"
+                  onClick={handleJoinEvents}
+                >
                   <Calendar className="h-4 w-4 mr-2" />
                   Join Events
                 </Button>

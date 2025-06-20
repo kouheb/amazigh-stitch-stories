@@ -12,7 +12,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { 
   Bell, 
-  Search, 	, 
+  Search, 
+  Menu, 
   Settings, 
   User, 
   LogOut,
