@@ -13,7 +13,8 @@ import {
   DollarSign,
   Heart,
   MessageCircle,
-  Plus
+  Plus,
+  Building
 } from "lucide-react";
 import { ServiceCard } from "@/components/marketplace/ServiceCard";
 import { BookingModal } from "@/components/marketplace/BookingModal";
@@ -124,13 +125,22 @@ export const MarketplacePage = () => {
               <h1 className="text-3xl font-bold text-gray-800 mb-2">Services Marketplace</h1>
               <p className="text-gray-600">Discover and book authentic artisan services</p>
             </div>
-            <Button 
-              onClick={() => setIsAddWorkModalOpen(true)}
-              className="bg-orange-600 hover:bg-orange-700"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add New Work
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button 
+                onClick={() => setIsAddWorkModalOpen(true)}
+                className="bg-orange-600 hover:bg-orange-700"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add New Work
+              </Button>
+              <Button 
+                variant="outline"
+                className="border-orange-200 text-orange-600 hover:bg-orange-50"
+              >
+                <Building className="h-4 w-4 mr-2" />
+                List Your Space
+              </Button>
+            </div>
           </div>
         </div>
 
