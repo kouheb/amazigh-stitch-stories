@@ -22,15 +22,15 @@ const ProfileCreationScreen = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 p-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Create Your Fashion & Arts Profile</h1>
-          <p className="text-gray-600">Join the Amazigh Nations community of fashion designers, artists, and artisans</p>
+          <p className="text-gray-600">Join the art community of fashion designers, artists, and artisans</p>
         </div>
 
-        <Card className="p-8 bg-white shadow-lg border border-orange-200">
+        <Card className="p-8 bg-white shadow-lg border border-gray-200">
           <div className="space-y-8">
             <ProfileImageUpload 
               profileImage={profileImage} 
