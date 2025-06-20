@@ -41,7 +41,7 @@ interface ServiceCardProps {
 
 export const ServiceCard = ({ service, onBook, onMessage, onFavorite }: ServiceCardProps) => {
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow border-gray-200 bg-white">
       {/* Service Image */}
       <div className="relative">
         <div className="h-48 bg-gray-200 flex items-center justify-center">
@@ -53,7 +53,7 @@ export const ServiceCard = ({ service, onBook, onMessage, onFavorite }: ServiceC
         </div>
         
         {service.featured && (
-          <Badge className="absolute top-3 left-3 bg-orange-600">
+          <Badge className="absolute top-3 left-3 bg-black text-white hover:bg-gray-800">
             Featured
           </Badge>
         )}
@@ -62,7 +62,7 @@ export const ServiceCard = ({ service, onBook, onMessage, onFavorite }: ServiceC
           variant="ghost"
           size="sm"
           onClick={onFavorite}
-          className="absolute top-3 right-3 bg-white/80 hover:bg-white"
+          className="absolute top-3 right-3 bg-white/90 hover:bg-white text-gray-600 hover:text-gray-900 shadow-sm"
         >
           <Heart className="h-4 w-4" />
         </Button>
@@ -70,7 +70,7 @@ export const ServiceCard = ({ service, onBook, onMessage, onFavorite }: ServiceC
 
       <div className="p-4">
         {/* Title */}
-        <h3 className="font-semibold text-gray-800 mb-2 line-clamp-2">
+        <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
           {service.title}
         </h3>
 
@@ -78,14 +78,14 @@ export const ServiceCard = ({ service, onBook, onMessage, onFavorite }: ServiceC
         <div className="flex items-center gap-3 mb-3">
           <Avatar className="h-8 w-8">
             <AvatarImage src={service.artisan.avatar} />
-            <AvatarFallback>
+            <AvatarFallback className="bg-gray-200 text-gray-700">
               {service.artisan.name.split(' ').map(n => n[0]).join('')}
             </AvatarFallback>
           </Avatar>
           
           <div className="flex-1">
             <div className="flex items-center gap-1">
-              <span className="text-sm font-medium">{service.artisan.name}</span>
+              <span className="text-sm font-medium text-gray-900">{service.artisan.name}</span>
               {service.artisan.verified && (
                 <Shield className="h-3 w-3 text-blue-600" />
               )}
@@ -101,7 +101,7 @@ export const ServiceCard = ({ service, onBook, onMessage, onFavorite }: ServiceC
         {/* Skills */}
         <div className="flex flex-wrap gap-1 mb-3">
           {service.skills.slice(0, 3).map((skill) => (
-            <Badge key={skill} variant="secondary" className="text-xs">
+            <Badge key={skill} variant="secondary" className="text-xs bg-gray-100 text-gray-700 hover:bg-gray-200">
               {skill}
             </Badge>
           ))}
@@ -134,7 +134,11 @@ export const ServiceCard = ({ service, onBook, onMessage, onFavorite }: ServiceC
         <div className="mb-4">
           <Badge 
             variant={service.availability === "Available" ? "default" : "secondary"}
-            className={service.availability === "Available" ? "bg-green-600" : ""}
+            className={
+              service.availability === "Available" 
+                ? "bg-green-100 text-green-800 hover:bg-green-200" 
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }
           >
             {service.availability}
           </Badge>
@@ -144,12 +148,17 @@ export const ServiceCard = ({ service, onBook, onMessage, onFavorite }: ServiceC
         <div className="flex gap-2">
           <Button 
             onClick={onBook}
-            className="flex-1 bg-orange-600 hover:bg-orange-700"
+            className="flex-1 bg-black hover:bg-gray-800 text-white disabled:bg-gray-300 disabled:text-gray-500"
             disabled={service.availability !== "Available"}
           >
             Book Now
           </Button>
-          <Button variant="outline" size="sm" onClick={onMessage}>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={onMessage}
+            className="border-gray-300 text-gray-700 hover:bg-gray-100"
+          >
             <MessageCircle className="h-4 w-4" />
           </Button>
         </div>

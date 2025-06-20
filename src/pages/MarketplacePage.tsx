@@ -15,7 +15,10 @@ import {
   Heart,
   MessageCircle,
   Plus,
-  Building
+  Building,
+  SlidersHorizontal,
+  Grid3X3,
+  List
 } from "lucide-react";
 import { ServiceCard } from "@/components/marketplace/ServiceCard";
 import { BookingModal } from "@/components/marketplace/BookingModal";
@@ -31,6 +34,8 @@ export const MarketplacePage = () => {
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [isAddWorkModalOpen, setIsAddWorkModalOpen] = useState(false);
   const [isListSpaceModalOpen, setIsListSpaceModalOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [showFilters, setShowFilters] = useState(false);
 
   const categories = [
     { id: "all", name: t('marketplace.allServices'), count: 127 },
@@ -56,7 +61,7 @@ export const MarketplacePage = () => {
       category: "embroidery",
       featured: true,
       images: ["/api/placeholder/300/200"],
-      description: "Exquisite traditional Z ardozi embroidery for special occasions",
+      description: "Exquisite traditional Zardozi embroidery for special occasions",
       location: "Casablanca, Morocco",
       skills: ["Zardozi", "Gold Thread", "Traditional Patterns"],
       availability: t('status.available')
@@ -125,27 +130,35 @@ export const MarketplacePage = () => {
     // You can add logic here to handle the new space listing
   };
 
+  const handleFavorite = (serviceId: string) => {
+    console.log("Added to favorites:", serviceId);
+  };
+
+  const handleMessage = (serviceId: string) => {
+    console.log("Message artisan:", serviceId);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('marketplace.title')}</h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('marketplace.title')}</h1>
               <p className="text-gray-600">{t('marketplace.subtitle')}</p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
               <Button 
                 onClick={() => setIsAddWorkModalOpen(true)}
-                className="bg-black hover:bg-gray-800"
+                className="bg-black hover:bg-gray-800 text-white"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 {t('marketplace.addNewWork')}
               </Button>
               <Button 
                 variant="outline"
-                className="border-gray-200 text-gray-600 hover:bg-gray-100"
+                className="border-gray-300 text-gray-700 hover:bg-gray-100"
                 onClick={() => setIsListSpaceModalOpen(true)}
               >
                 <Building className="h-4 w-4 mr-2" />
@@ -155,22 +168,48 @@ export const MarketplacePage = () => {
           </div>
         </div>
 
-        {/* Search and Filters */}
+        {/* Search and Controls */}
         <div className="mb-8">
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
+          <div className="flex flex-col lg:flex-row gap-4 mb-6">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <Input
                 placeholder={t('marketplace.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-10 border-gray-300 focus:border-gray-500 focus:ring-gray-500"
               />
             </div>
-            <Button variant="outline" className="flex items-center gap-2">
-              <Filter className="h-4 w-4" />
-              {t('marketplace.filters')}
-            </Button>
+            
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center gap-2 border-gray-300 text-gray-700 hover:bg-gray-100"
+              >
+                <SlidersHorizontal className="h-4 w-4" />
+                {t('marketplace.filters')}
+              </Button>
+              
+              <div className="flex border border-gray-300 rounded-md">
+                <Button
+                  variant={viewMode === "grid" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("grid")}
+                  className={viewMode === "grid" ? "bg-black text-white" : "text-gray-600 hover:bg-gray-100"}
+                >
+                  <Grid3X3 className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === "list" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("list")}
+                  className={viewMode === "list" ? "bg-black text-white" : "text-gray-600 hover:bg-gray-100"}
+                >
+                  <List className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </div>
 
           {/* Categories */}
@@ -183,11 +222,11 @@ export const MarketplacePage = () => {
                 className={`flex items-center gap-2 ${
                   selectedCategory === category.id 
                     ? "bg-black hover:bg-gray-800 text-white" 
-                    : "border-gray-300 text-gray-600 hover:bg-gray-100"
+                    : "border-gray-300 text-gray-700 hover:bg-gray-100"
                 }`}
               >
                 {category.name}
-                <Badge variant="secondary" className="ml-1">
+                <Badge variant="secondary" className="ml-1 bg-gray-200 text-gray-700">
                   {category.count}
                 </Badge>
               </Button>
@@ -195,23 +234,99 @@ export const MarketplacePage = () => {
           </div>
         </div>
 
+        {/* Filters Panel */}
+        {showFilters && (
+          <Card className="p-6 mb-6 bg-white border-gray-200">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <h4 className="font-medium text-gray-900 mb-3">Price Range</h4>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" className="rounded border-gray-300" />
+                    <span>Under $100</span>
+                  </label>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" className="rounded border-gray-300" />
+                    <span>$100 - $500</span>
+                  </label>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" className="rounded border-gray-300" />
+                    <span>$500+</span>
+                  </label>
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="font-medium text-gray-900 mb-3">Availability</h4>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" className="rounded border-gray-300" />
+                    <span>Available Now</span>
+                  </label>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" className="rounded border-gray-300" />
+                    <span>Within 1 Week</span>
+                  </label>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" className="rounded border-gray-300" />
+                    <span>Within 1 Month</span>
+                  </label>
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="font-medium text-gray-900 mb-3">Rating</h4>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" className="rounded border-gray-300" />
+                    <span className="flex items-center gap-1">
+                      4.5+ <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                    </span>
+                  </label>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" className="rounded border-gray-300" />
+                    <span className="flex items-center gap-1">
+                      4.0+ <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
+
         {/* Results Count */}
-        <div className="mb-6">
+        <div className="mb-6 flex justify-between items-center">
           <p className="text-gray-600">
             {filteredServices.length} {t('marketplace.servicesFound')}
             {searchQuery && ` for "${searchQuery}"`}
           </p>
+          
+          <div className="flex items-center gap-4 text-sm text-gray-600">
+            <span>Sort by:</span>
+            <select className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:border-gray-500 focus:ring-gray-500">
+              <option>Most Relevant</option>
+              <option>Price: Low to High</option>
+              <option>Price: High to Low</option>
+              <option>Highest Rated</option>
+              <option>Most Recent</option>
+            </select>
+          </div>
         </div>
 
         {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className={`grid gap-6 ${
+          viewMode === "grid" 
+            ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" 
+            : "grid-cols-1"
+        }`}>
           {filteredServices.map((service) => (
             <ServiceCard
               key={service.id}
               service={service}
               onBook={() => handleBookService(service)}
-              onMessage={() => console.log("Message artisan")}
-              onFavorite={() => console.log("Add to favorites")}
+              onMessage={() => handleMessage(service.id)}
+              onFavorite={() => handleFavorite(service.id)}
             />
           ))}
         </div>
@@ -224,9 +339,19 @@ export const MarketplacePage = () => {
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
               {t('marketplace.noServicesTitle')}
             </h3>
-            <p className="text-gray-600">
+            <p className="text-gray-600 mb-4">
               {t('marketplace.noServicesDesc')}
             </p>
+            <Button 
+              onClick={() => {
+                setSearchQuery("");
+                setSelectedCategory("all");
+              }}
+              variant="outline"
+              className="border-gray-300 text-gray-700 hover:bg-gray-100"
+            >
+              Clear Filters
+            </Button>
           </div>
         )}
       </div>
