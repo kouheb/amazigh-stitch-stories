@@ -10,6 +10,7 @@ import Membership from "./pages/Membership";
 import Wireframe from "./pages/Wireframe";
 import AdminDashboard from "./pages/AdminDashboard";
 import { MainApp } from "./pages/MainApp";
+import { PlayStoreBannerPage } from "./pages/PlayStoreBannerPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/wireframe" element={<Wireframe />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/app" element={<MainApp />} />
+            <Route path="/playstore-banner" element={<PlayStoreBannerPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
