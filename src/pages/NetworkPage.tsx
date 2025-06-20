@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -71,10 +72,24 @@ export const NetworkPage = () => {
   const filterOptions = [
     { value: "all", label: "All Artisans" },
     { value: "embroidery", label: "Embroidery" },
+    { value: "seamstress", label: "Seamstress" },
     { value: "leather", label: "Leather Work" },
     { value: "ceramics", label: "Ceramics" },
     { value: "jewelry", label: "Jewelry" },
-    { value: "textiles", label: "Textiles" }
+    { value: "textiles", label: "Textiles" },
+    { value: "artist", label: "Artist" },
+    { value: "abstract-art", label: "Abstract Art" },
+    { value: "fashion-design", label: "Fashion Design" },
+    { value: "weaving", label: "Weaving" },
+    { value: "pottery", label: "Pottery" },
+    { value: "metalwork", label: "Metalwork" },
+    { value: "woodwork", label: "Woodwork" },
+    { value: "glasswork", label: "Glasswork" },
+    { value: "painting", label: "Painting" },
+    { value: "sculpture", label: "Sculpture" },
+    { value: "calligraphy", label: "Calligraphy" },
+    { value: "textile-art", label: "Textile Art" },
+    { value: "digital-art", label: "Digital Art" }
   ];
 
   return (
@@ -103,7 +118,7 @@ export const NetworkPage = () => {
               Filters
             </Button>
             <select 
-              className="px-3 py-2 border border-gray-400 rounded-md text-sm focus:border-black focus:ring-gray-500"
+              className="px-3 py-2 border border-gray-400 rounded-md text-sm focus:border-black focus:ring-gray-500 bg-white z-10"
               value={selectedFilter}
               onChange={(e) => setSelectedFilter(e.target.value)}
             >
