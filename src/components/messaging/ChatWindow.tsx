@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -6,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Phone, Video, MoreVertical, Info } from "lucide-react";
 import { MessageInput } from "./MessageInput";
 import { MessageBubble } from "./MessageBubble";
+import { toast } from "sonner";
 
 interface Conversation {
   id: string;
@@ -50,6 +50,26 @@ export const ChatWindow = ({ conversation, messages }: ChatWindowProps) => {
     setMessageList([...messageList, newMessage]);
   };
 
+  const handleVoiceCall = () => {
+    console.log(`Starting voice call with ${conversation.participant.name}`);
+    toast.success(`Connecting voice call with ${conversation.participant.name}...`);
+  };
+
+  const handleVideoCall = () => {
+    console.log(`Starting video call with ${conversation.participant.name}`);
+    toast.success(`Connecting video call with ${conversation.participant.name}...`);
+  };
+
+  const handleShowInfo = () => {
+    console.log(`Showing info for ${conversation.participant.name}`);
+    toast.info(`Showing profile info for ${conversation.participant.name}`);
+  };
+
+  const handleMoreOptions = () => {
+    console.log(`Opening more options for ${conversation.participant.name}`);
+    toast.info("More options menu opened");
+  };
+
   return (
     <>
       {/* Chat Header */}
@@ -77,16 +97,36 @@ export const ChatWindow = ({ conversation, messages }: ChatWindowProps) => {
           </div>
           
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={handleVoiceCall}
+              className="hover:bg-green-50 hover:text-green-600"
+            >
               <Phone className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="sm">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={handleVideoCall}
+              className="hover:bg-blue-50 hover:text-blue-600"
+            >
               <Video className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="sm">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={handleShowInfo}
+              className="hover:bg-orange-50 hover:text-orange-600"
+            >
               <Info className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="sm">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={handleMoreOptions}
+              className="hover:bg-gray-50"
+            >
               <MoreVertical className="h-4 w-4" />
             </Button>
           </div>
