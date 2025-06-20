@@ -19,6 +19,7 @@ import {
 import { ServiceCard } from "@/components/marketplace/ServiceCard";
 import { BookingModal } from "@/components/marketplace/BookingModal";
 import { AddWorkModal } from "@/components/modals/AddWorkModal";
+import { ListSpaceModal } from "@/components/modals/ListSpaceModal";
 
 export const MarketplacePage = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,6 +27,7 @@ export const MarketplacePage = () => {
   const [selectedService, setSelectedService] = useState<any>(null);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [isAddWorkModalOpen, setIsAddWorkModalOpen] = useState(false);
+  const [isListSpaceModalOpen, setIsListSpaceModalOpen] = useState(false);
 
   const categories = [
     { id: "all", name: "All Services", count: 127 },
@@ -115,6 +117,11 @@ export const MarketplacePage = () => {
     // You can add logic here to update the services list or refresh data
   };
 
+  const handleSpaceListed = (space: any) => {
+    console.log("New space listed:", space);
+    // You can add logic here to handle the new space listing
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-6">
@@ -136,6 +143,7 @@ export const MarketplacePage = () => {
               <Button 
                 variant="outline"
                 className="border-orange-200 text-orange-600 hover:bg-orange-50"
+                onClick={() => setIsListSpaceModalOpen(true)}
               >
                 <Building className="h-4 w-4 mr-2" />
                 List Your Space
@@ -230,6 +238,13 @@ export const MarketplacePage = () => {
         isOpen={isAddWorkModalOpen}
         onClose={() => setIsAddWorkModalOpen(false)}
         onWorkAdded={handleWorkAdded}
+      />
+
+      {/* List Space Modal */}
+      <ListSpaceModal
+        isOpen={isListSpaceModalOpen}
+        onClose={() => setIsListSpaceModalOpen(false)}
+        onSpaceListed={handleSpaceListed}
       />
     </div>
   );
