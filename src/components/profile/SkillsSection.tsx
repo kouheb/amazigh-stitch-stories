@@ -4,6 +4,9 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { 
   Plus, 
   Star, 
@@ -14,6 +17,7 @@ import {
   Edit3,
   Trash2
 } from "lucide-react";
+import { toast } from "sonner";
 
 interface SkillsSectionProps {
   skills: string[];
@@ -23,6 +27,10 @@ interface SkillsSectionProps {
 
 export const SkillsSection = ({ skills, specialties, isOwnProfile }: SkillsSectionProps) => {
   const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
+  const [isAddSkillModalOpen, setIsAddSkillModalOpen] = useState(false);
+  const [isAddSpecialtyModalOpen, setIsAddSpecialtyModalOpen] = useState(false);
+  const [newSkillName, setNewSkillName] = useState("");
+  const [newSpecialtyName, setNewSpecialtyName] = useState("");
 
   const skillDetails = {
     "Zardozi Embroidery": {
@@ -54,6 +62,24 @@ export const SkillsSection = ({ skills, specialties, isOwnProfile }: SkillsSecti
     }
   };
 
+  const handleAddSkill = () => {
+    if (newSkillName.trim()) {
+      console.log("Adding new skill:", newSkillName);
+      toast.success(`Added skill: ${newSkillName}`);
+      setNewSkillName("");
+      setIsAddSkillModalOpen(false);
+    }
+  };
+
+  const handleAddSpecialty = () => {
+    if (newSpecialtyName.trim()) {
+      console.log("Adding new specialty:", newSpecialtyName);
+      toast.success(`Added specialty: ${newSpecialtyName}`);
+      setNewSpecialtyName("");
+      setIsAddSpecialtyModalOpen(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Skills Overview */}
@@ -64,7 +90,10 @@ export const SkillsSection = ({ skills, specialties, isOwnProfile }: SkillsSecti
             <p className="text-gray-600">Professional skills and certifications</p>
           </div>
           {isOwnProfile && (
-            <Button className="bg-orange-600 hover:bg-orange-700">
+            <Button 
+              className="bg-orange-600 hover:bg-orange-700"
+              onClick={() => setIsAddSkillModalOpen(true)}
+            >
               <Plus className="h-4 w-4 mr-2" />
               Add Skill
             </Button>
@@ -194,7 +223,11 @@ export const SkillsSection = ({ skills, specialties, isOwnProfile }: SkillsSecti
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-semibold">Specialties</h3>
           {isOwnProfile && (
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setIsAddSpecialtyModalOpen(true)}
+            >
               <Plus className="h-4 w-4 mr-2" />
               Add Specialty
             </Button>
@@ -208,6 +241,70 @@ export const SkillsSection = ({ skills, specialties, isOwnProfile }: SkillsSecti
           ))}
         </div>
       </Card>
+
+      {/* Add Skill Modal */}
+      <Dialog open={isAddSkillModalOpen} onOpenChange={setIsAddSkillModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Skill</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label htmlFor="skillName">Skill Name</Label>
+              <Input
+                id="skillName"
+                value={newSkillName}
+                onChange={(e) => setNewSkillName(e.target.value)}
+                placeholder="Enter skill name"
+                className="mt-1"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-3">
+            <Button variant="outline" onClick={() => setIsAddSkillModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleAddSkill}
+              className="bg-orange-600 hover:bg-orange-700"
+            >
+              Add Skill
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Specialty Modal */}
+      <Dialog open={isAddSpecialtyModalOpen} onOpenChange={setIsAddSpecialtyModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Specialty</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label htmlFor="specialtyName">Specialty Name</Label>
+              <Input
+                id="specialtyName"
+                value={newSpecialtyName}
+                onChange={(e) => setNewSpecialtyName(e.target.value)}
+                placeholder="Enter specialty name"
+                className="mt-1"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-3">
+            <Button variant="outline" onClick={() => setIsAddSpecialtyModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleAddSpecialty}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              Add Specialty
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

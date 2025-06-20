@@ -21,10 +21,12 @@ import { PortfolioGallery } from "@/components/profile/PortfolioGallery";
 import { SkillsSection } from "@/components/profile/SkillsSection";
 import { WorkShowcase } from "@/components/profile/WorkShowcase";
 import { ProfileStats } from "@/components/profile/ProfileStats";
+import { EditProfileModal } from "@/components/profile/EditProfileModal";
 
 export const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("overview");
-  const [isOwnProfile] = useState(true); // This would come from auth context
+  const [isOwnProfile] = useState(true);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // Mock profile data
   const profileData = {
@@ -45,6 +47,15 @@ export const ProfilePage = () => {
     verified: true,
     rating: 4.9,
     reviewCount: 127
+  };
+
+  const handleEditProfile = () => {
+    console.log("Edit Profile clicked");
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
   };
 
   return (
@@ -109,7 +120,7 @@ export const ProfilePage = () => {
                   <div className="flex items-center gap-3">
                     {isOwnProfile ? (
                       <>
-                        <Button variant="outline">
+                        <Button variant="outline" onClick={handleEditProfile}>
                           <Edit className="h-4 w-4 mr-2" />
                           Edit Profile
                         </Button>
@@ -196,6 +207,13 @@ export const ProfilePage = () => {
           </Tabs>
         </div>
       </div>
+
+      {/* Edit Profile Modal */}
+      <EditProfileModal 
+        isOpen={isEditModalOpen}
+        onClose={handleCloseEditModal}
+        profileData={profileData}
+      />
     </div>
   );
 };
