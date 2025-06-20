@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -64,7 +63,7 @@ export const MarketplacePage = () => {
       description: "Exquisite traditional Zardozi embroidery for special occasions",
       location: "Casablanca, Morocco",
       skills: ["Zardozi", "Gold Thread", "Traditional Patterns"],
-      availability: t('status.available')
+      availability: "Available"
     },
     {
       id: "2",
@@ -84,7 +83,7 @@ export const MarketplacePage = () => {
       description: "Contemporary beadwork combining traditional techniques with modern aesthetics",
       location: "Rabat, Morocco",
       skills: ["Beadwork", "Jewelry", "Contemporary Design"],
-      availability: t('status.busy')
+      availability: "Busy"
     },
     {
       id: "3",
@@ -104,7 +103,7 @@ export const MarketplacePage = () => {
       description: "Authentic Berber carpets woven using ancestral techniques",
       location: "Marrakech, Morocco",
       skills: ["Carpet Weaving", "Traditional Patterns", "Natural Dyes"],
-      availability: t('status.available')
+      availability: "Available"
     }
   ];
 
@@ -122,12 +121,12 @@ export const MarketplacePage = () => {
 
   const handleWorkAdded = (work: any) => {
     console.log("New work added:", work);
-    // You can add logic here to update the services list or refresh data
+    setIsAddWorkModalOpen(false);
   };
 
   const handleSpaceListed = (space: any) => {
     console.log("New space listed:", space);
-    // You can add logic here to handle the new space listing
+    setIsListSpaceModalOpen(false);
   };
 
   const handleFavorite = (serviceId: string) => {
@@ -136,6 +135,16 @@ export const MarketplacePage = () => {
 
   const handleMessage = (serviceId: string) => {
     console.log("Message artisan:", serviceId);
+  };
+
+  const handleAddWorkClick = () => {
+    console.log("Opening Add Work Modal");
+    setIsAddWorkModalOpen(true);
+  };
+
+  const handleListSpaceClick = () => {
+    console.log("Opening List Space Modal");
+    setIsListSpaceModalOpen(true);
   };
 
   return (
@@ -150,7 +159,7 @@ export const MarketplacePage = () => {
             </div>
             <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
               <Button 
-                onClick={() => setIsAddWorkModalOpen(true)}
+                onClick={handleAddWorkClick}
                 className="bg-black hover:bg-gray-800 text-white"
               >
                 <Plus className="h-4 w-4 mr-2" />
@@ -159,7 +168,7 @@ export const MarketplacePage = () => {
               <Button 
                 variant="outline"
                 className="border-gray-300 text-gray-700 hover:bg-gray-100"
-                onClick={() => setIsListSpaceModalOpen(true)}
+                onClick={handleListSpaceClick}
               >
                 <Building className="h-4 w-4 mr-2" />
                 {t('marketplace.listYourSpace')}
