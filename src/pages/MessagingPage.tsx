@@ -124,7 +124,7 @@ export const MessagingPage = () => {
               <Button size="sm" variant="ghost">
                 <MoreVertical className="h-4 w-4" />
               </Button>
-              <Button size="sm" className="bg-orange-600 hover:bg-orange-700">
+              <Button size="sm" className="bg-black hover:bg-gray-800">
                 <Plus className="h-4 w-4" />
               </Button>
             </div>

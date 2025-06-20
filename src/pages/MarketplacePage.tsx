@@ -138,14 +138,14 @@ export const MarketplacePage = () => {
             <div className="flex flex-col sm:flex-row gap-3">
               <Button 
                 onClick={() => setIsAddWorkModalOpen(true)}
-                className="bg-orange-600 hover:bg-orange-700"
+                className="bg-black hover:bg-gray-800"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 {t('marketplace.addNewWork')}
               </Button>
               <Button 
                 variant="outline"
-                className="border-orange-200 text-orange-600 hover:bg-orange-50"
+                className="border-gray-200 text-gray-600 hover:bg-gray-100"
                 onClick={() => setIsListSpaceModalOpen(true)}
               >
                 <Building className="h-4 w-4 mr-2" />
@@ -180,7 +180,11 @@ export const MarketplacePage = () => {
                 key={category.id}
                 variant={selectedCategory === category.id ? "default" : "outline"}
                 onClick={() => setSelectedCategory(category.id)}
-                className="flex items-center gap-2"
+                className={`flex items-center gap-2 ${
+                  selectedCategory === category.id 
+                    ? "bg-black hover:bg-gray-800 text-white" 
+                    : "border-gray-300 text-gray-600 hover:bg-gray-100"
+                }`}
               >
                 {category.name}
                 <Badge variant="secondary" className="ml-1">

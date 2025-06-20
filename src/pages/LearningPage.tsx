@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -128,10 +129,10 @@ export const LearningPage = () => {
             placeholder="Search courses or instructors..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 border-orange-300 focus:border-orange-500 focus:ring-orange-500"
+            className="pl-10 border-gray-300 focus:border-gray-500 focus:ring-gray-500"
           />
         </div>
-        <Button variant="outline" size="sm" className="border-orange-300 text-orange-600 hover:bg-orange-50">
+        <Button variant="outline" size="sm" className="border-gray-300 text-gray-600 hover:bg-gray-100">
           <Filter className="h-4 w-4 mr-2" />
           Filters
         </Button>
@@ -146,8 +147,8 @@ export const LearningPage = () => {
             size="sm"
             onClick={() => setActiveCategory(category.id)}
             className={activeCategory === category.id ? 
-              "bg-orange-500 hover:bg-orange-600 text-white" : 
-              "border-orange-300 text-orange-600 hover:bg-orange-50"
+              "bg-black hover:bg-gray-800 text-white" : 
+              "border-gray-300 text-gray-600 hover:bg-gray-100"
             }
           >
             {category.label}
@@ -156,10 +157,10 @@ export const LearningPage = () => {
       </div>
 
       {/* Featured Course */}
-      <Card className="p-8 bg-gradient-to-r from-orange-50 to-orange-100 border-orange-300">
+      <Card className="p-8 bg-gradient-to-r from-gray-100 to-gray-200 border-gray-300">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           <div>
-            <Badge className="mb-4 bg-orange-500 hover:bg-orange-600 text-white">Featured Course</Badge>
+            <Badge className="mb-4 bg-black hover:bg-gray-800 text-white">Featured Course</Badge>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
               Traditional Amazigh Jewelry Making
             </h2>
@@ -170,7 +171,7 @@ export const LearningPage = () => {
             <div className="flex items-center gap-4">
               <Button 
                 onClick={handleFeaturedEnroll}
-                className="bg-orange-500 hover:bg-orange-600 text-white"
+                className="bg-black hover:bg-gray-800 text-white"
               >
                 <Play className="h-4 w-4 mr-2" />
                 Enroll Now - $249
@@ -178,14 +179,14 @@ export const LearningPage = () => {
               <Button 
                 variant="outline"
                 onClick={handleFeaturedPreview}
-                className="border-orange-400 text-orange-600 hover:bg-orange-100"
+                className="border-gray-400 text-gray-600 hover:bg-gray-100"
               >
                 Preview Course
               </Button>
             </div>
           </div>
           <div className="text-center">
-            <div className="w-48 h-48 bg-gradient-to-br from-orange-400 to-orange-400 rounded-full mx-auto flex items-center justify-center text-6xl">
+            <div className="w-48 h-48 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full mx-auto flex items-center justify-center text-6xl text-white">
               💍
             </div>
           </div>
@@ -199,28 +200,28 @@ export const LearningPage = () => {
             All Courses ({filteredCourses.length})
           </h2>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="border-orange-300 text-orange-600 hover:bg-orange-50">Most Popular</Button>
-            <Button variant="outline" size="sm" className="border-orange-300 text-orange-600 hover:bg-orange-50">Newest</Button>
-            <Button variant="outline" size="sm" className="border-orange-300 text-orange-600 hover:bg-orange-50">Price: Low to High</Button>
+            <Button variant="outline" size="sm" className="border-gray-300 text-gray-600 hover:bg-gray-100">Most Popular</Button>
+            <Button variant="outline" size="sm" className="border-gray-300 text-gray-600 hover:bg-gray-100">Newest</Button>
+            <Button variant="outline" size="sm" className="border-gray-300 text-gray-600 hover:bg-gray-100">Price: Low to High</Button>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCourses.map((course) => (
-            <Card key={course.id} className="overflow-hidden hover:shadow-lg transition-shadow border-orange-200 bg-white">
-              <div className="h-48 bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center text-6xl">
+            <Card key={course.id} className="overflow-hidden hover:shadow-lg transition-shadow border-gray-200 bg-white">
+              <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-6xl">
                 {course.image}
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
-                  <Badge variant="outline" className="border-orange-300 text-orange-600">{course.level}</Badge>
+                  <Badge variant="outline" className="border-gray-300 text-gray-600">{course.level}</Badge>
                   <Badge variant="secondary">{course.duration}</Badge>
                 </div>
                 <h3 className="text-xl font-semibold text-gray-800 mb-2">{course.title}</h3>
                 <p className="text-gray-600 text-sm mb-4">{course.description}</p>
                 
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
+                  <div className="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
                     {course.instructor.split(' ').map(n => n[0]).join('')}
                   </div>
                   <div>
@@ -239,7 +240,7 @@ export const LearningPage = () => {
                   </div>
                   <Button 
                     size="sm" 
-                    className="bg-orange-500 hover:bg-orange-600 text-white"
+                    className="bg-black hover:bg-gray-800 text-white"
                     onClick={() => handleCourseEnroll(course.id, course.price)}
                   >
                     Enroll Now
@@ -252,10 +253,10 @@ export const LearningPage = () => {
       </div>
 
       {/* Upcoming Workshops */}
-      <Card className="p-6 border-orange-200 bg-white">
+      <Card className="p-6 border-gray-200 bg-white">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-800">Upcoming Live Workshops</h2>
-          <Button variant="outline" size="sm" className="border-orange-300 text-orange-600 hover:bg-orange-50">
+          <Button variant="outline" size="sm" className="border-gray-300 text-gray-600 hover:bg-gray-100">
             <Calendar className="h-4 w-4 mr-2" />
             View Calendar
           </Button>
@@ -266,7 +267,7 @@ export const LearningPage = () => {
             { title: "Leather Crafting Basics", date: "Dec 28", time: "10:00 AM EST", spots: 8 },
             { title: "Pottery & Ceramics", date: "Jan 2", time: "3:00 PM EST", spots: 15 }
           ].map((workshop, index) => (
-            <Card key={index} className="p-4 border border-orange-200">
+            <Card key={index} className="p-4 border border-gray-200">
               <h4 className="font-semibold mb-2">{workshop.title}</h4>
               <div className="text-sm text-gray-600 space-y-1">
                 <p>{workshop.date} at {workshop.time}</p>
@@ -274,7 +275,7 @@ export const LearningPage = () => {
               </div>
               <Button 
                 size="sm" 
-                className="w-full mt-3 bg-orange-500 hover:bg-orange-600 text-white"
+                className="w-full mt-3 bg-black hover:bg-gray-800 text-white"
                 onClick={() => handleWorkshopReserve(workshop.title)}
               >
                 Reserve Spot

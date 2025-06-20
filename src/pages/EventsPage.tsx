@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -184,7 +183,7 @@ export const EventsPage = () => {
               <Filter className="h-4 w-4 mr-2" />
               Filters
             </Button>
-            <Button className="bg-orange-600 hover:bg-orange-700">
+            <Button className="bg-black hover:bg-gray-800">
               <Plus className="h-4 w-4 mr-2" />
               Create Event
             </Button>
@@ -198,7 +197,7 @@ export const EventsPage = () => {
                 variant={activeCategory === category.id ? "default" : "outline"}
                 size="sm"
                 onClick={() => setActiveCategory(category.id)}
-                className={activeCategory === category.id ? "bg-orange-600 hover:bg-orange-700" : ""}
+                className={activeCategory === category.id ? "bg-black hover:bg-gray-800" : ""}
               >
                 {category.label}
               </Button>
@@ -206,10 +205,10 @@ export const EventsPage = () => {
           </div>
 
           {/* Featured Event */}
-          <Card className="p-8 bg-gradient-to-r from-orange-50 to-red-50 border-orange-200">
+          <Card className="p-8 bg-gradient-to-r from-gray-100 to-gray-200 border-gray-200">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
               <div>
-                <Badge className="mb-4 bg-orange-600">Featured Event</Badge>
+                <Badge className="mb-4 bg-black">Featured Event</Badge>
                 <h2 className="text-2xl font-bold text-gray-800 mb-4">
                   International Craft Symposium 2024
                 </h2>
@@ -232,14 +231,14 @@ export const EventsPage = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <Button className="bg-orange-600 hover:bg-orange-700">
+                  <Button className="bg-black hover:bg-gray-800">
                     Register Now - $299
                   </Button>
                   <Button variant="outline">Learn More</Button>
                 </div>
               </div>
               <div className="text-center">
-                <div className="w-48 h-48 bg-gradient-to-br from-orange-400 to-red-400 rounded-full mx-auto flex items-center justify-center text-6xl">
+                <div className="w-48 h-48 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full mx-auto flex items-center justify-center text-6xl text-white">
                   🌍
                 </div>
               </div>
@@ -262,7 +261,7 @@ export const EventsPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredEvents.map((event) => (
                 <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <div className="h-48 bg-gradient-to-br from-orange-100 to-red-100 flex items-center justify-center text-6xl">
+                  <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-6xl">
                     {event.image}
                   </div>
                   <div className="p-6">
@@ -362,7 +361,7 @@ export const EventsPage = () => {
               <h3 className="text-lg font-semibold mb-4">Community Highlights</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-orange-600">500+</div>
+                  <div className="text-2xl font-bold text-gray-600">500+</div>
                   <div className="text-sm text-gray-600">Active Artisans</div>
                 </div>
                 <div className="text-center">
@@ -370,11 +369,11 @@ export const EventsPage = () => {
                   <div className="text-sm text-gray-600">Monthly Workshops</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-purple-600">25+</div>
+                  <div className="text-2xl font-bold text-gray-600">25+</div>
                   <div className="text-sm text-gray-600">Studio Partners</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">12</div>
+                  <div className="text-2xl font-bold text-gray-600">12</div>
                   <div className="text-sm text-gray-600">Cultural Events</div>
                 </div>
               </div>
@@ -393,8 +392,8 @@ export const EventsPage = () => {
             <div className="space-y-4">
               {forumTopics.map((topic) => (
                 <div key={topic.id} className="flex items-center gap-4 p-3 border rounded hover:bg-gray-50">
-                  <div className="w-10 h-10 bg-orange-200 rounded-full flex items-center justify-center">
-                    <MessageSquare className="h-5 w-5 text-orange-600" />
+                  <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                    <MessageSquare className="h-5 w-5 text-gray-600" />
                   </div>
                   <div className="flex-1">
                     <h4 className="font-medium">{topic.title}</h4>
@@ -432,7 +431,7 @@ export const EventsPage = () => {
                     className={`aspect-square flex items-center justify-center text-sm border rounded ${
                       isCurrentMonth 
                         ? hasEvent 
-                          ? 'bg-orange-100 border-orange-300 text-orange-700 font-medium' 
+                          ? 'bg-gray-100 border-gray-300 text-gray-700 font-medium' 
                           : 'border-gray-200 hover:bg-gray-50'
                         : 'text-gray-400 border-gray-100'
                     }`}
@@ -444,7 +443,7 @@ export const EventsPage = () => {
             </div>
             <div className="mt-4 text-sm text-gray-600">
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-orange-100 border border-orange-300 rounded"></div>
+                <div className="w-4 h-4 bg-gray-100 border border-gray-300 rounded"></div>
                 <span>Events scheduled</span>
               </div>
             </div>
