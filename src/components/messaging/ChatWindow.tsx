@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Phone, Video, MoreVertical, Info } from "lucide-react";
 import { MessageInput } from "./MessageInput";
 import { MessageBubble } from "./MessageBubble";
+import { TypingIndicator } from "./TypingIndicator";
 import { toast } from "sonner";
 
 interface Conversation {
@@ -29,6 +30,10 @@ interface Message {
   text: string;
   timestamp: string;
   isRead: boolean;
+  status?: "sending" | "sent" | "delivered" | "read";
+  type?: "text" | "image" | "file";
+  fileUrl?: string;
+  fileName?: string;
 }
 
 interface ChatWindowProps {
@@ -38,16 +43,54 @@ interface ChatWindowProps {
 
 export const ChatWindow = ({ conversation, messages }: ChatWindowProps) => {
   const [messageList, setMessageList] = useState<Message[]>(messages);
+  const [isTyping, setIsTyping] = useState(false);
 
-  const handleSendMessage = (text: string) => {
+  const handleSendMessage = (text: string, type: "text" | "image" | "file" = "text", fileUrl?: string, fileName?: string) => {
     const newMessage: Message = {
       id: Date.now().toString(),
       senderId: "me",
       text,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      isRead: false
+      isRead: false,
+      status: "sending",
+      type,
+      fileUrl,
+      fileName
     };
+    
     setMessageList([...messageList, newMessage]);
+    
+    // Simulate message delivery
+    setTimeout(() => {
+      setMessageList(prev => prev.map(msg => 
+        msg.id === newMessage.id ? { ...msg, status: "sent" } : msg
+      ));
+    }, 500);
+    
+    setTimeout(() => {
+      setMessageList(prev => prev.map(msg => 
+        msg.id === newMessage.id ? { ...msg, status: "delivered" } : msg
+      ));
+    }, 1000);
+
+    // Simulate typing response
+    setTimeout(() => {
+      setIsTyping(true);
+    }, 2000);
+
+    setTimeout(() => {
+      setIsTyping(false);
+      const responseMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        senderId: "other",
+        text: "Thank you for sharing! That looks beautiful.",
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        isRead: true,
+        status: "read",
+        type: "text"
+      };
+      setMessageList(prev => [...prev, responseMessage]);
+    }, 4000);
   };
 
   const handleVoiceCall = () => {
@@ -142,6 +185,7 @@ export const ChatWindow = ({ conversation, messages }: ChatWindowProps) => {
             isOwn={message.senderId === "me"}
           />
         ))}
+        {isTyping && <TypingIndicator />}
       </div>
 
       {/* Message Input */}
