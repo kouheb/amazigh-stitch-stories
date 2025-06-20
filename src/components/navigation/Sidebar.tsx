@@ -62,7 +62,7 @@ export const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
                 className={`w-full justify-start transition-all duration-200 ${
                   isActive 
                     ? "bg-orange-600 hover:bg-orange-700 text-white shadow-md" 
-                    : "text-gray-700 hover:bg-orange-50 hover:text-orange-600"
+                    : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                 }`}
                 onClick={() => handleNavigationClick(item.id)}
               >
@@ -81,7 +81,7 @@ export const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
         <div className="pt-4 border-t">
           <Button 
             variant="ghost" 
-            className="w-full justify-start text-gray-600 hover:bg-gray-100 hover:text-gray-700"
+            className="w-full justify-start text-gray-600 hover:bg-gray-100 hover:text-gray-900"
             onClick={handleSettingsClick}
           >
             <Settings className="h-4 w-4 mr-3" />

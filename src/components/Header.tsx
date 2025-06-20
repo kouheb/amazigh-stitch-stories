@@ -36,7 +36,7 @@ export const Header = () => {
                 <Link
                   key={item.name}
                   to={item.href}
-                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-gray-700 hover:text-orange-500 hover:bg-orange-50 transition-colors"
+                  className="flex items-center space-x-2 px-3 py-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors"
                 >
                   <Icon className="h-4 w-4" />
                   <span>{item.name}</span>
@@ -51,7 +51,7 @@ export const Header = () => {
               variant="ghost"
               size="sm"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-700 hover:text-orange-500 hover:bg-orange-50"
+              className="text-gray-700 hover:text-gray-900 hover:bg-gray-100"
             >
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
@@ -68,7 +68,7 @@ export const Header = () => {
                   <Link
                     key={item.name}
                     to={item.href}
-                    className="flex items-center space-x-3 px-3 py-2 rounded-md text-gray-700 hover:text-orange-500 hover:bg-orange-50 transition-colors"
+                    className="flex items-center space-x-3 px-3 py-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <Icon className="h-5 w-5" />

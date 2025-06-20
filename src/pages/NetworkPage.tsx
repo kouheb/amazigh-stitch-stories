@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -98,7 +99,7 @@ export const NetworkPage = () => {
             />
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="border-orange-300 text-orange-600 hover:bg-orange-50">
+            <Button variant="outline" size="sm" className="border-gray-300 text-gray-600 hover:bg-gray-100">
               <Filter className="h-4 w-4 mr-2" />
               Filters
             </Button>
@@ -121,8 +122,8 @@ export const NetworkPage = () => {
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-600">{artisans.length} artisans found</p>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="border-orange-300 text-orange-600 hover:bg-orange-50">Grid</Button>
-          <Button variant="ghost" size="sm" className="text-orange-600 hover:bg-orange-50">List</Button>
+          <Button variant="outline" size="sm" className="border-gray-300 text-gray-600 hover:bg-gray-100">Grid</Button>
+          <Button variant="ghost" size="sm" className="text-gray-600 hover:bg-gray-100">List</Button>
         </div>
       </div>
 
@@ -172,15 +173,15 @@ export const NetworkPage = () => {
               </div>
 
               <div className="flex gap-2 pt-4">
-                <Button size="sm" className="flex-1 bg-orange-500 hover:bg-orange-600 text-white">
+                <Button size="sm" className="flex-1 bg-orange-500 hover:bg-gray-600 text-white">
                   <Users className="h-4 w-4 mr-1" />
                   Connect
                 </Button>
-                <Button size="sm" variant="outline" className="border-orange-300 text-orange-600 hover:bg-orange-50">
+                <Button size="sm" variant="outline" className="border-gray-300 text-gray-600 hover:bg-gray-100">
                   <MessageCircle className="h-4 w-4 mr-1" />
                   Message
                 </Button>
-                <Button size="sm" variant="outline" className="border-orange-300 text-orange-600 hover:bg-orange-50">
+                <Button size="sm" variant="outline" className="border-gray-300 text-gray-600 hover:bg-gray-100">
                   <Eye className="h-4 w-4" />
                 </Button>
               </div>

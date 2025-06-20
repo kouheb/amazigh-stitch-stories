@@ -40,7 +40,7 @@ export const BottomNavigation = ({ activeTab, onTabChange }: BottomNavigationPro
               variant="ghost"
               onClick={() => handleTabClick(tab.id)}
               className={`flex flex-col items-center gap-1 h-auto py-2 px-3 transition-colors ${
-                isActive ? 'text-orange-600 bg-orange-50' : 'text-gray-600 hover:text-orange-500 hover:bg-orange-50'
+                isActive ? 'text-orange-600 bg-orange-50' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
               }`}
             >
               <IconComponent className={`h-5 w-5 ${isActive ? 'text-orange-600' : 'text-gray-600'}`} />

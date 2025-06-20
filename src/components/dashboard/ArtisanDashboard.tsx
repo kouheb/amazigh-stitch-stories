@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -97,14 +98,14 @@ export const ArtisanDashboard = ({ onTabChange }: ArtisanDashboardProps) => {
         <div className="flex gap-3">
           <Button 
             onClick={handleCreateProfile}
-            className="bg-orange-500 hover:bg-orange-600 text-white"
+            className="bg-orange-500 hover:bg-gray-600 text-white"
           >
             <UserCog className="h-4 w-4 mr-2" />
             {t('dashboard.createProfile')}
           </Button>
           <Button 
             onClick={handleChooseMembership}
-            className="bg-orange-600 hover:bg-orange-700 text-white"
+            className="bg-orange-600 hover:bg-gray-700 text-white"
           >
             <Crown className="h-4 w-4 mr-2" />
             {t('dashboard.chooseMembership')}
@@ -122,7 +123,7 @@ export const ArtisanDashboard = ({ onTabChange }: ArtisanDashboardProps) => {
               variant="link" 
               size="sm" 
               onClick={handleRetry}
-              className="text-orange-600 p-0 ml-2 h-auto"
+              className="text-orange-600 hover:text-gray-700 p-0 ml-2 h-auto"
             >
               <RefreshCw className="h-3 w-3 mr-1" />
               Try again
@@ -182,7 +183,7 @@ export const ArtisanDashboard = ({ onTabChange }: ArtisanDashboardProps) => {
         <Card className="lg:col-span-2 p-6 border-orange-200 bg-white">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold">{t('dashboard.recentProjects')}</h3>
-            <Button variant="outline" size="sm" className="border-orange-300 text-orange-600 hover:bg-orange-50">{t('dashboard.viewAll')}</Button>
+            <Button variant="outline" size="sm" className="border-gray-300 text-gray-600 hover:bg-gray-100">{t('dashboard.viewAll')}</Button>
           </div>
           <div className="space-y-3">
             {recentProjects.map((project, index) => (
@@ -191,7 +192,7 @@ export const ArtisanDashboard = ({ onTabChange }: ArtisanDashboardProps) => {
                   <h4 className="font-medium">{project.title}</h4>
                   <Badge 
                     variant={project.status === t('status.completed') ? "default" : "secondary"}
-                    className={project.status === t('status.completed') ? "bg-orange-500 hover:bg-orange-600 text-white" : "mt-1"}
+                    className={project.status === t('status.completed') ? "bg-orange-500 hover:bg-gray-600 text-white" : "mt-1"}
                   >
                     {project.status}
                   </Badge>
@@ -211,19 +212,19 @@ export const ArtisanDashboard = ({ onTabChange }: ArtisanDashboardProps) => {
         <Card className="p-6 border-orange-200 bg-white">
           <h3 className="text-lg font-semibold mb-4">{t('dashboard.quickActions')}</h3>
           <div className="space-y-3">
-            <Button variant="outline" className="w-full justify-start border-orange-300 text-orange-600 hover:bg-orange-50">
+            <Button variant="outline" className="w-full justify-start border-gray-300 text-gray-600 hover:bg-gray-100">
               <Calendar className="h-4 w-4 mr-2" />
               {t('dashboard.scheduleWorkshop')}
             </Button>
-            <Button variant="outline" className="w-full justify-start border-orange-300 text-orange-600 hover:bg-orange-50">
+            <Button variant="outline" className="w-full justify-start border-gray-300 text-gray-600 hover:bg-gray-100">
               <BookOpen className="h-4 w-4 mr-2" />
               {t('dashboard.createCourse')}
             </Button>
-            <Button variant="outline" className="w-full justify-start border-orange-300 text-orange-600 hover:bg-orange-50">
+            <Button variant="outline" className="w-full justify-start border-gray-300 text-gray-600 hover:bg-gray-100">
               <Users className="h-4 w-4 mr-2" />
               {t('dashboard.findCollaborators')}
             </Button>
-            <Button variant="outline" className="w-full justify-start border-orange-300 text-orange-600 hover:bg-orange-50">
+            <Button variant="outline" className="w-full justify-start border-gray-300 text-gray-600 hover:bg-gray-100">
               <TrendingUp className="h-4 w-4 mr-2" />
               {t('dashboard.viewAnalytics')}
             </Button>
