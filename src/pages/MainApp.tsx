@@ -9,6 +9,7 @@ import { ProfilePage } from "./ProfilePage";
 import { MessagingPage } from "./MessagingPage";
 import { MarketplacePage } from "./MarketplacePage";
 import { ArtisanDashboard } from "@/components/dashboard/ArtisanDashboard";
+import ProfileCreationScreen from "@/components/wireframe/ProfileCreationScreen";
 import Membership from "./Membership";
 
 export const MainApp = () => {
@@ -41,6 +42,8 @@ export const MainApp = () => {
         return <MarketplacePage />;
       case "profile":
         return <ArtisanDashboard onTabChange={handleTabChange} />;
+      case "create-profile":
+        return <ProfileCreationScreen />;
       case "enhanced-profile":
         return <ProfilePage />;
       case "membership":

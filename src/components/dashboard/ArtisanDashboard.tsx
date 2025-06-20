@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,7 +34,7 @@ export const ArtisanDashboard = ({ onTabChange }: ArtisanDashboardProps) => {
   const handleCreateProfile = () => {
     console.log("Navigate to profile creation");
     if (onTabChange) {
-      onTabChange("enhanced-profile");
+      onTabChange("create-profile");
     }
   };
 
