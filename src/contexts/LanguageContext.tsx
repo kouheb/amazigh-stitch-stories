@@ -48,6 +48,8 @@ const translations = {
     'auth.createAccountButton': 'Create Account',
     'auth.forgotPassword': 'Forgot password?',
     'auth.termsAgreement': 'By continuing, you agree to our Terms of Service and Privacy Policy',
+    'auth.switchToLogin': 'Already have an account? Sign in',
+    'auth.switchToRegister': "Don't have an account? Sign up",
     
     // Dashboard
     'dashboard.welcome': 'Welcome back, Sarah!',
@@ -122,6 +124,8 @@ const translations = {
     'auth.createAccountButton': 'إنشاء حساب',
     'auth.forgotPassword': 'نسيت كلمة المرور؟',
     'auth.termsAgreement': 'بالمتابعة، فإنك توافق على شروط الخدمة وسياسة الخصوصية الخاصة بنا',
+    'auth.switchToLogin': 'لديك حساب بالفعل؟ سجل دخولك',
+    'auth.switchToRegister': 'ليس لديك حساب؟ أنشئ حساباً',
     
     // Dashboard - Arabic
     'dashboard.welcome': 'أهلاً بك مرة أخرى، سارة!',
@@ -196,6 +200,8 @@ const translations = {
     'auth.createAccountButton': 'Créer un compte',
     'auth.forgotPassword': 'Mot de passe oublié?',
     'auth.termsAgreement': 'En continuant, vous acceptez nos conditions de service et notre politique de confidentialité',
+    'auth.switchToLogin': 'Vous avez déjà un compte? Connectez-vous',
+    'auth.switchToRegister': "Vous n'avez pas de compte? Inscrivez-vous",
     
     // Dashboard - French
     'dashboard.welcome': 'Bon retour, Sarah!',
@@ -242,6 +248,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     console.log(`Language changing from ${language} to ${lang}`);
     setLanguage(lang);
     console.log(`Language changed to: ${lang}`);
+    console.log(`Interface should now display in: ${lang}`);
   };
 
   const t = (key: string): string => {
@@ -253,7 +260,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     return translation;
   };
 
-  console.log(`Current language: ${language}`);
+  console.log(`Current language context: ${language}`);
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage: handleLanguageChange, t }}>
