@@ -9,7 +9,11 @@ import { ExperienceAndGoals } from "./profile/ExperienceAndGoals";
 import { FormTermsAndActions } from "./profile/FormTermsAndActions";
 import { ProgressIndicator } from "./profile/ProgressIndicator";
 
-const ProfileCreationScreen = () => {
+interface ProfileCreationScreenProps {
+  onProfileComplete?: () => void;
+}
+
+const ProfileCreationScreen = ({ onProfileComplete }: ProfileCreationScreenProps) => {
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
@@ -19,6 +23,13 @@ const ProfileCreationScreen = () => {
         ? prev.filter(r => r !== role)
         : [...prev, role]
     );
+  };
+
+  const handleProfileSubmit = () => {
+    console.log("Profile creation completed");
+    if (onProfileComplete) {
+      onProfileComplete();
+    }
   };
 
   return (
@@ -48,7 +59,7 @@ const ProfileCreationScreen = () => {
             
             <ExperienceAndGoals />
             
-            <FormTermsAndActions />
+            <FormTermsAndActions onSubmit={handleProfileSubmit} />
           </div>
         </Card>
 

@@ -14,10 +14,17 @@ import Membership from "./Membership";
 
 export const MainApp = () => {
   const [activeTab, setActiveTab] = useState("home");
+  const [isProfileComplete, setIsProfileComplete] = useState(false);
 
   const handleTabChange = (tab: string) => {
     console.log(`Tab changed to: ${tab}`);
     setActiveTab(tab);
+  };
+
+  const handleProfileComplete = () => {
+    console.log("Profile creation completed");
+    setIsProfileComplete(true);
+    setActiveTab("home"); // Redirect to home after profile completion
   };
 
   useEffect(() => {
@@ -43,7 +50,7 @@ export const MainApp = () => {
       case "profile":
         return <ArtisanDashboard onTabChange={handleTabChange} />;
       case "create-profile":
-        return <ProfileCreationScreen />;
+        return <ProfileCreationScreen onProfileComplete={handleProfileComplete} />;
       case "enhanced-profile":
         return <ProfilePage />;
       case "membership":

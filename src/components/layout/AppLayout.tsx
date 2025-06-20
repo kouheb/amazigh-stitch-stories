@@ -15,6 +15,9 @@ export const AppLayout = ({ children, activeTab, onTabChange }: AppLayoutProps) 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isAddWorkModalOpen, setIsAddWorkModalOpen] = useState(false);
 
+  // Mock profile completion check - in a real app this would come from user data
+  const [isProfileComplete, setIsProfileComplete] = useState(false);
+
   const handleTabChange = (tab: string) => {
     console.log(`AppLayout handling tab change: ${tab}`);
     onTabChange(tab);
@@ -30,6 +33,14 @@ export const AppLayout = ({ children, activeTab, onTabChange }: AppLayoutProps) 
   };
 
   const handleCreateClick = () => {
+    console.log("Create button clicked");
+    
+    if (!isProfileComplete) {
+      console.log("Profile not complete, redirecting to profile creation");
+      onTabChange("create-profile");
+      return;
+    }
+    
     console.log("Opening Add Work Modal from AppLayout");
     setIsAddWorkModalOpen(true);
   };
@@ -78,7 +89,7 @@ export const AppLayout = ({ children, activeTab, onTabChange }: AppLayoutProps) 
         <BottomNavigation activeTab={activeTab} onTabChange={handleTabChange} />
       </div>
 
-      {/* Add Work Modal */}
+      {/* Add Work Modal - only opens when profile is complete */}
       <AddWorkModal
         isOpen={isAddWorkModalOpen}
         onClose={() => setIsAddWorkModalOpen(false)}
