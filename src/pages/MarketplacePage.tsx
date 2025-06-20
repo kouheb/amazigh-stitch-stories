@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,7 @@ import { ServiceCard } from "@/components/marketplace/ServiceCard";
 import { BookingModal } from "@/components/marketplace/BookingModal";
 import { AddWorkModal } from "@/components/modals/AddWorkModal";
 import { ListSpaceModal } from "@/components/modals/ListSpaceModal";
+import { MainNavbar } from "@/components/navigation/MainNavbar";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export const MarketplacePage = () => {
@@ -149,6 +151,11 @@ export const MarketplacePage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <MainNavbar 
+        isAuthenticated={true} 
+        onCreateClick={handleAddWorkClick}
+      />
+      
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-8">

@@ -29,9 +29,10 @@ import { useLanguage } from "@/contexts/LanguageContext";
 interface MainNavbarProps {
   isAuthenticated?: boolean;
   onMenuToggle?: () => void;
+  onCreateClick?: () => void;
 }
 
-export const MainNavbar = ({ isAuthenticated = false, onMenuToggle }: MainNavbarProps) => {
+export const MainNavbar = ({ isAuthenticated = false, onMenuToggle, onCreateClick }: MainNavbarProps) => {
   const { t } = useLanguage();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "register">("login");
@@ -39,6 +40,12 @@ export const MainNavbar = ({ isAuthenticated = false, onMenuToggle }: MainNavbar
   const handleAuthClick = (mode: "login" | "register") => {
     setAuthMode(mode);
     setShowAuthModal(true);
+  };
+
+  const handleCreateClick = () => {
+    if (onCreateClick) {
+      onCreateClick();
+    }
   };
 
   return (
@@ -88,7 +95,11 @@ export const MainNavbar = ({ isAuthenticated = false, onMenuToggle }: MainNavbar
             {isAuthenticated ? (
               <>
                 {/* Create button - hidden on mobile */}
-                <Button size="sm" className="hidden sm:flex bg-black hover:bg-gray-800 text-white">
+                <Button 
+                  size="sm" 
+                  className="hidden sm:flex bg-black hover:bg-gray-800 text-white"
+                  onClick={handleCreateClick}
+                >
                   <Plus className="h-4 w-4 mr-1" />
                   {t('nav.create')}
                 </Button>
