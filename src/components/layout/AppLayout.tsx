@@ -3,6 +3,7 @@ import { useState } from "react";
 import { MainNavbar } from "@/components/navigation/MainNavbar";
 import { BottomNavigation } from "@/components/navigation/BottomNavigation";
 import { Sidebar } from "@/components/navigation/Sidebar";
+import { AddWorkModal } from "@/components/modals/AddWorkModal";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -12,6 +13,7 @@ interface AppLayoutProps {
 
 export const AppLayout = ({ children, activeTab, onTabChange }: AppLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isAddWorkModalOpen, setIsAddWorkModalOpen] = useState(false);
 
   const handleTabChange = (tab: string) => {
     console.log(`AppLayout handling tab change: ${tab}`);
@@ -25,6 +27,16 @@ export const AppLayout = ({ children, activeTab, onTabChange }: AppLayoutProps) 
   const handleMenuToggle = () => {
     console.log("Menu toggle clicked");
     setSidebarOpen(!sidebarOpen);
+  };
+
+  const handleCreateClick = () => {
+    console.log("Opening Add Work Modal from AppLayout");
+    setIsAddWorkModalOpen(true);
+  };
+
+  const handleWorkAdded = (work: any) => {
+    console.log("New work added:", work);
+    setIsAddWorkModalOpen(false);
   };
 
   return (
@@ -54,6 +66,7 @@ export const AppLayout = ({ children, activeTab, onTabChange }: AppLayoutProps) 
         <MainNavbar 
           isAuthenticated={true} 
           onMenuToggle={handleMenuToggle}
+          onCreateClick={handleCreateClick}
         />
         
         <main className="flex-1 overflow-auto pb-16 md:pb-0 px-4 py-4">
@@ -64,6 +77,13 @@ export const AppLayout = ({ children, activeTab, onTabChange }: AppLayoutProps) 
         
         <BottomNavigation activeTab={activeTab} onTabChange={handleTabChange} />
       </div>
+
+      {/* Add Work Modal */}
+      <AddWorkModal
+        isOpen={isAddWorkModalOpen}
+        onClose={() => setIsAddWorkModalOpen(false)}
+        onWorkAdded={handleWorkAdded}
+      />
     </div>
   );
 };

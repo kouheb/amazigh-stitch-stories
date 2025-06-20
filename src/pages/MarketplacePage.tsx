@@ -21,7 +21,6 @@ import {
 } from "lucide-react";
 import { ServiceCard } from "@/components/marketplace/ServiceCard";
 import { BookingModal } from "@/components/marketplace/BookingModal";
-import { AddWorkModal } from "@/components/modals/AddWorkModal";
 import { ListSpaceModal } from "@/components/modals/ListSpaceModal";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -31,7 +30,6 @@ export const MarketplacePage = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedService, setSelectedService] = useState<any>(null);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-  const [isAddWorkModalOpen, setIsAddWorkModalOpen] = useState(false);
   const [isListSpaceModalOpen, setIsListSpaceModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
@@ -119,11 +117,6 @@ export const MarketplacePage = () => {
     setIsBookingModalOpen(true);
   };
 
-  const handleWorkAdded = (work: any) => {
-    console.log("New work added:", work);
-    setIsAddWorkModalOpen(false);
-  };
-
   const handleSpaceListed = (space: any) => {
     console.log("New space listed:", space);
     setIsListSpaceModalOpen(false);
@@ -135,11 +128,6 @@ export const MarketplacePage = () => {
 
   const handleMessage = (serviceId: string) => {
     console.log("Message artisan:", serviceId);
-  };
-
-  const handleAddWorkClick = () => {
-    console.log("Opening Add Work Modal");
-    setIsAddWorkModalOpen(true);
   };
 
   const handleListSpaceClick = () => {
@@ -158,13 +146,6 @@ export const MarketplacePage = () => {
               <p className="text-gray-600">{t('marketplace.subtitle')}</p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-              <Button 
-                onClick={handleAddWorkClick}
-                className="bg-black hover:bg-gray-800 text-white"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                {t('marketplace.addNewWork')}
-              </Button>
               <Button 
                 variant="outline"
                 className="border-gray-300 text-gray-700 hover:bg-gray-100"
@@ -373,13 +354,6 @@ export const MarketplacePage = () => {
           service={selectedService}
         />
       )}
-
-      {/* Add Work Modal */}
-      <AddWorkModal
-        isOpen={isAddWorkModalOpen}
-        onClose={() => setIsAddWorkModalOpen(false)}
-        onWorkAdded={handleWorkAdded}
-      />
 
       {/* List Space Modal */}
       <ListSpaceModal
