@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ interface AuthModalProps {
 }
 
 export const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProps) => {
+  const { t } = useLanguage();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -45,25 +47,25 @@ export const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProp
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-bold text-gray-800">
-            Welcome to Amazigh Nations
+            {t('auth.welcomeTitle')}
           </DialogTitle>
         </DialogHeader>
 
         <Tabs value={mode} onValueChange={(value) => onModeChange(value as "login" | "register")} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            <TabsTrigger value="login">{t('auth.login')}</TabsTrigger>
+            <TabsTrigger value="signup">{t('auth.signup')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="login" className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('auth.email')}</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   id="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={t('auth.emailPlaceholder')}
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   className="pl-10"
@@ -72,13 +74,13 @@ export const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProp
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('auth.password')}</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
+                  placeholder={t('auth.passwordPlaceholder')}
                   value={formData.password}
                   onChange={(e) => handleInputChange("password", e.target.value)}
                   className="pl-10 pr-10"
@@ -94,12 +96,12 @@ export const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProp
             </div>
 
             <Button onClick={handleLogin} className="w-full bg-orange-600 hover:bg-orange-700">
-              Login
+              {t('auth.loginButton')}
             </Button>
 
             <div className="text-center">
               <Button variant="link" className="text-sm text-gray-600">
-                Forgot password?
+                {t('auth.forgotPassword')}
               </Button>
             </div>
           </TabsContent>
@@ -107,12 +109,12 @@ export const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProp
           <TabsContent value="signup" className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="firstName">First Name</Label>
+                <Label htmlFor="firstName">{t('auth.firstName')}</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
                     id="firstName"
-                    placeholder="First name"
+                    placeholder={t('auth.firstNamePlaceholder')}
                     value={formData.firstName}
                     onChange={(e) => handleInputChange("firstName", e.target.value)}
                     className="pl-10"
@@ -120,10 +122,10 @@ export const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProp
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lastName">Last Name</Label>
+                <Label htmlFor="lastName">{t('auth.lastName')}</Label>
                 <Input
                   id="lastName"
-                  placeholder="Last name"
+                  placeholder={t('auth.lastNamePlaceholder')}
                   value={formData.lastName}
                   onChange={(e) => handleInputChange("lastName", e.target.value)}
                 />
@@ -131,13 +133,13 @@ export const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProp
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="signupEmail">Email</Label>
+              <Label htmlFor="signupEmail">{t('auth.email')}</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   id="signupEmail"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={t('auth.emailPlaceholder')}
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   className="pl-10"
@@ -146,13 +148,13 @@ export const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProp
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="signupPassword">Password</Label>
+              <Label htmlFor="signupPassword">{t('auth.password')}</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   id="signupPassword"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Create password"
+                  placeholder={t('auth.createPasswordPlaceholder')}
                   value={formData.password}
                   onChange={(e) => handleInputChange("password", e.target.value)}
                   className="pl-10 pr-10"
@@ -168,13 +170,13 @@ export const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProp
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">{t('auth.confirmPassword')}</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   id="confirmPassword"
                   type="password"
-                  placeholder="Confirm password"
+                  placeholder={t('auth.confirmPasswordPlaceholder')}
                   value={formData.confirmPassword}
                   onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
                   className="pl-10"
@@ -183,13 +185,13 @@ export const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProp
             </div>
 
             <Button onClick={handleSignUp} className="w-full bg-orange-600 hover:bg-orange-700">
-              Create Account
+              {t('auth.createAccountButton')}
             </Button>
           </TabsContent>
         </Tabs>
 
         <div className="text-center text-sm text-gray-600">
-          By continuing, you agree to our Terms of Service and Privacy Policy
+          {t('auth.termsAgreement')}
         </div>
       </DialogContent>
     </Dialog>

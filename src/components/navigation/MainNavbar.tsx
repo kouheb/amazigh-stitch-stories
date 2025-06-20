@@ -24,6 +24,7 @@ import { MobileLogo } from "@/components/ui/MobileLogo";
 import { Logo } from "@/components/ui/Logo";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { LanguageSelector } from "./LanguageSelector";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface MainNavbarProps {
   isAuthenticated?: boolean;
@@ -31,6 +32,7 @@ interface MainNavbarProps {
 }
 
 export const MainNavbar = ({ isAuthenticated = false, onMenuToggle }: MainNavbarProps) => {
+  const { t } = useLanguage();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "register">("login");
 
@@ -72,7 +74,7 @@ export const MainNavbar = ({ isAuthenticated = false, onMenuToggle }: MainNavbar
               <div className="relative w-full">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
-                  placeholder="Search artisans, skills, or services..."
+                  placeholder={t('nav.searchPlaceholder')}
                   className="pl-9 bg-gray-50 border-gray-200"
                 />
               </div>
@@ -88,7 +90,7 @@ export const MainNavbar = ({ isAuthenticated = false, onMenuToggle }: MainNavbar
                 {/* Create button - hidden on mobile */}
                 <Button size="sm" className="hidden sm:flex bg-orange-600 hover:bg-orange-700">
                   <Plus className="h-4 w-4 mr-1" />
-                  Create
+                  {t('nav.create')}
                 </Button>
 
                 {/* Notifications */}
@@ -121,16 +123,16 @@ export const MainNavbar = ({ isAuthenticated = false, onMenuToggle }: MainNavbar
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
                       <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
+                      <span>{t('nav.profile')}</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
                       <Settings className="mr-2 h-4 w-4" />
-                      <span>Settings</span>
+                      <span>{t('nav.settings')}</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
                       <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
+                      <span>{t('nav.logout')}</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -142,14 +144,14 @@ export const MainNavbar = ({ isAuthenticated = false, onMenuToggle }: MainNavbar
                   size="sm"
                   onClick={() => handleAuthClick("login")}
                 >
-                  Sign In
+                  {t('nav.signIn')}
                 </Button>
                 <Button 
                   size="sm"
                   onClick={() => handleAuthClick("register")}
                   className="bg-orange-600 hover:bg-orange-700"
                 >
-                  Get Started
+                  {t('nav.getStarted')}
                 </Button>
               </div>
             )}
@@ -162,7 +164,7 @@ export const MainNavbar = ({ isAuthenticated = false, onMenuToggle }: MainNavbar
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
-                placeholder="Search..."
+                placeholder={t('nav.searchMobile')}
                 className="pl-9 bg-gray-50 border-gray-200"
               />
             </div>
