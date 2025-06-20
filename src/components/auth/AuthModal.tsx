@@ -10,9 +10,11 @@ import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
+  mode: "login" | "register";
+  onModeChange: (mode: "login" | "register") => void;
 }
 
-export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
+export const AuthModal = ({ isOpen, onClose, mode, onModeChange }: AuthModalProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -47,7 +49,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
           </DialogTitle>
         </DialogHeader>
 
-        <Tabs defaultValue="login" className="w-full">
+        <Tabs value={mode} onValueChange={(value) => onModeChange(value as "login" | "register")} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login">Login</TabsTrigger>
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
