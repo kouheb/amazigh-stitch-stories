@@ -52,7 +52,7 @@ export const MainNavbar = ({ isAuthenticated = false, onMenuToggle }: MainNavbar
                 variant="ghost"
                 size="sm"
                 onClick={onMenuToggle}
-                className="lg:hidden"
+                className="lg:hidden text-gray-700 hover:text-black hover:bg-gray-100"
               >
                 <Menu className="h-5 w-5" />
               </Button>
@@ -75,7 +75,7 @@ export const MainNavbar = ({ isAuthenticated = false, onMenuToggle }: MainNavbar
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
                   placeholder={t('nav.searchPlaceholder')}
-                  className="pl-9 bg-gray-50 border-gray-200"
+                  className="pl-9 bg-gray-50 border-gray-200 focus:border-gray-400 focus:ring-gray-400"
                 />
               </div>
             </div>
@@ -88,15 +88,15 @@ export const MainNavbar = ({ isAuthenticated = false, onMenuToggle }: MainNavbar
             {isAuthenticated ? (
               <>
                 {/* Create button - hidden on mobile */}
-                <Button size="sm" className="hidden sm:flex bg-orange-600 hover:bg-orange-700">
+                <Button size="sm" className="hidden sm:flex bg-black hover:bg-gray-800 text-white">
                   <Plus className="h-4 w-4 mr-1" />
                   {t('nav.create')}
                 </Button>
 
                 {/* Notifications */}
-                <Button variant="ghost" size="sm" className="relative">
+                <Button variant="ghost" size="sm" className="relative text-gray-700 hover:text-black hover:bg-gray-100">
                   <Bell className="h-5 w-5" />
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-red-500 text-xs">
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-gray-800 hover:bg-gray-700 text-white text-xs">
                     3
                   </Badge>
                 </Button>
@@ -104,33 +104,33 @@ export const MainNavbar = ({ isAuthenticated = false, onMenuToggle }: MainNavbar
                 {/* Profile Dropdown */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Button variant="ghost" className="relative h-8 w-8 rounded-full hover:bg-gray-100">
                       <Avatar className="h-8 w-8">
                         <AvatarImage src="/api/placeholder/40/40" alt="Profile" />
-                        <AvatarFallback>SM</AvatarFallback>
+                        <AvatarFallback className="bg-gray-200 text-gray-800">SM</AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuContent className="w-56 bg-white border-gray-200 shadow-lg z-50" align="end" forceMount>
                     <div className="flex items-center justify-start gap-2 p-2">
                       <div className="flex flex-col space-y-1 leading-none">
-                        <p className="font-medium">Sarah Mansouri</p>
-                        <p className="w-[200px] truncate text-sm text-muted-foreground">
+                        <p className="font-medium text-gray-900">Sarah Mansouri</p>
+                        <p className="w-[200px] truncate text-sm text-gray-600">
                           sarah@example.com
                         </p>
                       </div>
                     </div>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>
+                    <DropdownMenuSeparator className="bg-gray-200" />
+                    <DropdownMenuItem className="text-gray-700 hover:bg-gray-100 hover:text-black cursor-pointer">
                       <User className="mr-2 h-4 w-4" />
                       <span>{t('nav.profile')}</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem className="text-gray-700 hover:bg-gray-100 hover:text-black cursor-pointer">
                       <Settings className="mr-2 h-4 w-4" />
                       <span>{t('nav.settings')}</span>
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>
+                    <DropdownMenuSeparator className="bg-gray-200" />
+                    <DropdownMenuItem className="text-gray-700 hover:bg-gray-100 hover:text-black cursor-pointer">
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>{t('nav.logout')}</span>
                     </DropdownMenuItem>
@@ -143,13 +143,14 @@ export const MainNavbar = ({ isAuthenticated = false, onMenuToggle }: MainNavbar
                   variant="ghost" 
                   size="sm"
                   onClick={() => handleAuthClick("login")}
+                  className="text-gray-700 hover:text-black hover:bg-gray-100"
                 >
                   {t('nav.signIn')}
                 </Button>
                 <Button 
                   size="sm"
                   onClick={() => handleAuthClick("register")}
-                  className="bg-orange-600 hover:bg-orange-700"
+                  className="bg-black hover:bg-gray-800 text-white"
                 >
                   {t('nav.getStarted')}
                 </Button>
@@ -165,7 +166,7 @@ export const MainNavbar = ({ isAuthenticated = false, onMenuToggle }: MainNavbar
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 placeholder={t('nav.searchMobile')}
-                className="pl-9 bg-gray-50 border-gray-200"
+                className="pl-9 bg-gray-50 border-gray-200 focus:border-gray-400 focus:ring-gray-400"
               />
             </div>
           </div>
