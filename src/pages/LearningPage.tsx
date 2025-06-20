@@ -93,6 +93,28 @@ export const LearningPage = () => {
     return matchesCategory && matchesSearch;
   });
 
+  const handleFeaturedEnroll = () => {
+    console.log("Enrolling in featured course: Traditional Amazigh Jewelry Making");
+    // Here you would typically navigate to a payment/enrollment page
+    alert("Redirecting to enrollment page for Traditional Amazigh Jewelry Making - $249");
+  };
+
+  const handleFeaturedPreview = () => {
+    console.log("Previewing featured course");
+    // Here you would typically open a modal or navigate to preview page
+    alert("Opening course preview for Traditional Amazigh Jewelry Making");
+  };
+
+  const handleCourseEnroll = (courseId: number, price: number) => {
+    console.log(`Enrolling in course ${courseId} for $${price}`);
+    alert(`Redirecting to enrollment page - $${price}`);
+  };
+
+  const handleWorkshopReserve = (workshopTitle: string) => {
+    console.log(`Reserving spot for: ${workshopTitle}`);
+    alert(`Reserving spot for ${workshopTitle}`);
+  };
+
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-8">
       {/* Header */}
@@ -160,11 +182,19 @@ export const LearningPage = () => {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <Button className="bg-orange-600 hover:bg-orange-700">
+              <Button 
+                onClick={handleFeaturedEnroll}
+                className="bg-orange-600 hover:bg-orange-700"
+              >
                 <Play className="h-4 w-4 mr-2" />
                 Enroll Now - $249
               </Button>
-              <Button variant="outline">Preview Course</Button>
+              <Button 
+                variant="outline"
+                onClick={handleFeaturedPreview}
+              >
+                Preview Course
+              </Button>
             </div>
           </div>
           <div className="text-center">
@@ -220,7 +250,11 @@ export const LearningPage = () => {
                   <div className="flex items-center gap-2">
                     <span className="text-2xl font-bold text-gray-800">${course.price}</span>
                   </div>
-                  <Button size="sm" className="bg-orange-600 hover:bg-orange-700">
+                  <Button 
+                    size="sm" 
+                    className="bg-orange-600 hover:bg-orange-700"
+                    onClick={() => handleCourseEnroll(course.id, course.price)}
+                  >
                     Enroll Now
                   </Button>
                 </div>
@@ -251,7 +285,13 @@ export const LearningPage = () => {
                 <p>{workshop.date} at {workshop.time}</p>
                 <p>{workshop.spots} spots available</p>
               </div>
-              <Button size="sm" className="w-full mt-3">Reserve Spot</Button>
+              <Button 
+                size="sm" 
+                className="w-full mt-3"
+                onClick={() => handleWorkshopReserve(workshop.title)}
+              >
+                Reserve Spot
+              </Button>
             </Card>
           ))}
         </div>
