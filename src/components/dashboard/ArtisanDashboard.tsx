@@ -1,7 +1,8 @@
-
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { 
   Users, 
   Calendar, 
@@ -11,9 +12,13 @@ import {
   Star,
   Eye,
   UserCog,
-  Crown
+  Crown,
+  RefreshCw,
+  AlertTriangle,
+  TrendingDown
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useDashboardStats } from "@/hooks/useDashboardStats";
 
 interface ArtisanDashboardProps {
   onTabChange?: (tab: string) => void;
@@ -21,12 +26,33 @@ interface ArtisanDashboardProps {
 
 export const ArtisanDashboard = ({ onTabChange }: ArtisanDashboardProps) => {
   const { t } = useLanguage();
-  
-  const stats = [
-    { title: t('dashboard.profileViews'), value: "1,234", icon: Eye, color: "text-blue-600" },
-    { title: t('dashboard.connections'), value: "89", icon: Users, color: "text-green-600" },
-    { title: t('dashboard.bookings'), value: "12", icon: Calendar, color: "text-purple-600" },
-    { title: t('dashboard.messages'), value: "5", icon: MessageSquare, color: "text-orange-600" }
+  const { stats, isLoading, error, refetch, useMockData } = useDashboardStats();
+
+  const statsConfig = [
+    { 
+      key: 'profileViews',
+      title: t('dashboard.profileViews'), 
+      icon: Eye, 
+      color: "text-blue-600" 
+    },
+    { 
+      key: 'connections',
+      title: t('dashboard.connections'), 
+      icon: Users, 
+      color: "text-green-600" 
+    },
+    { 
+      key: 'bookings',
+      title: t('dashboard.bookings'), 
+      icon: Calendar, 
+      color: "text-purple-600" 
+    },
+    { 
+      key: 'messages',
+      title: t('dashboard.messages'), 
+      icon: MessageSquare, 
+      color: "text-orange-600" 
+    }
   ];
 
   const recentProjects = [
@@ -49,12 +75,20 @@ export const ArtisanDashboard = ({ onTabChange }: ArtisanDashboardProps) => {
     }
   };
 
+  const handleRetry = () => {
+    console.log("Retrying stats fetch...");
+    refetch();
+  };
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">{t('dashboard.welcome')}</h1>
           <p className="text-gray-600">{t('dashboard.subtitle')}</p>
+          {useMockData && (
+            <p className="text-xs text-amber-600 mt-1">Using demo data - updates every 30 seconds</p>
+          )}
         </div>
         <div className="flex gap-3">
           <Button 
@@ -74,21 +108,65 @@ export const ArtisanDashboard = ({ onTabChange }: ArtisanDashboardProps) => {
         </div>
       </div>
 
+      {/* Error State */}
+      {error && (
+        <Alert className="border-red-200 bg-red-50">
+          <AlertTriangle className="h-4 w-4 text-red-600" />
+          <AlertDescription className="text-red-800">
+            Failed to load dashboard statistics. 
+            <Button 
+              variant="link" 
+              size="sm" 
+              onClick={handleRetry}
+              className="text-red-600 p-0 ml-2 h-auto"
+            >
+              <RefreshCw className="h-3 w-3 mr-1" />
+              Try again
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {stats.map((stat, index) => {
-          const IconComponent = stat.icon;
+        {statsConfig.map((config, index) => {
+          const IconComponent = config.icon;
+          const statData = stats[index];
+
           return (
-            <Card key={index} className="p-4">
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg bg-gray-100`}>
-                  <IconComponent className={`h-4 w-4 ${stat.color}`} />
+            <Card key={config.key} className="p-4">
+              {isLoading ? (
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-8 w-8 rounded-lg" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-6 w-12" />
+                    <Skeleton className="h-4 w-16" />
+                  </div>
                 </div>
-                <div>
-                  <p className="text-2xl font-bold text-gray-800">{stat.value}</p>
-                  <p className="text-sm text-gray-600">{stat.title}</p>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-gray-100">
+                    <IconComponent className={`h-4 w-4 ${config.color}`} />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-2xl font-bold text-gray-800">{statData?.value}</p>
+                    <p className="text-sm text-gray-600">{config.title}</p>
+                    {statData?.change && (
+                      <div className={`flex items-center gap-1 text-xs mt-1 ${
+                        statData.changeType === 'increase' ? 'text-green-600' : 
+                        statData.changeType === 'decrease' ? 'text-red-600' : 'text-gray-600'
+                      }`}>
+                        {statData.changeType === 'increase' ? (
+                          <TrendingUp className="h-3 w-3" />
+                        ) : statData.changeType === 'decrease' ? (
+                          <TrendingDown className="h-3 w-3" />
+                        ) : null}
+                        <span>{statData.change}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
             </Card>
           );
         })}
