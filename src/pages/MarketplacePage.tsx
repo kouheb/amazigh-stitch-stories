@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,8 +21,10 @@ import { ServiceCard } from "@/components/marketplace/ServiceCard";
 import { BookingModal } from "@/components/marketplace/BookingModal";
 import { AddWorkModal } from "@/components/modals/AddWorkModal";
 import { ListSpaceModal } from "@/components/modals/ListSpaceModal";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const MarketplacePage = () => {
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedService, setSelectedService] = useState<any>(null);
@@ -30,7 +33,7 @@ export const MarketplacePage = () => {
   const [isListSpaceModalOpen, setIsListSpaceModalOpen] = useState(false);
 
   const categories = [
-    { id: "all", name: "All Services", count: 127 },
+    { id: "all", name: t('marketplace.allServices'), count: 127 },
     { id: "embroidery", name: "Embroidery", count: 45 },
     { id: "beading", name: "Beading", count: 32 },
     { id: "weaving", name: "Weaving", count: 28 },
@@ -53,10 +56,10 @@ export const MarketplacePage = () => {
       category: "embroidery",
       featured: true,
       images: ["/api/placeholder/300/200"],
-      description: "Exquisite traditional Zardozi embroidery for special occasions",
+      description: "Exquisite traditional Z ardozi embroidery for special occasions",
       location: "Casablanca, Morocco",
       skills: ["Zardozi", "Gold Thread", "Traditional Patterns"],
-      availability: "Available"
+      availability: t('status.available')
     },
     {
       id: "2",
@@ -76,7 +79,7 @@ export const MarketplacePage = () => {
       description: "Contemporary beadwork combining traditional techniques with modern aesthetics",
       location: "Rabat, Morocco",
       skills: ["Beadwork", "Jewelry", "Contemporary Design"],
-      availability: "Busy until next month"
+      availability: t('status.busy')
     },
     {
       id: "3",
@@ -96,7 +99,7 @@ export const MarketplacePage = () => {
       description: "Authentic Berber carpets woven using ancestral techniques",
       location: "Marrakech, Morocco",
       skills: ["Carpet Weaving", "Traditional Patterns", "Natural Dyes"],
-      availability: "Available"
+      availability: t('status.available')
     }
   ];
 
@@ -129,8 +132,8 @@ export const MarketplacePage = () => {
         <div className="mb-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">Services Marketplace</h1>
-              <p className="text-gray-600">Discover and book authentic artisan services</p>
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('marketplace.title')}</h1>
+              <p className="text-gray-600">{t('marketplace.subtitle')}</p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3">
               <Button 
@@ -138,7 +141,7 @@ export const MarketplacePage = () => {
                 className="bg-orange-600 hover:bg-orange-700"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Add New Work
+                {t('marketplace.addNewWork')}
               </Button>
               <Button 
                 variant="outline"
@@ -146,7 +149,7 @@ export const MarketplacePage = () => {
                 onClick={() => setIsListSpaceModalOpen(true)}
               >
                 <Building className="h-4 w-4 mr-2" />
-                List Your Space
+                {t('marketplace.listYourSpace')}
               </Button>
             </div>
           </div>
@@ -158,7 +161,7 @@ export const MarketplacePage = () => {
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <Input
-                placeholder="Search for services, artisans, or techniques..."
+                placeholder={t('marketplace.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -166,7 +169,7 @@ export const MarketplacePage = () => {
             </div>
             <Button variant="outline" className="flex items-center gap-2">
               <Filter className="h-4 w-4" />
-              Filters
+              {t('marketplace.filters')}
             </Button>
           </div>
 
@@ -191,7 +194,7 @@ export const MarketplacePage = () => {
         {/* Results Count */}
         <div className="mb-6">
           <p className="text-gray-600">
-            {filteredServices.length} services found
+            {filteredServices.length} {t('marketplace.servicesFound')}
             {searchQuery && ` for "${searchQuery}"`}
           </p>
         </div>
@@ -215,10 +218,10 @@ export const MarketplacePage = () => {
               <Search className="h-8 w-8 text-gray-400" />
             </div>
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              No services found
+              {t('marketplace.noServicesTitle')}
             </h3>
             <p className="text-gray-600">
-              Try adjusting your search or filter criteria
+              {t('marketplace.noServicesDesc')}
             </p>
           </div>
         )}

@@ -1,26 +1,29 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Logo } from "@/components/ui/Logo";
 import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { 
+  Bell, 
   Search, 
-  MessageSquare, 
-  User, 
+  Menu, 
   Settings, 
+  User, 
   LogOut,
-  Menu
+  Plus
 } from "lucide-react";
-import { AuthModal } from "../auth/AuthModal";
-import { NotificationDropdown } from "../notifications/NotificationDropdown";
-import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { MobileLogo } from "@/components/ui/MobileLogo";
+import { Logo } from "@/components/ui/Logo";
+import { AuthModal } from "@/components/auth/AuthModal";
+import { LanguageSelector } from "./LanguageSelector";
 
 interface MainNavbarProps {
   isAuthenticated?: boolean;
@@ -28,30 +31,21 @@ interface MainNavbarProps {
 }
 
 export const MainNavbar = ({ isAuthenticated = false, onMenuToggle }: MainNavbarProps) => {
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState<"login" | "register">("login");
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      console.log(`Searching for: ${searchQuery}`);
-      toast.success(`Searching for "${searchQuery}"...`);
-      // Here you would typically call a search API or filter function
-    }
-  };
-
-  const handleMessagesClick = () => {
-    console.log("Opening messages");
-    toast.info("Opening messages...");
+  const handleAuthClick = (mode: "login" | "register") => {
+    setAuthMode(mode);
+    setShowAuthModal(true);
   };
 
   return (
     <>
-      <nav className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-50">
+      <nav className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-40">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
-          {/* Left Section */}
+          {/* Left side */}
           <div className="flex items-center gap-4">
-            {onMenuToggle && (
+            {isAuthenticated && onMenuToggle && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -62,64 +56,63 @@ export const MainNavbar = ({ isAuthenticated = false, onMenuToggle }: MainNavbar
               </Button>
             )}
             
-            <Logo size="md" showText={true} />
+            <div className="flex items-center gap-2">
+              <div className="block md:hidden">
+                <MobileLogo />
+              </div>
+              <div className="hidden md:block">
+                <Logo />
+              </div>
+            </div>
           </div>
 
-          {/* Center Section - Search */}
-          <div className="flex-1 max-w-md mx-4 hidden md:block">
-            <form onSubmit={handleSearch} className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <input
-                type="text"
-                placeholder="Search artisans, workshops, or services..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-              />
-            </form>
-          </div>
+          {/* Center - Search (only when authenticated) */}
+          {isAuthenticated && (
+            <div className="hidden md:flex flex-1 max-w-md mx-6">
+              <div className="relative w-full">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder="Search artisans, skills, or services..."
+                  className="pl-9 bg-gray-50 border-gray-200"
+                />
+              </div>
+            </div>
+          )}
 
-          {/* Right Section */}
+          {/* Right side */}
           <div className="flex items-center gap-3">
+            <LanguageSelector />
+            
             {isAuthenticated ? (
               <>
-                {/* Search button for mobile */}
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="md:hidden"
-                  onClick={() => toast.info("Mobile search coming soon...")}
-                >
-                  <Search className="h-5 w-5" />
-                </Button>
-
-                {/* Messages */}
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="relative"
-                  onClick={handleMessagesClick}
-                >
-                  <MessageSquare className="h-5 w-5" />
+                {/* Create button - hidden on mobile */}
+                <Button size="sm" className="hidden sm:flex bg-orange-600 hover:bg-orange-700">
+                  <Plus className="h-4 w-4 mr-1" />
+                  Create
                 </Button>
 
                 {/* Notifications */}
-                <NotificationDropdown />
+                <Button variant="ghost" size="sm" className="relative">
+                  <Bell className="h-5 w-5" />
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-red-500 text-xs">
+                    3
+                  </Badge>
+                </Button>
 
-                {/* User Menu */}
+                {/* Profile Dropdown */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src="/placeholder.svg" alt="User" />
-                        <AvatarFallback>SA</AvatarFallback>
+                        <AvatarImage src="/api/placeholder/40/40" alt="Profile" />
+                        <AvatarFallback>SM</AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56 bg-white" align="end" forceMount>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
                     <div className="flex items-center justify-start gap-2 p-2">
                       <div className="flex flex-col space-y-1 leading-none">
-                        <p className="font-medium">Sarah Al-Maghribi</p>
+                        <p className="font-medium">Sarah Mansouri</p>
                         <p className="w-[200px] truncate text-sm text-muted-foreground">
                           sarah@example.com
                         </p>
@@ -128,30 +121,32 @@ export const MainNavbar = ({ isAuthenticated = false, onMenuToggle }: MainNavbar
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
                       <User className="mr-2 h-4 w-4" />
-                      Profile
+                      <span>Profile</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
                       <Settings className="mr-2 h-4 w-4" />
-                      Settings
+                      <span>Settings</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
                       <LogOut className="mr-2 h-4 w-4" />
-                      Log out
+                      <span>Log out</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
             ) : (
               <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  onClick={() => setIsAuthModalOpen(true)}
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => handleAuthClick("login")}
                 >
-                  Login
+                  Sign In
                 </Button>
-                <Button
-                  onClick={() => setIsAuthModalOpen(true)}
+                <Button 
+                  size="sm"
+                  onClick={() => handleAuthClick("register")}
                   className="bg-orange-600 hover:bg-orange-700"
                 >
                   Get Started
@@ -160,11 +155,26 @@ export const MainNavbar = ({ isAuthenticated = false, onMenuToggle }: MainNavbar
             )}
           </div>
         </div>
+
+        {/* Mobile search bar (only when authenticated) */}
+        {isAuthenticated && (
+          <div className="md:hidden mt-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                placeholder="Search..."
+                className="pl-9 bg-gray-50 border-gray-200"
+              />
+            </div>
+          </div>
+        )}
       </nav>
 
       <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        mode={authMode}
+        onModeChange={setAuthMode}
       />
     </>
   );

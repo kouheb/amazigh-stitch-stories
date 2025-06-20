@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,23 +13,26 @@ import {
   UserCog,
   Crown
 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ArtisanDashboardProps {
   onTabChange?: (tab: string) => void;
 }
 
 export const ArtisanDashboard = ({ onTabChange }: ArtisanDashboardProps) => {
+  const { t } = useLanguage();
+  
   const stats = [
-    { title: "Profile Views", value: "1,234", icon: Eye, color: "text-blue-600" },
-    { title: "Connections", value: "89", icon: Users, color: "text-green-600" },
-    { title: "Bookings", value: "12", icon: Calendar, color: "text-purple-600" },
-    { title: "Messages", value: "5", icon: MessageSquare, color: "text-orange-600" }
+    { title: t('dashboard.profileViews'), value: "1,234", icon: Eye, color: "text-blue-600" },
+    { title: t('dashboard.connections'), value: "89", icon: Users, color: "text-green-600" },
+    { title: t('dashboard.bookings'), value: "12", icon: Calendar, color: "text-purple-600" },
+    { title: t('dashboard.messages'), value: "5", icon: MessageSquare, color: "text-orange-600" }
   ];
 
   const recentProjects = [
-    { title: "Traditional Wedding Dress", status: "Completed", rating: 5 },
-    { title: "Modern Kaftan Design", status: "In Progress", rating: null },
-    { title: "Beaded Evening Gown", status: "Completed", rating: 4.8 }
+    { title: "Traditional Wedding Dress", status: t('status.completed'), rating: 5 },
+    { title: "Modern Kaftan Design", status: t('status.inProgress'), rating: null },
+    { title: "Beaded Evening Gown", status: t('status.completed'), rating: 4.8 }
   ];
 
   const handleCreateProfile = () => {
@@ -49,8 +53,8 @@ export const ArtisanDashboard = ({ onTabChange }: ArtisanDashboardProps) => {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Welcome back, Sarah!</h1>
-          <p className="text-gray-600">Here's what's happening with your artisan profile</p>
+          <h1 className="text-2xl font-bold text-gray-800">{t('dashboard.welcome')}</h1>
+          <p className="text-gray-600">{t('dashboard.subtitle')}</p>
         </div>
         <div className="flex gap-3">
           <Button 
@@ -58,14 +62,14 @@ export const ArtisanDashboard = ({ onTabChange }: ArtisanDashboardProps) => {
             className="bg-blue-600 hover:bg-blue-700"
           >
             <UserCog className="h-4 w-4 mr-2" />
-            Create Profile
+            {t('dashboard.createProfile')}
           </Button>
           <Button 
             onClick={handleChooseMembership}
             className="bg-orange-600 hover:bg-orange-700"
           >
             <Crown className="h-4 w-4 mr-2" />
-            Choose Membership
+            {t('dashboard.chooseMembership')}
           </Button>
         </div>
       </div>
@@ -95,8 +99,8 @@ export const ArtisanDashboard = ({ onTabChange }: ArtisanDashboardProps) => {
         {/* Recent Projects */}
         <Card className="lg:col-span-2 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">Recent Projects</h3>
-            <Button variant="outline" size="sm">View All</Button>
+            <h3 className="text-lg font-semibold">{t('dashboard.recentProjects')}</h3>
+            <Button variant="outline" size="sm">{t('dashboard.viewAll')}</Button>
           </div>
           <div className="space-y-3">
             {recentProjects.map((project, index) => (
@@ -104,7 +108,7 @@ export const ArtisanDashboard = ({ onTabChange }: ArtisanDashboardProps) => {
                 <div className="flex-1">
                   <h4 className="font-medium">{project.title}</h4>
                   <Badge 
-                    variant={project.status === "Completed" ? "default" : "secondary"}
+                    variant={project.status === t('status.completed') ? "default" : "secondary"}
                     className="mt-1"
                   >
                     {project.status}
@@ -123,23 +127,23 @@ export const ArtisanDashboard = ({ onTabChange }: ArtisanDashboardProps) => {
 
         {/* Quick Actions */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
+          <h3 className="text-lg font-semibold mb-4">{t('dashboard.quickActions')}</h3>
           <div className="space-y-3">
             <Button variant="outline" className="w-full justify-start">
               <Calendar className="h-4 w-4 mr-2" />
-              Schedule Workshop
+              {t('dashboard.scheduleWorkshop')}
             </Button>
             <Button variant="outline" className="w-full justify-start">
               <BookOpen className="h-4 w-4 mr-2" />
-              Create Course
+              {t('dashboard.createCourse')}
             </Button>
             <Button variant="outline" className="w-full justify-start">
               <Users className="h-4 w-4 mr-2" />
-              Find Collaborators
+              {t('dashboard.findCollaborators')}
             </Button>
             <Button variant="outline" className="w-full justify-start">
               <TrendingUp className="h-4 w-4 mr-2" />
-              View Analytics
+              {t('dashboard.viewAnalytics')}
             </Button>
           </div>
         </Card>
@@ -147,7 +151,7 @@ export const ArtisanDashboard = ({ onTabChange }: ArtisanDashboardProps) => {
 
       {/* Activity Feed */}
       <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
+        <h3 className="text-lg font-semibold mb-4">{t('dashboard.recentActivity')}</h3>
         <div className="space-y-4">
           <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
