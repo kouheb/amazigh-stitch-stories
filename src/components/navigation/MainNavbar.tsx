@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -11,7 +12,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { 
   Search, 
-  Bell, 
   MessageSquare, 
   User, 
   Settings, 
@@ -19,6 +19,8 @@ import {
   Menu
 } from "lucide-react";
 import { AuthModal } from "../auth/AuthModal";
+import { NotificationDropdown } from "../notifications/NotificationDropdown";
+import { toast } from "sonner";
 
 interface MainNavbarProps {
   isAuthenticated?: boolean;
@@ -27,7 +29,21 @@ interface MainNavbarProps {
 
 export const MainNavbar = ({ isAuthenticated = false, onMenuToggle }: MainNavbarProps) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [notifications] = useState(3); // Mock notification count
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      console.log(`Searching for: ${searchQuery}`);
+      toast.success(`Searching for "${searchQuery}"...`);
+      // Here you would typically call a search API or filter function
+    }
+  };
+
+  const handleMessagesClick = () => {
+    console.log("Opening messages");
+    toast.info("Opening messages...");
+  };
 
   return (
     <>
@@ -51,14 +67,16 @@ export const MainNavbar = ({ isAuthenticated = false, onMenuToggle }: MainNavbar
 
           {/* Center Section - Search */}
           <div className="flex-1 max-w-md mx-4 hidden md:block">
-            <div className="relative">
+            <form onSubmit={handleSearch} className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <input
                 type="text"
                 placeholder="Search artisans, workshops, or services..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               />
-            </div>
+            </form>
           </div>
 
           {/* Right Section */}
@@ -66,24 +84,27 @@ export const MainNavbar = ({ isAuthenticated = false, onMenuToggle }: MainNavbar
             {isAuthenticated ? (
               <>
                 {/* Search button for mobile */}
-                <Button variant="ghost" size="sm" className="md:hidden">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="md:hidden"
+                  onClick={() => toast.info("Mobile search coming soon...")}
+                >
                   <Search className="h-5 w-5" />
                 </Button>
 
                 {/* Messages */}
-                <Button variant="ghost" size="sm" className="relative">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="relative"
+                  onClick={handleMessagesClick}
+                >
                   <MessageSquare className="h-5 w-5" />
                 </Button>
 
                 {/* Notifications */}
-                <Button variant="ghost" size="sm" className="relative">
-                  <Bell className="h-5 w-5" />
-                  {notifications > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                      {notifications}
-                    </span>
-                  )}
-                </Button>
+                <NotificationDropdown />
 
                 {/* User Menu */}
                 <DropdownMenu>
