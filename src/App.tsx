@@ -16,6 +16,7 @@ import { AuthPage } from "./pages/AuthPage";
 import { PlayStoreBannerPage } from "./pages/PlayStoreBannerPage";
 import { DeveloperIconPage } from "./pages/DeveloperIconPage";
 import { DeveloperHeaderPage } from "./pages/DeveloperHeaderPage";
+import { MessagingPage } from "./pages/MessagingPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,11 @@ const App = () => (
               <Route path="/app" element={
                 <ProtectedRoute>
                   <MainApp />
+                </ProtectedRoute>
+              } />
+              <Route path="/messaging" element={
+                <ProtectedRoute>
+                  <MessagingPage />
                 </ProtectedRoute>
               } />
               <Route path="/playstore-banner" element={<PlayStoreBannerPage />} />
