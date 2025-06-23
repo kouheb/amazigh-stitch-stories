@@ -1,5 +1,5 @@
-
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,7 @@ import {
 import { toast } from "sonner";
 
 export const NetworkPage = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
   const [connectedArtisans, setConnectedArtisans] = useState<number[]>([]);
@@ -36,7 +37,9 @@ export const NetworkPage = () => {
 
   const handleMessage = (artisanName: string) => {
     console.log(`Message clicked for ${artisanName}`);
-    toast.info(`Opening message to ${artisanName}...`);
+    // Navigate to messaging page
+    navigate('/messaging');
+    toast.success(`Opening chat with ${artisanName}...`);
   };
 
   const handleViewProfile = (artisanName: string) => {
