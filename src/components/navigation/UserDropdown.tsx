@@ -23,9 +23,10 @@ import { toast } from "sonner";
 
 interface UserDropdownProps {
   onCreateClick?: () => void;
+  onTabChange?: (tab: string) => void;
 }
 
-export const UserDropdown = ({ onCreateClick }: UserDropdownProps) => {
+export const UserDropdown = ({ onCreateClick, onTabChange }: UserDropdownProps) => {
   const { t } = useLanguage();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -41,8 +42,13 @@ export const UserDropdown = ({ onCreateClick }: UserDropdownProps) => {
   };
 
   const handleProfileClick = () => {
-    console.log("Profile clicked");
-    toast.info("Profile feature coming soon");
+    console.log("Profile clicked - navigating to profile");
+    if (onTabChange) {
+      onTabChange("enhanced-profile");
+    } else {
+      navigate('/app');
+    }
+    toast.info("Navigating to profile");
   };
 
   const handleSettingsClick = () => {

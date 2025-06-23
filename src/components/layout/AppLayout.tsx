@@ -1,10 +1,8 @@
 
 import { useState } from "react";
 import { MainNavbar } from "@/components/navigation/MainNavbar";
-import { BottomNavigation } from "@/components/navigation/BottomNavigation";
 import { Sidebar } from "@/components/navigation/Sidebar";
-import { AddWorkModal } from "@/components/modals/AddWorkModal";
-import { useAuth } from "@/contexts/AuthContext";
+import { BottomNavigation } from "@/components/navigation/BottomNavigation";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -14,89 +12,51 @@ interface AppLayoutProps {
 
 export const AppLayout = ({ children, activeTab, onTabChange }: AppLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isAddWorkModalOpen, setIsAddWorkModalOpen] = useState(false);
-  const { user } = useAuth();
 
-  // Check if profile is complete (this is a simplified check)
-  const [isProfileComplete] = useState(true); // We'll implement proper profile completion check later
-
-  const handleTabChange = (tab: string) => {
-    console.log(`AppLayout handling tab change: ${tab}`);
-    onTabChange(tab);
-    // Close sidebar on mobile after navigation
-    if (window.innerWidth < 1024) {
-      setSidebarOpen(false);
-    }
+  const handleCreateClick = () => {
+    console.log("Create clicked from navbar");
+    onTabChange("create-profile");
   };
 
   const handleMenuToggle = () => {
-    console.log("Menu toggle clicked");
     setSidebarOpen(!sidebarOpen);
   };
 
-  const handleCreateClick = () => {
-    console.log("Create button clicked");
-    
-    if (!isProfileComplete) {
-      console.log("Profile not complete, redirecting to profile creation");
-      onTabChange("create-profile");
-      return;
-    }
-    
-    console.log("Opening Add Work Modal from AppLayout");
-    setIsAddWorkModalOpen(true);
-  };
-
-  const handleWorkAdded = (work: any) => {
-    console.log("New work added:", work);
-    setIsAddWorkModalOpen(false);
+  const handleTabChange = (tab: string) => {
+    console.log("AppLayout handling tab change:", tab);
+    onTabChange(tab);
+    setSidebarOpen(false); // Close sidebar on mobile when navigating
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex w-full">
-      {/* Mobile sidebar overlay */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" 
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+    <div className="min-h-screen bg-gray-50">
+      <MainNavbar 
+        onMenuToggle={handleMenuToggle}
+        onCreateClick={handleCreateClick}
+        onTabChange={handleTabChange}
+      />
       
-      {/* Sidebar */}
-      <div className={`
-        fixed lg:static inset-y-0 left-0 z-50 lg:z-auto
-        transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
-        lg:translate-x-0 transition-transform duration-300 ease-in-out
-        ${sidebarOpen ? 'block' : 'hidden lg:block'}
-      `}>
+      <div className="flex flex-1">
         <Sidebar 
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
+        
+        <main className="flex-1 lg:ml-64">
+          <div className="h-full">
+            {children}
+          </div>
+        </main>
+      </div>
+
+      <div className="lg:hidden">
+        <BottomNavigation 
           activeTab={activeTab}
           onTabChange={handleTabChange}
         />
       </div>
-      
-      <div className="flex-1 flex flex-col lg:ml-0">
-        <MainNavbar 
-          isAuthenticated={!!user} 
-          onMenuToggle={handleMenuToggle}
-          onCreateClick={handleCreateClick}
-        />
-        
-        <main className="flex-1 overflow-auto pb-16 md:pb-0 px-4 py-4">
-          <div className="max-w-7xl mx-auto">
-            {children}
-          </div>
-        </main>
-        
-        <BottomNavigation activeTab={activeTab} onTabChange={handleTabChange} />
-      </div>
-
-      {/* Add Work Modal - only opens when profile is complete */}
-      <AddWorkModal
-        isOpen={isAddWorkModalOpen}
-        onClose={() => setIsAddWorkModalOpen(false)}
-        onWorkAdded={handleWorkAdded}
-      />
     </div>
   );
 };

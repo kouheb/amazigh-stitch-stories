@@ -14,9 +14,10 @@ interface MainNavbarProps {
   isAuthenticated?: boolean;
   onMenuToggle?: () => void;
   onCreateClick?: () => void;
+  onTabChange?: (tab: string) => void;
 }
 
-export const MainNavbar = ({ onMenuToggle, onCreateClick }: MainNavbarProps) => {
+export const MainNavbar = ({ onMenuToggle, onCreateClick, onTabChange }: MainNavbarProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -64,7 +65,7 @@ export const MainNavbar = ({ onMenuToggle, onCreateClick }: MainNavbarProps) => 
           <LanguageSelector />
           
           {isAuthenticated ? (
-            <UserDropdown onCreateClick={onCreateClick} />
+            <UserDropdown onCreateClick={onCreateClick} onTabChange={onTabChange} />
           ) : (
             <AuthButtons onAuthClick={handleAuthClick} />
           )}
