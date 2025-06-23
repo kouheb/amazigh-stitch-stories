@@ -14,18 +14,22 @@ const Index = () => {
   // If user is authenticated, redirect to app
   useEffect(() => {
     if (user && !loading) {
+      console.log("User is authenticated, redirecting to app");
       navigate('/app');
     }
   }, [user, loading, navigate]);
 
   const handleGetStarted = () => {
+    console.log("Get started clicked");
     navigate('/auth');
   };
 
   const handleExploreFeatures = () => {
+    console.log("Explore features clicked");
     navigate('/wireframe');
   };
 
+  // Show loading while checking auth
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-red-50">
@@ -34,6 +38,7 @@ const Index = () => {
     );
   }
 
+  // Only show landing page if user is not authenticated
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
       {/* Navigation */}
