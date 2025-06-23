@@ -41,6 +41,7 @@ const App = () => (
               } />
               <Route path="/playstore-banner" element={<PlayStoreBannerPage />} />
               <Route path="/developer-icon" element={<DeveloperIconPage />} />
+              <Route path="/developer-header" element={<DeveloperHeaderPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
