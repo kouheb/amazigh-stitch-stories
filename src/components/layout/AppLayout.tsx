@@ -4,6 +4,7 @@ import { MainNavbar } from "@/components/navigation/MainNavbar";
 import { BottomNavigation } from "@/components/navigation/BottomNavigation";
 import { Sidebar } from "@/components/navigation/Sidebar";
 import { AddWorkModal } from "@/components/modals/AddWorkModal";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -14,9 +15,10 @@ interface AppLayoutProps {
 export const AppLayout = ({ children, activeTab, onTabChange }: AppLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isAddWorkModalOpen, setIsAddWorkModalOpen] = useState(false);
+  const { user } = useAuth();
 
-  // Mock profile completion check - in a real app this would come from user data
-  const [isProfileComplete, setIsProfileComplete] = useState(false);
+  // Check if profile is complete (this is a simplified check)
+  const [isProfileComplete] = useState(true); // We'll implement proper profile completion check later
 
   const handleTabChange = (tab: string) => {
     console.log(`AppLayout handling tab change: ${tab}`);
@@ -75,7 +77,7 @@ export const AppLayout = ({ children, activeTab, onTabChange }: AppLayoutProps) 
       
       <div className="flex-1 flex flex-col lg:ml-0">
         <MainNavbar 
-          isAuthenticated={true} 
+          isAuthenticated={!!user} 
           onMenuToggle={handleMenuToggle}
           onCreateClick={handleCreateClick}
         />
