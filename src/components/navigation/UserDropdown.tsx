@@ -42,9 +42,9 @@ export const UserDropdown = ({ onCreateClick, onTabChange }: UserDropdownProps) 
   };
 
   const handleProfileClick = () => {
-    console.log("Profile clicked - navigating to profile");
+    console.log("Profile clicked - navigating to user profile");
     if (onTabChange) {
-      onTabChange("enhanced-profile");
+      onTabChange("profile");
     } else {
       navigate('/app');
     }
