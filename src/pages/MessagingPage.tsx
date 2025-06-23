@@ -1,13 +1,13 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Search, Plus, MoreVertical } from "lucide-react";
+import { Search, Plus, MoreVertical, ArrowLeft } from "lucide-react";
 import { ChatWindow } from "@/components/messaging/ChatWindow";
 import { ChatList } from "@/components/messaging/ChatList";
+import { useNavigate } from "react-router-dom";
 
 interface Conversation {
   id: string;
@@ -34,8 +34,13 @@ interface Message {
 }
 
 export const MessagingPage = () => {
+  const navigate = useNavigate();
   const [selectedConversationId, setSelectedConversationId] = useState<string>("1");
   const [searchQuery, setSearchQuery] = useState("");
+
+  const handleBackToApp = () => {
+    navigate('/app');
+  };
 
   // Mock data - in real app this would come from your backend
   const conversations: Conversation[] = [
@@ -114,12 +119,36 @@ export const MessagingPage = () => {
 
   return (
     <div className="h-screen flex bg-gray-50">
+      {/* Back to App Button - Mobile */}
+      <div className="absolute top-4 left-4 z-50 lg:hidden">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleBackToApp}
+          className="bg-white shadow-md hover:bg-gray-100"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back
+        </Button>
+      </div>
+
       {/* Sidebar */}
       <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
         {/* Header */}
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-xl font-semibold text-gray-900">Messages</h1>
+            <div className="flex items-center gap-3">
+              {/* Back button for desktop */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleBackToApp}
+                className="hidden lg:flex text-gray-600 hover:text-black hover:bg-gray-100"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <h1 className="text-xl font-semibold text-gray-900">Messages</h1>
+            </div>
             <div className="flex gap-2">
               <Button size="sm" variant="ghost">
                 <MoreVertical className="h-4 w-4" />
