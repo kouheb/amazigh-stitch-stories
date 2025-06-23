@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,43 +15,68 @@ import {
   UserPlus,
   Settings,
   Share,
-  Edit
+  Edit,
+  Mail,
+  Phone
 } from "lucide-react";
 import { PortfolioGallery } from "@/components/profile/PortfolioGallery";
 import { SkillsSection } from "@/components/profile/SkillsSection";
 import { WorkShowcase } from "@/components/profile/WorkShowcase";
 import { ProfileStats } from "@/components/profile/ProfileStats";
 import { EditProfileModal } from "@/components/profile/EditProfileModal";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 export const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [isOwnProfile] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { user } = useAuth();
 
-  // Mock profile data
+  // Get user's display name or fall back to email or default
+  const getUserDisplayName = () => {
+    if (user?.user_metadata?.display_name) {
+      return user.user_metadata.display_name;
+    }
+    if (user?.user_metadata?.full_name) {
+      return user.user_metadata.full_name;
+    }
+    if (user?.email) {
+      // Extract name from email (everything before @)
+      const emailName = user.email.split('@')[0];
+      // Capitalize first letter
+      return emailName.charAt(0).toUpperCase() + emailName.slice(1);
+    }
+    return "User";
+  };
+
+  // Mock profile data with actual user data where available
   const [profileData, setProfileData] = useState({
-    name: "Aicha Benali",
-    title: "Traditional Zardozi Embroidery Artist & Fashion Designer",
-    location: "Fes, Morocco",
-    memberSince: "2022",
-    website: "https://aichabenali.com",
-    bio: "Master artisan specializing in traditional Zardozi embroidery with over 15 years of experience. I blend ancient Amazigh techniques with contemporary fashion design, creating unique pieces that honor our cultural heritage while meeting modern aesthetic needs.",
-    avatar: "https://images.unsplash.com/photo-1494790108755-2616c163f505?w=150&h=150&fit=crop&crop=face",
+    name: getUserDisplayName(),
+    title: user?.user_metadata?.title || "Creative Professional",
+    location: user?.user_metadata?.location || "Location not set",
+    memberSince: user?.created_at ? new Date(user.created_at).getFullYear().toString() : "2024",
+    website: user?.user_metadata?.website || "",
+    bio: user?.user_metadata?.bio || "Welcome to my profile! I'm passionate about creative work and looking forward to connecting with fellow artists and designers.",
+    avatar: user?.user_metadata?.avatar_url || "https://images.unsplash.com/photo-1494790108755-2616c163f505?w=150&h=150&fit=crop&crop=face",
     coverImage: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=300&fit=crop",
     followers: 2847,
     following: 456,
     likes: 15420,
     experience: "15+ Years",
-    skills: ["Zardozi Embroidery", "Fashion Design", "Textile Arts", "Pattern Making", "Cultural Research", "Teaching", "Sustainable Fashion"],
-    specialties: ["Traditional Embroidery", "Contemporary Fusion", "Cultural Preservation", "Artisan Training"],
+    skills: ["Creative Design", "Digital Arts", "Traditional Crafts", "Pattern Making", "Cultural Research", "Teaching"],
+    specialties: ["Traditional Arts", "Contemporary Fusion", "Cultural Preservation", "Artisan Training"],
     verified: true,
     rating: 4.9,
-    reviewCount: 127
+    reviewCount: 127,
+    email: user?.email || "",
+    phone: user?.user_metadata?.phone || ""
   });
 
   const handleEditProfile = () => {
     console.log("Edit Profile clicked");
     setIsEditModalOpen(true);
+    toast.success("Opening profile editor");
   };
 
   const handleCloseEditModal = () => {
@@ -63,6 +89,27 @@ export const ProfilePage = () => {
       ...prev,
       ...updatedData
     }));
+    toast.success("Profile updated successfully!");
+  };
+
+  const handleSettingsClick = () => {
+    console.log("Settings clicked");
+    toast.info("Settings feature coming soon");
+  };
+
+  const handleMessageClick = () => {
+    console.log("Message clicked");
+    toast.info("Messaging feature coming soon");
+  };
+
+  const handleFollowClick = () => {
+    console.log("Follow clicked");
+    toast.success("Follow feature coming soon");
+  };
+
+  const handleShareClick = () => {
+    console.log("Share clicked");
+    toast.info("Share feature coming soon");
   };
 
   return (
@@ -103,6 +150,12 @@ export const ProfilePage = () => {
                     <p className="text-lg text-gray-600 mb-3">{profileData.title}</p>
                     
                     <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                      {profileData.email && (
+                        <div className="flex items-center gap-1">
+                          <Mail className="h-4 w-4" />
+                          {profileData.email}
+                        </div>
+                      )}
                       <div className="flex items-center gap-1">
                         <MapPin className="h-4 w-4" />
                         {profileData.location}
@@ -111,12 +164,14 @@ export const ProfilePage = () => {
                         <Calendar className="h-4 w-4" />
                         Member since {profileData.memberSince}
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Globe className="h-4 w-4" />
-                        <a href={profileData.website} className="text-orange-600 hover:underline">
-                          Portfolio Website
-                        </a>
-                      </div>
+                      {profileData.website && (
+                        <div className="flex items-center gap-1">
+                          <Globe className="h-4 w-4" />
+                          <a href={profileData.website} className="text-orange-600 hover:underline">
+                            Portfolio Website
+                          </a>
+                        </div>
+                      )}
                       <div className="flex items-center gap-1">
                         <Star className="h-4 w-4 text-yellow-500" />
                         {profileData.rating} ({profileData.reviewCount} reviews)
@@ -131,21 +186,21 @@ export const ProfilePage = () => {
                           <Edit className="h-4 w-4 mr-2" />
                           Edit Profile
                         </Button>
-                        <Button variant="outline">
+                        <Button variant="outline" onClick={handleSettingsClick}>
                           <Settings className="h-4 w-4" />
                         </Button>
                       </>
                     ) : (
                       <>
-                        <Button className="bg-orange-600 hover:bg-orange-700">
+                        <Button className="bg-orange-600 hover:bg-orange-700" onClick={handleMessageClick}>
                           <MessageSquare className="h-4 w-4 mr-2" />
                           Message
                         </Button>
-                        <Button variant="outline">
+                        <Button variant="outline" onClick={handleFollowClick}>
                           <UserPlus className="h-4 w-4 mr-2" />
                           Follow
                         </Button>
-                        <Button variant="outline">
+                        <Button variant="outline" onClick={handleShareClick}>
                           <Share className="h-4 w-4" />
                         </Button>
                       </>
@@ -172,6 +227,37 @@ export const ProfilePage = () => {
         <Card className="p-6 mt-8">
           <h2 className="text-xl font-semibold mb-4">About</h2>
           <p className="text-gray-700 leading-relaxed">{profileData.bio}</p>
+          
+          {/* Contact Information */}
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <h3 className="text-lg font-semibold mb-3">Contact Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {profileData.email && (
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-gray-500" />
+                  <span className="text-gray-700">{profileData.email}</span>
+                </div>
+              )}
+              {profileData.phone && (
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4 text-gray-500" />
+                  <span className="text-gray-700">{profileData.phone}</span>
+                </div>
+              )}
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-gray-500" />
+                <span className="text-gray-700">{profileData.location}</span>
+              </div>
+              {profileData.website && (
+                <div className="flex items-center gap-2">
+                  <Globe className="h-4 w-4 text-gray-500" />
+                  <a href={profileData.website} className="text-orange-600 hover:underline">
+                    {profileData.website}
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
         </Card>
 
         {/* Profile Tabs */}
