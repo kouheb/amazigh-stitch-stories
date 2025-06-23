@@ -40,8 +40,6 @@ export const AppLayout = ({ children, activeTab, onTabChange }: AppLayoutProps) 
         <Sidebar 
           activeTab={activeTab}
           onTabChange={handleTabChange}
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
         />
         
         <main className="flex-1 lg:ml-64">
