@@ -1,18 +1,78 @@
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const regions = [
-  "Morocco (Tamazgha)",
-  "Algeria (Dzayer)",
-  "Tunisia (Tunis)",
-  "Libya (Libya)",
+  // North Africa (Amazigh regions)
+  "Morocco (Al-Maghrib)",
+  "Algeria (Al-Jazāʾir)", 
+  "Tunisia (Tūnis)",
+  "Libya (Lībiyā)",
+  "Egypt (Miṣr)",
+  
+  // West Africa
   "Mali (Mali)",
-  "Niger (Niger)",
+  "Niger (Niger)", 
   "Burkina Faso",
+  "Mauritania (Mūrītānyā)",
+  "Senegal (Sénégal)",
+  "Chad (Tchad)",
+  
+  // Other African Countries
+  "Nigeria",
+  "Ghana",
+  "Ivory Coast (Côte d'Ivoire)",
+  "Cameroon (Cameroun)",
+  "South Africa",
+  "Kenya",
+  "Ethiopia (ʾĪtyōṗṗyā)",
+  "Tanzania",
+  "Uganda",
+  "Rwanda",
+  "Democratic Republic of Congo",
+  
+  // Middle East
+  "Saudi Arabia (Al-ʿArabiyyah as-Suʿūdiyyah)",
+  "United Arab Emirates (UAE)",
+  "Qatar (Qaṭar)",
+  "Kuwait (Al-Kuwayt)",
+  "Bahrain (Al-Baḥrayn)",
+  "Oman (ʿUmān)",
+  "Yemen (Al-Yaman)",
+  "Jordan (Al-ʾUrdun)",
+  "Lebanon (Lubnān)",
+  "Syria (Sūriyā)",
+  "Iraq (Al-ʿIrāq)",
+  "Iran (Īrān)",
+  "Turkey (Türkiye)",
+  "Israel (Yisrāʾēl)",
+  "Palestine (Filasṭīn)",
+  
+  // Europe
+  "France (France)",
+  "Spain (España)",
+  "Italy (Italia)",
+  "Germany (Deutschland)",
+  "United Kingdom (UK)",
+  "Netherlands (Nederland)",
+  "Belgium (België/Belgique)",
+  "Switzerland (Schweiz/Suisse)",
+  "Sweden (Sverige)",
+  "Norway (Norge)",
+  "Denmark (Danmark)",
+  "Portugal (Portugal)",
+  "Greece (Elláda)",
+  
+  // North America
+  "United States (USA)",
+  "Canada",
+  "Mexico (México)",
+  
+  // Diaspora Categories
   "Diaspora - Europe",
-  "Diaspora - North America",
+  "Diaspora - North America", 
+  "Diaspora - Australia/Oceania",
+  "Diaspora - Asia",
   "Diaspora - Other"
 ];
 
@@ -35,11 +95,11 @@ export const BasicInfoForm = () => {
         <Label htmlFor="region">Region/Location *</Label>
         <Select>
           <SelectTrigger className="mt-1">
-            <SelectValue placeholder="Select your region" />
+            <SelectValue placeholder="Select your region or country" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="max-h-[200px]">
             {regions.map((region) => (
-              <SelectItem key={region} value={region.toLowerCase().replace(/\s+/g, '-')}>
+              <SelectItem key={region} value={region.toLowerCase().replace(/[^a-z0-9]/g, '-')}>
                 {region}
               </SelectItem>
             ))}
