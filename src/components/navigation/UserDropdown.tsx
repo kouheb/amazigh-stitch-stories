@@ -32,19 +32,22 @@ export const UserDropdown = ({ onCreateClick, onTabChange }: UserDropdownProps) 
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
+    console.log("Sign out clicked");
     const { error } = await signOut();
     if (error) {
+      console.error("Sign out error:", error);
       toast.error("Failed to sign out");
     } else {
+      console.log("Successfully signed out");
       toast.success("Signed out successfully");
       navigate('/');
     }
   };
 
   const handleProfileClick = () => {
-    console.log("Profile clicked - navigating to user profile");
+    console.log("Profile clicked - navigating to enhanced profile");
     if (onTabChange) {
-      onTabChange("profile");
+      onTabChange("enhanced-profile");
     } else {
       navigate('/app');
     }
@@ -57,9 +60,17 @@ export const UserDropdown = ({ onCreateClick, onTabChange }: UserDropdownProps) 
   };
 
   const handleCreateClick = () => {
+    console.log("Create button clicked");
     if (onCreateClick) {
       onCreateClick();
+    } else {
+      toast.info("Create feature coming soon");
     }
+  };
+
+  const handleNotificationsClick = () => {
+    console.log("Notifications clicked");
+    toast.info("Notifications feature coming soon");
   };
 
   return (
@@ -75,7 +86,12 @@ export const UserDropdown = ({ onCreateClick, onTabChange }: UserDropdownProps) 
       </Button>
 
       {/* Notifications */}
-      <Button variant="ghost" size="sm" className="relative text-gray-700 hover:text-black hover:bg-gray-100">
+      <Button 
+        variant="ghost" 
+        size="sm" 
+        className="relative text-gray-700 hover:text-black hover:bg-gray-100"
+        onClick={handleNotificationsClick}
+      >
         <Bell className="h-5 w-5" />
         <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-gray-800 hover:bg-gray-700 text-white text-xs">
           3
