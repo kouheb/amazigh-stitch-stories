@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,9 +23,28 @@ import {
 import { RecommendationEngine } from "@/components/ai/RecommendationEngine";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 import { CollaborationHub } from "@/components/collaboration/CollaborationHub";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const HomePage = () => {
   const [showNotifications, setShowNotifications] = useState(false);
+  const { user } = useAuth();
+
+  // Get user's display name or fall back to email or default
+  const getUserDisplayName = () => {
+    if (user?.user_metadata?.display_name) {
+      return user.user_metadata.display_name;
+    }
+    if (user?.user_metadata?.full_name) {
+      return user.user_metadata.full_name;
+    }
+    if (user?.email) {
+      // Extract name from email (everything before @)
+      const emailName = user.email.split('@')[0];
+      // Capitalize first letter
+      return emailName.charAt(0).toUpperCase() + emailName.slice(1);
+    }
+    return "Friend";
+  };
 
   const handleCreateWork = () => {
     console.log("Create button clicked - opening work creation modal");
@@ -143,7 +161,7 @@ export const HomePage = () => {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-bold mb-2">
-                  Welcome back, Sarah! 👋
+                  Welcome back, {getUserDisplayName()}! 👋
                 </h1>
                 <p className="text-gray-200">
                   Continue your creative journey with personalized recommendations
