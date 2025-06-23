@@ -28,16 +28,6 @@ const Index = () => {
     navigate('/wireframe');
   };
 
-  const handleDeveloperIcon = () => {
-    console.log("Developer icon clicked");
-    navigate('/developer-icon');
-  };
-
-  const handleDeveloperHeader = () => {
-    console.log("Developer header clicked");
-    navigate('/developer-header');
-  };
-
   // Show loading while checking auth
   if (loading) {
     return (
@@ -63,12 +53,6 @@ const Index = () => {
             <div className="flex items-center space-x-4">
               <Button variant="ghost" onClick={handleExploreFeatures}>
                 Features
-              </Button>
-              <Button variant="ghost" onClick={handleDeveloperIcon}>
-                Developer Icon
-              </Button>
-              <Button variant="ghost" onClick={handleDeveloperHeader}>
-                Developer Header
               </Button>
               <Button onClick={handleGetStarted} className="bg-orange-600 hover:bg-orange-700">
                 Get Started
@@ -105,10 +89,10 @@ const Index = () => {
             <Button 
               size="lg" 
               variant="outline" 
-              onClick={handleDeveloperHeader}
+              onClick={handleExploreFeatures}
               className="border-orange-300 text-orange-700 hover:bg-orange-50 px-8 py-4 text-lg"
             >
-              Create Developer Header
+              Explore Features
             </Button>
           </div>
         </div>
