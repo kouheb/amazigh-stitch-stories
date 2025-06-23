@@ -14,6 +14,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import { MainApp } from "./pages/MainApp";
 import { AuthPage } from "./pages/AuthPage";
 import { PlayStoreBannerPage } from "./pages/PlayStoreBannerPage";
+import { DeveloperIconPage } from "./pages/DeveloperIconPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
                 </ProtectedRoute>
               } />
               <Route path="/playstore-banner" element={<PlayStoreBannerPage />} />
+              <Route path="/developer-icon" element={<DeveloperIconPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
