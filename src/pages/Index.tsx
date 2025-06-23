@@ -23,11 +23,6 @@ const Index = () => {
     navigate('/auth');
   };
 
-  const handleExploreFeatures = () => {
-    console.log("Explore features clicked");
-    navigate('/wireframe');
-  };
-
   // Show loading while checking auth
   if (loading) {
     return (
@@ -51,9 +46,6 @@ const Index = () => {
               <span className="text-xl font-bold text-gray-800">Fil et Toile Studio</span>
             </div>
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" onClick={handleExploreFeatures}>
-                Features
-              </Button>
               <Button onClick={handleGetStarted} className="bg-orange-600 hover:bg-orange-700">
                 Get Started
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -85,14 +77,6 @@ const Index = () => {
             >
               Start Your Journey
               <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              onClick={handleExploreFeatures}
-              className="border-orange-300 text-orange-700 hover:bg-orange-50 px-8 py-4 text-lg"
-            >
-              Explore Features
             </Button>
           </div>
         </div>
