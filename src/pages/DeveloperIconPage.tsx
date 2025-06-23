@@ -4,14 +4,44 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Download, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import html2canvas from 'html2canvas';
 
 export const DeveloperIconPage = () => {
-  const handleDownload = () => {
+  const handleDownload = async () => {
     const iconElement = document.getElementById('developer-icon');
     if (iconElement) {
-      // For now, we'll show instructions for manual download
-      // In a real implementation, you'd use html2canvas or similar
-      alert("To save the icon:\n1. Right-click on the icon below\n2. Select 'Save image as...'\n3. Save as PNG format\n\nNote: The icon is already sized at 512x512px as required.");
+      try {
+        console.log('Starting icon download...');
+        
+        // Create canvas from the element
+        const canvas = await html2canvas(iconElement, {
+          width: 512,
+          height: 512,
+          scale: 1,
+          backgroundColor: null,
+          useCORS: true,
+          allowTaint: true
+        });
+        
+        // Convert to blob and download
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'fil-et-toile-developer-icon-512x512.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            console.log('Icon downloaded successfully');
+          }
+        }, 'image/png', 1.0);
+        
+      } catch (error) {
+        console.error('Error downloading icon:', error);
+        alert('Error downloading icon. Please try again or right-click and save the image manually.');
+      }
     }
   };
 
@@ -36,7 +66,7 @@ export const DeveloperIconPage = () => {
             <h2 className="text-xl font-semibold">Icon Preview</h2>
             <Button onClick={handleDownload} className="bg-orange-600 hover:bg-orange-700">
               <Download className="h-4 w-4 mr-2" />
-              Download Instructions
+              Download PNG
             </Button>
           </div>
           
@@ -86,8 +116,8 @@ export const DeveloperIconPage = () => {
           <div className="mt-6 p-4 bg-blue-50 rounded-lg">
             <h4 className="font-medium text-blue-900 mb-2">How to Download:</h4>
             <p className="text-sm text-blue-800">
-              Right-click on the icon above and select "Save image as..." to download the PNG file. 
-              The icon is already optimized to meet all app store requirements.
+              Click the "Download PNG" button above to save the icon as a 512x512px PNG file, 
+              ready for use in app stores and developer profiles.
             </p>
           </div>
         </Card>
