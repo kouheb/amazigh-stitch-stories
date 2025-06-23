@@ -59,6 +59,19 @@ export const MainNavbar = ({ onMenuToggle, onCreateClick }: MainNavbarProps) => 
     }
   };
 
+  const handleProfileClick = () => {
+    console.log("Profile clicked");
+    // Navigate to profile page or trigger profile tab change
+    // You can implement this based on your app's routing structure
+    toast.info("Profile feature coming soon");
+  };
+
+  const handleSettingsClick = () => {
+    console.log("Settings clicked");
+    // Navigate to settings page
+    toast.info("Settings feature coming soon");
+  };
+
   const isAuthenticated = !!user;
 
   return (
@@ -146,11 +159,17 @@ export const MainNavbar = ({ onMenuToggle, onCreateClick }: MainNavbarProps) => 
                     </div>
                   </div>
                   <DropdownMenuSeparator className="bg-gray-200" />
-                  <DropdownMenuItem className="text-gray-700 hover:bg-gray-100 hover:text-black cursor-pointer">
+                  <DropdownMenuItem 
+                    className="text-gray-700 hover:bg-gray-100 hover:text-black cursor-pointer"
+                    onClick={handleProfileClick}
+                  >
                     <User className="mr-2 h-4 w-4" />
                     <span>{t('nav.profile')}</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="text-gray-700 hover:bg-gray-100 hover:text-black cursor-pointer">
+                  <DropdownMenuItem 
+                    className="text-gray-700 hover:bg-gray-100 hover:text-black cursor-pointer"
+                    onClick={handleSettingsClick}
+                  >
                     <Settings className="mr-2 h-4 w-4" />
                     <span>{t('nav.settings')}</span>
                   </DropdownMenuItem>
