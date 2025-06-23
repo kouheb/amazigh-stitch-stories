@@ -8,6 +8,7 @@ import { EventsPage } from "./EventsPage";
 import { ProfilePage } from "./ProfilePage";
 import { MessagingPage } from "./MessagingPage";
 import { MarketplacePage } from "./MarketplacePage";
+import { TestingPage } from "./TestingPage";
 import { ArtisanDashboard } from "@/components/dashboard/ArtisanDashboard";
 import ProfileCreationScreen from "@/components/wireframe/ProfileCreationScreen";
 import Membership from "./Membership";
@@ -24,7 +25,7 @@ export const MainApp = () => {
   const handleProfileComplete = () => {
     console.log("Profile creation completed");
     setIsProfileComplete(true);
-    setActiveTab("home"); // Redirect to home after profile completion
+    setActiveTab("home");
   };
 
   useEffect(() => {
@@ -55,6 +56,8 @@ export const MainApp = () => {
         return <ProfilePage />;
       case "membership":
         return <Membership />;
+      case "testing":
+        return <TestingPage />;
       default:
         console.log(`Unknown tab: ${activeTab}, defaulting to home`);
         return <HomePage />;
