@@ -17,6 +17,7 @@ import { PlayStoreBannerPage } from "./pages/PlayStoreBannerPage";
 import { DeveloperIconPage } from "./pages/DeveloperIconPage";
 import { DeveloperHeaderPage } from "./pages/DeveloperHeaderPage";
 import { MessagingPage } from "./pages/MessagingPage";
+import { PrivacyPolicy } from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const App = () => (
               <Route path="/membership" element={<Membership />} />
               <Route path="/wireframe" element={<Wireframe />} />
               <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/app" element={
                 <ProtectedRoute>
                   <MainApp />

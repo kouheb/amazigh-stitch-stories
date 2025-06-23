@@ -28,7 +28,7 @@ export const FormTermsAndActions = ({ onSubmit }: FormTermsAndActionsProps) => {
               Terms of Service
             </a>{" "}
             and{" "}
-            <a href="#" className="text-orange-600 hover:underline">
+            <a href="/privacy-policy" className="text-orange-600 hover:underline">
               Privacy Policy
             </a>
           </Label>
