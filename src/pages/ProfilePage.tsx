@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,12 +25,14 @@ import { WorkShowcase } from "@/components/profile/WorkShowcase";
 import { ProfileStats } from "@/components/profile/ProfileStats";
 import { EditProfileModal } from "@/components/profile/EditProfileModal";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [isOwnProfile] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
 
   // Get user's display name or fall back to email or default
@@ -42,15 +44,12 @@ export const ProfilePage = () => {
       return user.user_metadata.full_name;
     }
     if (user?.email) {
-      // Extract name from email (everything before @)
       const emailName = user.email.split('@')[0];
-      // Capitalize first letter
       return emailName.charAt(0).toUpperCase() + emailName.slice(1);
     }
     return "User";
   };
 
-  // Mock profile data with actual user data where available
   const [profileData, setProfileData] = useState({
     name: getUserDisplayName(),
     title: user?.user_metadata?.title || "Creative Professional",
@@ -73,6 +72,62 @@ export const ProfilePage = () => {
     phone: user?.user_metadata?.phone || ""
   });
 
+  // Load profile data from database on component mount
+  useEffect(() => {
+    const loadProfileData = async () => {
+      if (!user) return;
+
+      try {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (error) {
+          console.error("Error loading profile:", error);
+          return;
+        }
+
+        if (profile) {
+          console.log("Loaded profile data:", profile);
+          setProfileData(prev => ({
+            ...prev,
+            name: profile.display_name || profile.full_name || getUserDisplayName(),
+            bio: profile.bio || prev.bio,
+            location: profile.region || prev.location,
+            website: profile.website || prev.website,
+            avatar: profile.avatar_url || prev.avatar,
+            email: profile.email || user.email || "",
+          }));
+        }
+      } catch (error) {
+        console.error("Unexpected error loading profile:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadProfileData();
+  }, [user]);
+
+  // Update profile data when user metadata changes
+  useEffect(() => {
+    if (user) {
+      setProfileData(prev => ({
+        ...prev,
+        name: getUserDisplayName(),
+        title: user.user_metadata?.title || prev.title,
+        location: user.user_metadata?.location || prev.location,
+        website: user.user_metadata?.website || prev.website,
+        bio: user.user_metadata?.bio || prev.bio,
+        avatar: user.user_metadata?.avatar_url || prev.avatar,
+        email: user.email || prev.email,
+        phone: user.user_metadata?.phone || prev.phone
+      }));
+    }
+  }, [user]);
+
   const handleEditProfile = () => {
     console.log("Edit Profile clicked");
     setIsEditModalOpen(true);
@@ -84,12 +139,12 @@ export const ProfilePage = () => {
   };
 
   const handleSaveProfile = (updatedData: any) => {
-    console.log("Saving updated profile data:", updatedData);
+    console.log("Profile updated locally:", updatedData);
     setProfileData(prev => ({
       ...prev,
       ...updatedData
     }));
-    toast.success("Profile updated successfully!");
+    // The actual saving is handled in the EditProfileModal component
   };
 
   const handleSettingsClick = () => {
@@ -111,6 +166,17 @@ export const ProfilePage = () => {
     console.log("Share clicked");
     toast.info("Share feature coming soon");
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 pb-8">
