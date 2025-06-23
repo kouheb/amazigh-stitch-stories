@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -34,6 +33,11 @@ const Index = () => {
     navigate('/developer-icon');
   };
 
+  const handleDeveloperHeader = () => {
+    console.log("Developer header clicked");
+    navigate('/developer-header');
+  };
+
   // Show loading while checking auth
   if (loading) {
     return (
@@ -62,6 +66,9 @@ const Index = () => {
               </Button>
               <Button variant="ghost" onClick={handleDeveloperIcon}>
                 Developer Icon
+              </Button>
+              <Button variant="ghost" onClick={handleDeveloperHeader}>
+                Developer Header
               </Button>
               <Button onClick={handleGetStarted} className="bg-orange-600 hover:bg-orange-700">
                 Get Started
@@ -98,10 +105,10 @@ const Index = () => {
             <Button 
               size="lg" 
               variant="outline" 
-              onClick={handleDeveloperIcon}
+              onClick={handleDeveloperHeader}
               className="border-orange-300 text-orange-700 hover:bg-orange-50 px-8 py-4 text-lg"
             >
-              Create Developer Icon
+              Create Developer Header
             </Button>
           </div>
         </div>

@@ -15,6 +15,7 @@ import { MainApp } from "./pages/MainApp";
 import { AuthPage } from "./pages/AuthPage";
 import { PlayStoreBannerPage } from "./pages/PlayStoreBannerPage";
 import { DeveloperIconPage } from "./pages/DeveloperIconPage";
+import { DeveloperHeaderPage } from "./pages/DeveloperHeaderPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
