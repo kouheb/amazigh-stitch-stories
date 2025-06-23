@@ -13,10 +13,36 @@ import {
   MessageCircle,
   Eye
 } from "lucide-react";
+import { toast } from "sonner";
 
 export const NetworkPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
+  const [connectedArtisans, setConnectedArtisans] = useState<number[]>([]);
+
+  const handleConnect = (artisanId: number, artisanName: string) => {
+    console.log(`Connect clicked for artisan ${artisanId}: ${artisanName}`);
+    
+    if (connectedArtisans.includes(artisanId)) {
+      // Disconnect
+      setConnectedArtisans(prev => prev.filter(id => id !== artisanId));
+      toast.success(`Disconnected from ${artisanName}`);
+    } else {
+      // Connect
+      setConnectedArtisans(prev => [...prev, artisanId]);
+      toast.success(`Connected with ${artisanName}!`);
+    }
+  };
+
+  const handleMessage = (artisanName: string) => {
+    console.log(`Message clicked for ${artisanName}`);
+    toast.info(`Opening message to ${artisanName}...`);
+  };
+
+  const handleViewProfile = (artisanName: string) => {
+    console.log(`View profile clicked for ${artisanName}`);
+    toast.info(`Opening ${artisanName}'s profile...`);
+  };
 
   const artisans = [
     {
@@ -143,65 +169,86 @@ export const NetworkPage = () => {
 
       {/* Artisans Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {artisans.map((artisan) => (
-          <Card key={artisan.id} className="p-6 hover:shadow-lg transition-shadow cursor-pointer border-gray-300 bg-white">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="relative">
-                  <div className="w-12 h-12 bg-gradient-to-r from-gray-600 to-black rounded-full flex items-center justify-center text-white font-medium">
-                    {artisan.image}
+        {artisans.map((artisan) => {
+          const isConnected = connectedArtisans.includes(artisan.id);
+          
+          return (
+            <Card key={artisan.id} className="p-6 hover:shadow-lg transition-shadow cursor-pointer border-gray-300 bg-white">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <div className="w-12 h-12 bg-gradient-to-r from-gray-600 to-black rounded-full flex items-center justify-center text-white font-medium">
+                      {artisan.image}
+                    </div>
+                    {artisan.isOnline && (
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-gray-500 border-2 border-white rounded-full"></div>
+                    )}
                   </div>
-                  {artisan.isOnline && (
-                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-gray-500 border-2 border-white rounded-full"></div>
-                  )}
-                </div>
-                <div>
-                  <h3 className="font-semibold text-black">{artisan.name}</h3>
-                  <p className="text-sm text-gray-600">{artisan.skill}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <MapPin className="h-4 w-4" />
-                {artisan.location}
-              </div>
-
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1">
-                  <Star className="h-4 w-4 fill-gray-400 text-gray-400" />
-                  <span className="font-medium">{artisan.rating}</span>
-                  <span className="text-sm text-gray-600">({artisan.reviews})</span>
+                  <div>
+                    <h3 className="font-semibold text-black">{artisan.name}</h3>
+                    <p className="text-sm text-gray-600">{artisan.skill}</p>
+                  </div>
                 </div>
               </div>
 
-              <p className="text-sm text-gray-700">{artisan.description}</p>
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <MapPin className="h-4 w-4" />
+                  {artisan.location}
+                </div>
 
-              <div className="flex flex-wrap gap-1">
-                {artisan.specialties.map((specialty, index) => (
-                  <Badge key={index} variant="secondary" className="text-xs bg-gray-200 text-gray-800">
-                    {specialty}
-                  </Badge>
-                ))}
-              </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    <Star className="h-4 w-4 fill-gray-400 text-gray-400" />
+                    <span className="font-medium">{artisan.rating}</span>
+                    <span className="text-sm text-gray-600">({artisan.reviews})</span>
+                  </div>
+                </div>
 
-              <div className="flex gap-2 pt-4">
-                <Button size="sm" className="flex-1 bg-black hover:bg-gray-800 text-white">
-                  <Users className="h-4 w-4 mr-1" />
-                  Connect
-                </Button>
-                <Button size="sm" variant="outline" className="border-gray-400 text-gray-600 hover:bg-gray-100">
-                  <MessageCircle className="h-4 w-4 mr-1" />
-                  Message
-                </Button>
-                <Button size="sm" variant="outline" className="border-gray-400 text-gray-600 hover:bg-gray-100">
-                  <Eye className="h-4 w-4" />
-                </Button>
+                <p className="text-sm text-gray-700">{artisan.description}</p>
+
+                <div className="flex flex-wrap gap-1">
+                  {artisan.specialties.map((specialty, index) => (
+                    <Badge key={index} variant="secondary" className="text-xs bg-gray-200 text-gray-800">
+                      {specialty}
+                    </Badge>
+                  ))}
+                </div>
+
+                <div className="flex gap-2 pt-4">
+                  <Button 
+                    size="sm" 
+                    className={`flex-1 ${isConnected 
+                      ? 'bg-green-600 hover:bg-green-700 text-white' 
+                      : 'bg-black hover:bg-gray-800 text-white'
+                    }`}
+                    onClick={() => handleConnect(artisan.id, artisan.name)}
+                  >
+                    <Users className="h-4 w-4 mr-1" />
+                    {isConnected ? 'Connected' : 'Connect'}
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="border-gray-400 text-gray-600 hover:bg-gray-100"
+                    onClick={() => handleMessage(artisan.name)}
+                  >
+                    <MessageCircle className="h-4 w-4 mr-1" />
+                    Message
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="border-gray-400 text-gray-600 hover:bg-gray-100"
+                    onClick={() => handleViewProfile(artisan.name)}
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
