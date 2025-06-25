@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -5,6 +6,7 @@ import { ArrowRight, Users, Palette, Calendar, MessageCircle, ShoppingBag, Star 
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
+import { Footer } from "@/components/layout/Footer";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -34,7 +36,7 @@ const Index = () => {
 
   // Only show landing page if user is not authenticated
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50 flex flex-col">
       {/* Navigation */}
       <nav className="bg-white/80 backdrop-blur-sm border-b border-orange-100 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -56,122 +58,127 @@ const Index = () => {
       </nav>
 
       {/* Hero Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
-        <div className="text-center">
-          <Badge className="mb-4 bg-orange-100 text-orange-800 hover:bg-orange-200">
-            ✨ Now Live - Join the Community
-          </Badge>
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-            Connect, Create, and
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500"> Collaborate</span>
-          </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Join the premier platform for artisans, designers, and craftspeople. Showcase your work, 
-            connect with peers, and grow your creative business.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+      <div className="flex-1">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
+          <div className="text-center">
+            <Badge className="mb-4 bg-orange-100 text-orange-800 hover:bg-orange-200">
+              ✨ Now Live - Join the Community
+            </Badge>
+            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+              Connect, Create, and
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500"> Collaborate</span>
+            </h1>
+            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+              Join the premier platform for artisans, designers, and craftspeople. Showcase your work, 
+              connect with peers, and grow your creative business.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                size="lg" 
+                onClick={handleGetStarted}
+                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-8 py-4 text-lg"
+              >
+                Start Your Journey
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Feature Cards */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-20">
+            <Card className="hover:shadow-lg transition-shadow border-orange-100">
+              <CardHeader>
+                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
+                  <Users className="h-6 w-6 text-orange-600" />
+                </div>
+                <CardTitle>Connect with Art</CardTitle>
+                <CardDescription>
+                  Network with talented artisans and designers from around the world
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow border-orange-100">
+              <CardHeader>
+                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
+                  <Palette className="h-6 w-6 text-orange-600" />
+                </div>
+                <CardTitle>Showcase Portfolio</CardTitle>
+                <CardDescription>
+                  Display your finest work with our beautiful portfolio galleries
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow border-orange-100">
+              <CardHeader>
+                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
+                  <ShoppingBag className="h-6 w-6 text-orange-600" />
+                </div>
+                <CardTitle>Marketplace</CardTitle>
+                <CardDescription>
+                  Sell your creations and discover unique pieces from other artists
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow border-orange-100">
+              <CardHeader>
+                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
+                  <Calendar className="h-6 w-6 text-orange-600" />
+                </div>
+                <CardTitle>Events & Workshops</CardTitle>
+                <CardDescription>
+                  Join exciting events and learn from master craftspeople
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow border-orange-100">
+              <CardHeader>
+                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
+                  <MessageCircle className="h-6 w-6 text-orange-600" />
+                </div>
+                <CardTitle>Community Chat</CardTitle>
+                <CardDescription>
+                  Engage in meaningful conversations with fellow creators
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow border-orange-100">
+              <CardHeader>
+                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
+                  <Star className="h-6 w-6 text-orange-600" />
+                </div>
+                <CardTitle>Recognition</CardTitle>
+                <CardDescription>
+                  Get recognized for your skills and build your reputation
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </div>
+
+          {/* CTA Section */}
+          <div className="text-center mt-20">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Ready to Join?</h2>
+            <p className="text-gray-600 mb-8">
+              Start connecting with the global community of artisans today
+            </p>
             <Button 
               size="lg" 
               onClick={handleGetStarted}
               className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-8 py-4 text-lg"
             >
-              Start Your Journey
+              Create Your Account
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
         </div>
-
-        {/* Feature Cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-20">
-          <Card className="hover:shadow-lg transition-shadow border-orange-100">
-            <CardHeader>
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-                <Users className="h-6 w-6 text-orange-600" />
-              </div>
-              <CardTitle>Connect with Art</CardTitle>
-              <CardDescription>
-                Network with talented artisans and designers from around the world
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow border-orange-100">
-            <CardHeader>
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-                <Palette className="h-6 w-6 text-orange-600" />
-              </div>
-              <CardTitle>Showcase Portfolio</CardTitle>
-              <CardDescription>
-                Display your finest work with our beautiful portfolio galleries
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow border-orange-100">
-            <CardHeader>
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-                <ShoppingBag className="h-6 w-6 text-orange-600" />
-              </div>
-              <CardTitle>Marketplace</CardTitle>
-              <CardDescription>
-                Sell your creations and discover unique pieces from other artists
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow border-orange-100">
-            <CardHeader>
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-                <Calendar className="h-6 w-6 text-orange-600" />
-              </div>
-              <CardTitle>Events & Workshops</CardTitle>
-              <CardDescription>
-                Join exciting events and learn from master craftspeople
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow border-orange-100">
-            <CardHeader>
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-                <MessageCircle className="h-6 w-6 text-orange-600" />
-              </div>
-              <CardTitle>Community Chat</CardTitle>
-              <CardDescription>
-                Engage in meaningful conversations with fellow creators
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-shadow border-orange-100">
-            <CardHeader>
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-                <Star className="h-6 w-6 text-orange-600" />
-              </div>
-              <CardTitle>Recognition</CardTitle>
-              <CardDescription>
-                Get recognized for your skills and build your reputation
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        </div>
-
-        {/* CTA Section */}
-        <div className="text-center mt-20">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Ready to Join?</h2>
-          <p className="text-gray-600 mb-8">
-            Start connecting with the global community of artisans today
-          </p>
-          <Button 
-            size="lg" 
-            onClick={handleGetStarted}
-            className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-8 py-4 text-lg"
-          >
-            Create Your Account
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
-        </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
