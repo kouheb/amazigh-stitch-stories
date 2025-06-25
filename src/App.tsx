@@ -37,6 +37,9 @@ const App = () => (
               <Route path="/wireframe" element={<Wireframe />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/playstore-banner" element={<PlayStoreBannerPage />} />
+              <Route path="/developer-icon" element={<DeveloperIconPage />} />
+              <Route path="/developer-header" element={<DeveloperHeaderPage />} />
               <Route path="/app" element={
                 <ProtectedRoute>
                   <MainApp />
@@ -47,9 +50,6 @@ const App = () => (
                   <MessagingPage />
                 </ProtectedRoute>
               } />
-              <Route path="/playstore-banner" element={<PlayStoreBannerPage />} />
-              <Route path="/developer-icon" element={<DeveloperIconPage />} />
-              <Route path="/developer-header" element={<DeveloperHeaderPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
