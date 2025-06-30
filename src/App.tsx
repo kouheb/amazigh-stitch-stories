@@ -18,6 +18,7 @@ import { DeveloperIconPage } from "./pages/DeveloperIconPage";
 import { DeveloperHeaderPage } from "./pages/DeveloperHeaderPage";
 import { MessagingPage } from "./pages/MessagingPage";
 import { PrivacyPolicy } from "./pages/PrivacyPolicy";
+import { DeleteAccountPage } from "./pages/DeleteAccountPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/wireframe" element={<Wireframe />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/delete-account" element={<DeleteAccountPage />} />
               <Route path="/playstore-banner" element={<PlayStoreBannerPage />} />
               <Route path="/developer-icon" element={<DeveloperIconPage />} />
               <Route path="/developer-header" element={<DeveloperHeaderPage />} />

@@ -3,14 +3,6 @@ import { Link } from "react-router-dom";
 import { Logo } from "@/components/ui/Logo";
 
 export const Footer = () => {
-  const handleDeleteAccountRequest = () => {
-    const subject = encodeURIComponent("Account Deletion Request");
-    const body = encodeURIComponent(
-      "Hello,\n\nI would like to request the deletion of my account and all associated data from Fil et Toile Studio.\n\nPlease confirm when this has been completed.\n\nThank you."
-    );
-    window.open(`mailto:support@filettoilestudio.com?subject=${subject}&body=${body}`, '_blank');
-  };
-
   return (
     <footer className="bg-white border-t border-gray-200 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -72,12 +64,9 @@ export const Footer = () => {
                   </a>
                 </li>
                 <li>
-                  <button 
-                    onClick={handleDeleteAccountRequest}
-                    className="text-gray-600 hover:text-gray-900 text-sm text-left"
-                  >
+                  <Link to="/delete-account" className="text-gray-600 hover:text-gray-900 text-sm">
                     Delete Account
-                  </button>
+                  </Link>
                 </li>
               </ul>
             </div>
