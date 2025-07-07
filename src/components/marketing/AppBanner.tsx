@@ -1,4 +1,3 @@
-
 import { Logo } from "@/components/ui/Logo";
 
 export const AppBanner = () => {
@@ -18,7 +17,7 @@ export const AppBanner = () => {
         {/* Left Side - Text Content */}
         <div className="flex-1 text-white">
           <div className="mb-8">
-            <Logo size="2xl" showText={true} className="mb-6 filter drop-shadow-lg" />
+            <Logo size="xl" showText={true} className="mb-6 filter drop-shadow-lg" />
           </div>
           
           <h1 className="text-6xl font-bold mb-6 leading-tight drop-shadow-lg">
