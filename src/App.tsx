@@ -15,6 +15,7 @@ import { MainApp } from "./pages/MainApp";
 import { AuthPage } from "./pages/AuthPage";
 import { PlayStoreBannerPage } from "./pages/PlayStoreBannerPage";
 import { AppBannerPage } from "./pages/AppBannerPage";
+import { IconBannerPage } from "./pages/IconBannerPage";
 import { DeveloperIconPage } from "./pages/DeveloperIconPage";
 import { DeveloperHeaderPage } from "./pages/DeveloperHeaderPage";
 import { MessagingPage } from "./pages/MessagingPage";
@@ -42,6 +43,7 @@ const App = () => (
               <Route path="/delete-account" element={<DeleteAccountPage />} />
               <Route path="/playstore-banner" element={<PlayStoreBannerPage />} />
               <Route path="/app-banner" element={<AppBannerPage />} />
+              <Route path="/icon-banner" element={<IconBannerPage />} />
               <Route path="/developer-icon" element={<DeveloperIconPage />} />
               <Route path="/developer-header" element={<DeveloperHeaderPage />} />
               <Route path="/app" element={
