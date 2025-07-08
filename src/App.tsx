@@ -48,11 +48,7 @@ const App = () => (
               <Route path="/developer-icon" element={<DeveloperIconPage />} />
               <Route path="/developer-header" element={<DeveloperHeaderPage />} />
               <Route path="/playstore-graphics" element={<PlayStoreGraphicsPage />} />
-              <Route path="/app" element={
-                <ProtectedRoute>
-                  <MainApp />
-                </ProtectedRoute>
-              } />
+              <Route path="/app" element={<MainApp />} />
               <Route path="/messaging" element={
                 <ProtectedRoute>
                   <MessagingPage />
