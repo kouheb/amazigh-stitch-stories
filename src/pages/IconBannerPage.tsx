@@ -6,11 +6,27 @@ import { Download, Share2, Copy } from "lucide-react";
 import { toast } from "sonner";
 
 export const IconBannerPage = () => {
-  const handleDownload = () => {
+  const handleDownload = async () => {
     const banner = document.getElementById('icon-banner');
     if (banner) {
-      console.log("Download banner functionality - integrate with html2canvas for actual download");
-      toast.success("To download: Right-click on the banner and select 'Save image as...' or use browser's screenshot feature");
+      try {
+        const html2canvas = (await import('html2canvas')).default;
+        const canvas = await html2canvas(banner, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true
+        });
+        
+        const link = document.createElement('a');
+        link.download = 'fil-et-toile-icon-banner.png';
+        link.href = canvas.toDataURL();
+        link.click();
+        
+        toast.success("Banner downloaded successfully!");
+      } catch (error) {
+        console.error('Download failed:', error);
+        toast.error("Download failed. Please right-click and 'Save image as...'");
+      }
     }
   };
 

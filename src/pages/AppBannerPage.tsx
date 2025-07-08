@@ -6,13 +6,27 @@ import { Download, Share2, Copy } from "lucide-react";
 import { toast } from "sonner";
 
 export const AppBannerPage = () => {
-  const handleDownload = () => {
-    // Create canvas and download functionality
+  const handleDownload = async () => {
     const banner = document.getElementById('app-banner');
     if (banner) {
-      // You can use html2canvas library or similar to convert to image
-      console.log("Download banner functionality - integrate with html2canvas for actual download");
-      toast.success("To download: Right-click on the banner and select 'Save image as...' or use browser's screenshot feature");
+      try {
+        const html2canvas = (await import('html2canvas')).default;
+        const canvas = await html2canvas(banner, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true
+        });
+        
+        const link = document.createElement('a');
+        link.download = 'fil-et-toile-app-banner.png';
+        link.href = canvas.toDataURL();
+        link.click();
+        
+        toast.success("Banner downloaded successfully!");
+      } catch (error) {
+        console.error('Download failed:', error);
+        toast.error("Download failed. Please right-click and 'Save image as...'");
+      }
     }
   };
 
