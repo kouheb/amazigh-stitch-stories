@@ -48,7 +48,7 @@ export const IconBanner = () => {
 
         {/* Tagline */}
         <p className="text-2xl text-orange-100 max-w-2xl leading-relaxed mb-8">
-          Connect with Amazigh Artisans • Preserve Traditional Crafts • Build Community
+          Connect with Creative Artisans • Artists • Fashion Designers • Build Community
         </p>
 
         {/* Features */}

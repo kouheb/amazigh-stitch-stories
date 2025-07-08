@@ -23,11 +23,11 @@ export const AppBanner = () => {
           <h1 className="text-6xl font-bold mb-6 leading-tight drop-shadow-lg">
             Connect with
             <br />
-            <span className="text-yellow-300">Amazigh Artisans</span>
+            <span className="text-yellow-300">Creative Artisans</span>
           </h1>
           
           <p className="text-2xl mb-8 text-orange-100 max-w-lg leading-relaxed">
-            Discover traditional crafts, learn from master artisans, and join a vibrant community preserving Amazigh heritage
+            Discover traditional crafts, learn from master artisans, and join a vibrant community of creative professionals
           </p>
           
           <div className="flex flex-col gap-4">
@@ -122,7 +122,7 @@ export const AppBanner = () => {
       {/* Bottom Section */}
       <div className="absolute bottom-8 left-20 right-20 flex justify-between items-center">
         <div className="text-white text-lg opacity-80">
-          Join thousands of artisans preserving Amazigh culture
+          Join thousands of creative artisans and designers
         </div>
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3 bg-white/20 backdrop-blur-sm rounded-full px-6 py-3">
