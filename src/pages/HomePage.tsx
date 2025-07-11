@@ -67,6 +67,21 @@ export const HomePage = () => {
     alert("Join events functionality - this would navigate to events");
   };
 
+  const handleExploreAll = () => {
+    console.log("Explore all artwork clicked");
+    alert("Explore all functionality - this would navigate to the marketplace");
+  };
+
+  const handleViewAllActivity = () => {
+    console.log("View all activity clicked");
+    alert("View all activity functionality - this would show activity feed");
+  };
+
+  const handleNotificationSettings = () => {
+    console.log("Notification settings clicked");
+    alert("Notification settings functionality - this would open notification preferences");
+  };
+
   const featuredWork = [
     {
       id: 1,
@@ -167,18 +182,28 @@ export const HomePage = () => {
                   Continue your creative journey with personalized recommendations
                 </p>
               </div>
-              <Button 
-                variant="secondary" 
-                size="sm"
-                onClick={() => setShowNotifications(true)}
-                className="relative bg-white/20 backdrop-blur-sm hover:bg-gray-300 text-white border-white/30 hover:text-black"
-              >
-                <Bell className="h-4 w-4 mr-2" />
-                Notifications
-                <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
-                  3
-                </Badge>
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="secondary" 
+                  size="sm"
+                  onClick={() => setShowNotifications(true)}
+                  className="relative bg-white/20 backdrop-blur-sm hover:bg-gray-300 text-white border-white/30 hover:text-black"
+                >
+                  <Bell className="h-4 w-4 mr-2" />
+                  Notifications
+                  <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+                    3
+                  </Badge>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleNotificationSettings}
+                  className="bg-white/20 backdrop-blur-sm hover:bg-gray-300 text-white border-white/30 hover:text-black"
+                >
+                  Settings
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -261,7 +286,14 @@ export const HomePage = () => {
                   <Sparkles className="h-5 w-5 text-black" />
                   Featured Artwork
                 </h3>
-                <Button variant="outline" size="sm" className="border-gray-400 text-gray-600 hover:bg-gray-100 hover:text-black">Explore All</Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="border-gray-400 text-gray-600 hover:bg-gray-100 hover:text-black"
+                  onClick={handleExploreAll}
+                >
+                  Explore All
+                </Button>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -298,7 +330,14 @@ export const HomePage = () => {
             <Card className="p-6 border-gray-300">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="font-semibold">Recent Activity</h3>
-                <Button variant="ghost" size="sm" className="text-gray-600 hover:bg-gray-100 hover:text-black">View All</Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-gray-600 hover:bg-gray-100 hover:text-black"
+                  onClick={handleViewAllActivity}
+                >
+                  View All
+                </Button>
               </div>
               
               <div className="space-y-6">
