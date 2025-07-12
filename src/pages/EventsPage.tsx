@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { EventRegistrationModal } from "@/components/modals/EventRegistrationModal";
 import { 
   Search, 
   Filter, 
@@ -25,6 +26,8 @@ export const EventsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
   const [rsvpEvents, setRsvpEvents] = useState<number[]>([]);
+  const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
 
   const categories = [
     { id: "all", label: "All Events" },
@@ -150,6 +153,11 @@ export const EventsPage = () => {
     );
   };
 
+  const handleEventRegistration = (event: any) => {
+    setSelectedEvent(event);
+    setIsRegistrationModalOpen(true);
+  };
+
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-8">
       {/* Header */}
@@ -233,7 +241,13 @@ export const EventsPage = () => {
                 <div className="flex items-center gap-4">
                   <Button 
                     className="bg-black hover:bg-gray-800"
-                    onClick={() => console.log("Registration modal opened")}
+                    onClick={() => handleEventRegistration({
+                      title: "International Craft Symposium 2024",
+                      date: "May 15-22, 2024",
+                      location: "Marrakech",
+                      price: "$299",
+                      attendees: 500
+                    })}
                   >
                     Register Now - $299
                   </Button>
@@ -311,10 +325,10 @@ export const EventsPage = () => {
                       <Button
                         size="sm"
                         variant={rsvpEvents.includes(event.id) ? "default" : "outline"}
-                        onClick={() => handleRSVP(event.id)}
+                        onClick={() => handleEventRegistration(event)}
                         className={rsvpEvents.includes(event.id) ? "bg-green-600 hover:bg-green-700" : ""}
                       >
-                        {rsvpEvents.includes(event.id) ? "Going" : "RSVP"}
+                        {rsvpEvents.includes(event.id) ? "Registered" : "Register"}
                       </Button>
                       <Button size="sm" variant="ghost">
                         <Heart className="h-4 w-4" />
@@ -458,6 +472,12 @@ export const EventsPage = () => {
           </Card>
         </TabsContent>
       </Tabs>
+      
+      <EventRegistrationModal
+        isOpen={isRegistrationModalOpen}
+        onClose={() => setIsRegistrationModalOpen(false)}
+        event={selectedEvent}
+      />
     </div>
   );
 };

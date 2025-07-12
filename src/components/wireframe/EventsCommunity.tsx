@@ -1,10 +1,20 @@
 
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { EventRegistrationModal } from "@/components/modals/EventRegistrationModal";
 import { Calendar, MapPin, Heart, MessageSquare, Users, Share, Building, Bell } from "lucide-react";
 
 export const EventsCommunity = () => {
+  const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+
+  const handleEventRegistration = (event: any) => {
+    setSelectedEvent(event);
+    setIsRegistrationModalOpen(true);
+  };
+
   return (
     <section>
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Events & Cultural Activities</h2>
@@ -42,7 +52,12 @@ export const EventsCommunity = () => {
                     </Button>
                     <Button 
                       size="sm"
-                      onClick={() => console.log(`Joined event: ${event.title}`)}
+                      onClick={() => handleEventRegistration({
+                        title: event.title,
+                        date: event.date,
+                        location: event.location,
+                        price: "Free"
+                      })}
                     >
                       Join
                     </Button>
@@ -89,6 +104,12 @@ export const EventsCommunity = () => {
           </div>
         </div>
       </Card>
+      
+      <EventRegistrationModal
+        isOpen={isRegistrationModalOpen}
+        onClose={() => setIsRegistrationModalOpen(false)}
+        event={selectedEvent}
+      />
     </section>
   );
 };
