@@ -42,9 +42,15 @@ export const NetworkPage = () => {
     toast.success(`Opening chat with ${artisanName}...`);
   };
 
-  const handleViewProfile = (artisanName: string) => {
+  const handleViewProfile = (artisanName: string, artisanId: number) => {
     console.log(`View profile clicked for ${artisanName}`);
-    toast.info(`Opening ${artisanName}'s profile...`);
+    
+    // Convert name to URL-friendly slug
+    const urlSlug = artisanName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    
+    // Navigate to the profile page
+    navigate(`/profile/${urlSlug}`);
+    toast.success(`Opening ${artisanName}'s profile...`);
   };
 
   const artisans = [
@@ -243,7 +249,7 @@ export const NetworkPage = () => {
                     size="sm" 
                     variant="outline" 
                     className="border-gray-400 text-gray-600 hover:bg-gray-100"
-                    onClick={() => handleViewProfile(artisan.name)}
+                    onClick={() => handleViewProfile(artisan.name, artisan.id)}
                   >
                     <Eye className="h-4 w-4" />
                   </Button>

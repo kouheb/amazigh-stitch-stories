@@ -22,6 +22,7 @@ import { MessagingPage } from "./pages/MessagingPage";
 import { PrivacyPolicy } from "./pages/PrivacyPolicy";
 import { DeleteAccountPage } from "./pages/DeleteAccountPage";
 import { PlayStoreGraphicsPage } from "./pages/PlayStoreGraphicsPage";
+import { PublicProfilePage } from "./pages/PublicProfilePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -56,6 +57,11 @@ const App = () => (
               <Route path="/messaging" element={
                 <ProtectedRoute>
                   <MessagingPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/profile/:username" element={
+                <ProtectedRoute>
+                  <PublicProfilePage />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
