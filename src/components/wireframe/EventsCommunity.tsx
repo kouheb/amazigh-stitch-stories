@@ -33,10 +33,19 @@ export const EventsCommunity = () => {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline">
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => console.log(`Added ${event.title} to favorites`)}
+                    >
                       <Heart className="h-4 w-4" />
                     </Button>
-                    <Button size="sm">Join</Button>
+                    <Button 
+                      size="sm"
+                      onClick={() => console.log(`Joined event: ${event.title}`)}
+                    >
+                      Join
+                    </Button>
                   </div>
                 </div>
               ))}

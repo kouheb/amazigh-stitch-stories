@@ -231,10 +231,18 @@ export const EventsPage = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <Button className="bg-black hover:bg-gray-800">
+                  <Button 
+                    className="bg-black hover:bg-gray-800"
+                    onClick={() => console.log("Registration modal opened")}
+                  >
                     Register Now - $299
                   </Button>
-                  <Button variant="outline">Learn More</Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => console.log("Event details modal opened")}
+                  >
+                    Learn More
+                  </Button>
                 </div>
               </div>
               <div className="text-center">
