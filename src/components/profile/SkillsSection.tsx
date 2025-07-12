@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { AddSkillModal } from "./AddSkillModal";
+import { EditSkillModal } from "./EditSkillModal";
 
 interface SkillData {
   level: number;
@@ -39,6 +40,8 @@ interface SkillsSectionProps {
 export const SkillsSection = ({ skills, specialties, isOwnProfile }: SkillsSectionProps) => {
   const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
   const [isAddSkillModalOpen, setIsAddSkillModalOpen] = useState(false);
+  const [isEditSkillModalOpen, setIsEditSkillModalOpen] = useState(false);
+  const [editingSkill, setEditingSkill] = useState<string | null>(null);
   const [isAddSpecialtyModalOpen, setIsAddSpecialtyModalOpen] = useState(false);
   const [newSpecialtyName, setNewSpecialtyName] = useState("");
   const [currentSkills, setCurrentSkills] = useState<string[]>(skills);
@@ -120,6 +123,21 @@ export const SkillsSection = ({ skills, specialties, isOwnProfile }: SkillsSecti
     toast.success(`Removed specialty: ${specialtyName}`);
   };
 
+  const handleEditSkill = (skillName: string) => {
+    console.log("Edit skill:", skillName);
+    setEditingSkill(skillName);
+    setIsEditSkillModalOpen(true);
+  };
+
+  const handleSkillUpdated = (skillName: string, updatedData: SkillData) => {
+    setSkillDetails(prev => ({
+      ...prev,
+      [skillName]: updatedData
+    }));
+    setIsEditSkillModalOpen(false);
+    setEditingSkill(null);
+  };
+
   return (
     <div className="space-y-6">
       {/* Skills Overview */}
@@ -159,8 +177,7 @@ export const SkillsSection = ({ skills, specialties, isOwnProfile }: SkillsSecti
                       size="sm"
                       onClick={(e) => {
                         e.stopPropagation();
-                        console.log("Edit skill:", skill);
-                        toast.info("Edit skill functionality coming soon!");
+                        handleEditSkill(skill);
                       }}
                     >
                       <Edit3 className="h-4 w-4" />
@@ -333,6 +350,20 @@ export const SkillsSection = ({ skills, specialties, isOwnProfile }: SkillsSecti
         onClose={() => setIsAddSkillModalOpen(false)}
         onSkillAdded={handleSkillAdded}
       />
+
+      {/* Edit Skill Modal */}
+      {editingSkill && skillDetails[editingSkill] && (
+        <EditSkillModal
+          isOpen={isEditSkillModalOpen}
+          onClose={() => {
+            setIsEditSkillModalOpen(false);
+            setEditingSkill(null);
+          }}
+          onSkillUpdated={handleSkillUpdated}
+          skillName={editingSkill}
+          currentData={skillDetails[editingSkill]}
+        />
+      )}
 
       {/* Add Specialty Modal */}
       <Dialog open={isAddSpecialtyModalOpen} onOpenChange={setIsAddSpecialtyModalOpen}>

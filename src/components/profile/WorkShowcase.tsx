@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AddWorkModal } from "@/components/modals/AddWorkModal";
+import { WorkDetailModal } from "./WorkDetailModal";
 import { 
   Play, 
   Image, 
@@ -40,6 +41,8 @@ interface WorkShowcaseProps {
 export const WorkShowcase = ({ isOwnProfile }: WorkShowcaseProps) => {
   const [activeShowcaseTab, setActiveShowcaseTab] = useState("featured");
   const [isAddWorkModalOpen, setIsAddWorkModalOpen] = useState(false);
+  const [selectedWork, setSelectedWork] = useState<any>(null);
+  const [isWorkDetailModalOpen, setIsWorkDetailModalOpen] = useState(false);
 
   const initialShowcaseItems = {
     featured: [
@@ -192,8 +195,17 @@ export const WorkShowcase = ({ isOwnProfile }: WorkShowcaseProps) => {
     });
   };
 
+  const handleWorkClick = (item: any) => {
+    setSelectedWork(item);
+    setIsWorkDetailModalOpen(true);
+  };
+
   const renderShowcaseItem = (item: any) => (
-    <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+    <Card 
+      key={item.id} 
+      className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+      onClick={() => handleWorkClick(item)}
+    >
       <div className="relative">
         <div className="h-48 overflow-hidden">
           <img 
@@ -331,6 +343,15 @@ export const WorkShowcase = ({ isOwnProfile }: WorkShowcaseProps) => {
         isOpen={isAddWorkModalOpen}
         onClose={() => setIsAddWorkModalOpen(false)}
         onWorkAdded={handleWorkAdded}
+      />
+
+      <WorkDetailModal
+        isOpen={isWorkDetailModalOpen}
+        onClose={() => {
+          setIsWorkDetailModalOpen(false);
+          setSelectedWork(null);
+        }}
+        work={selectedWork}
       />
     </>
   );

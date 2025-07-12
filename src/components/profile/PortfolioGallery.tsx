@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AddWorkModal } from "@/components/modals/AddWorkModal";
+import { WorkDetailModal } from "./WorkDetailModal";
 import { 
   Upload, 
   Heart, 
@@ -38,6 +39,8 @@ export const PortfolioGallery = ({ isOwnProfile }: PortfolioGalleryProps) => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isAddWorkModalOpen, setIsAddWorkModalOpen] = useState(false);
+  const [selectedWork, setSelectedWork] = useState<any>(null);
+  const [isWorkDetailModalOpen, setIsWorkDetailModalOpen] = useState(false);
 
   const initialPortfolioItems: WorkItem[] = [
     {
@@ -106,6 +109,15 @@ export const PortfolioGallery = ({ isOwnProfile }: PortfolioGalleryProps) => {
     setPortfolioItems(prev => [portfolioWork, ...prev]);
   };
 
+  const handleWorkClick = (item: WorkItem) => {
+    setSelectedWork({
+      ...item,
+      thumbnail: item.image,
+      type: "project"
+    });
+    setIsWorkDetailModalOpen(true);
+  };
+
   return (
     <>
       <Card className="p-6">
@@ -169,7 +181,11 @@ export const PortfolioGallery = ({ isOwnProfile }: PortfolioGalleryProps) => {
           : "space-y-6"
         }>
           {filteredItems.map((item) => (
-            <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+            <Card 
+              key={item.id} 
+              className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+              onClick={() => handleWorkClick(item)}
+            >
               {viewMode === "grid" ? (
                 <>
                   <div className="h-48 overflow-hidden">
@@ -266,6 +282,15 @@ export const PortfolioGallery = ({ isOwnProfile }: PortfolioGalleryProps) => {
         isOpen={isAddWorkModalOpen}
         onClose={() => setIsAddWorkModalOpen(false)}
         onWorkAdded={handleWorkAdded}
+      />
+
+      <WorkDetailModal
+        isOpen={isWorkDetailModalOpen}
+        onClose={() => {
+          setIsWorkDetailModalOpen(false);
+          setSelectedWork(null);
+        }}
+        work={selectedWork}
       />
     </>
   );
