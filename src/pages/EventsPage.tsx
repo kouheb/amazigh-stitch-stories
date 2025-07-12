@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EventRegistrationModal } from "@/components/modals/EventRegistrationModal";
+import { AddEventModal } from "@/components/modals/AddEventModal";
 import { 
   Search, 
   Filter, 
@@ -24,6 +25,79 @@ import {
   ChevronRight
 } from "lucide-react";
 
+const initialEvents = [
+  {
+    id: 1,
+    title: "Amazigh Cultural Festival",
+    date: "March 15-17, 2024",
+    time: "10:00 AM - 8:00 PM",
+    location: "Marrakech Cultural Center",
+    category: "cultural",
+    attendees: 245,
+    price: "Free",
+    image: "🎭",
+    description: "Celebrate Amazigh heritage with traditional music, dance, and crafts",
+    organizer: "Cultural Heritage Foundation",
+    tags: ["Traditional", "Music", "Dance", "Crafts"]
+  },
+  {
+    id: 2,
+    title: "Zardozi Embroidery Workshop",
+    date: "March 22, 2024",
+    time: "2:00 PM - 6:00 PM",
+    location: "Artisan Studio, Fez",
+    category: "workshop",
+    attendees: 18,
+    price: "$85",
+    image: "✨",
+    description: "Learn traditional Zardozi techniques from master artisan Fatima Al-Maghribi",
+    organizer: "Fatima Al-Maghribi",
+    tags: ["Hands-on", "Traditional", "Embroidery"]
+  },
+  {
+    id: 3,
+    title: "Moroccan Textile Exhibition",
+    date: "April 1-15, 2024",
+    time: "9:00 AM - 6:00 PM",
+    location: "National Museum, Rabat",
+    category: "exhibition",
+    attendees: 156,
+    price: "$12",
+    image: "🧵",
+    description: "Explore centuries of Moroccan textile traditions and contemporary innovations",
+    organizer: "National Museum",
+    tags: ["Historical", "Contemporary", "Textiles"]
+  },
+  {
+    id: 4,
+    title: "Artisan Market Pop-up",
+    date: "April 5, 2024",
+    time: "10:00 AM - 7:00 PM",
+    location: "Jemaa el-Fnaa, Marrakech",
+    category: "market",
+    attendees: 89,
+    price: "Free",
+    image: "🛍️",
+    description: "Shop directly from local artisans and discover unique handmade pieces",
+    organizer: "Artisan Collective",
+    tags: ["Shopping", "Local", "Handmade"]
+  },
+  {
+    id: 5,
+    title: "Fashion Designer Networking",
+    date: "April 12, 2024",
+    time: "7:00 PM - 10:00 PM",
+    location: "Design Hub, Casablanca",
+    category: "networking",
+    attendees: 67,
+    price: "$25",
+    image: "👥",
+    description: "Connect with fellow designers, share ideas, and build partnerships",
+    organizer: "Fashion Network Morocco",
+    tags: ["Networking", "Fashion", "Business"]
+  }
+];
+
 export const EventsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
@@ -32,6 +106,8 @@ export const EventsPage = () => {
   const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [currentCalendarDate, setCurrentCalendarDate] = useState(new Date());
+  const [isAddEventModalOpen, setIsAddEventModalOpen] = useState(false);
+  const [eventsList, setEventsList] = useState(initialEvents);
 
   const categories = [
     { id: "all", label: "All Events" },
@@ -42,78 +118,6 @@ export const EventsPage = () => {
     { id: "networking", label: "Networking" }
   ];
 
-  const events = [
-    {
-      id: 1,
-      title: "Amazigh Cultural Festival",
-      date: "March 15-17, 2024",
-      time: "10:00 AM - 8:00 PM",
-      location: "Marrakech Cultural Center",
-      category: "cultural",
-      attendees: 245,
-      price: "Free",
-      image: "🎭",
-      description: "Celebrate Amazigh heritage with traditional music, dance, and crafts",
-      organizer: "Cultural Heritage Foundation",
-      tags: ["Traditional", "Music", "Dance", "Crafts"]
-    },
-    {
-      id: 2,
-      title: "Zardozi Embroidery Workshop",
-      date: "March 22, 2024",
-      time: "2:00 PM - 6:00 PM",
-      location: "Artisan Studio, Fez",
-      category: "workshop",
-      attendees: 18,
-      price: "$85",
-      image: "✨",
-      description: "Learn traditional Zardozi techniques from master artisan Fatima Al-Maghribi",
-      organizer: "Fatima Al-Maghribi",
-      tags: ["Hands-on", "Traditional", "Embroidery"]
-    },
-    {
-      id: 3,
-      title: "Moroccan Textile Exhibition",
-      date: "April 1-15, 2024",
-      time: "9:00 AM - 6:00 PM",
-      location: "National Museum, Rabat",
-      category: "exhibition",
-      attendees: 156,
-      price: "$12",
-      image: "🧵",
-      description: "Explore centuries of Moroccan textile traditions and contemporary innovations",
-      organizer: "National Museum",
-      tags: ["Historical", "Contemporary", "Textiles"]
-    },
-    {
-      id: 4,
-      title: "Artisan Market Pop-up",
-      date: "April 5, 2024",
-      time: "10:00 AM - 7:00 PM",
-      location: "Jemaa el-Fnaa, Marrakech",
-      category: "market",
-      attendees: 89,
-      price: "Free",
-      image: "🛍️",
-      description: "Shop directly from local artisans and discover unique handmade pieces",
-      organizer: "Artisan Collective",
-      tags: ["Shopping", "Local", "Handmade"]
-    },
-    {
-      id: 5,
-      title: "Fashion Designer Networking",
-      date: "April 12, 2024",
-      time: "7:00 PM - 10:00 PM",
-      location: "Design Hub, Casablanca",
-      category: "networking",
-      attendees: 67,
-      price: "$25",
-      image: "👥",
-      description: "Connect with fellow designers, share ideas, and build partnerships",
-      organizer: "Fashion Network Morocco",
-      tags: ["Networking", "Fashion", "Business"]
-    }
-  ];
 
   const forumTopics = [
     {
@@ -158,7 +162,7 @@ export const EventsPage = () => {
     return new Date(year, month, day);
   };
 
-  const filteredEvents = events.filter(event => {
+  const filteredEvents = eventsList.filter(event => {
     const matchesCategory = activeCategory === "all" || event.category === activeCategory;
     const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       event.location.toLowerCase().includes(searchTerm.toLowerCase());
@@ -236,7 +240,7 @@ export const EventsPage = () => {
     const month = currentCalendarDate.getMonth();
     const dayDate = new Date(year, month, day);
     
-    return events.some(event => {
+    return eventsList.some(event => {
       const eventDate = getDateFromString(event.date);
       return eventDate.getDate() === day && 
              eventDate.getMonth() === month && 
@@ -250,7 +254,7 @@ export const EventsPage = () => {
     const year = currentCalendarDate.getFullYear();
     const month = currentCalendarDate.getMonth();
     
-    return events.filter(event => {
+    return eventsList.filter(event => {
       const eventDate = getDateFromString(event.date);
       return eventDate.getDate() === day && 
              eventDate.getMonth() === month && 
@@ -281,6 +285,11 @@ export const EventsPage = () => {
       default:
         alert('Feature coming soon!');
     }
+  };
+
+  // Handle adding new event
+  const handleAddEvent = (newEvent: any) => {
+    setEventsList(prev => [...prev, newEvent]);
   };
 
   return (
@@ -688,7 +697,11 @@ export const EventsPage = () => {
                   <span>Event indicator</span>
                 </div>
               </div>
-              <Button variant="outline" size="sm">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setIsAddEventModalOpen(true)}
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Event
               </Button>
@@ -701,7 +714,7 @@ export const EventsPage = () => {
               Events in {currentCalendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
             </h3>
             <div className="space-y-3">
-              {events.filter(event => {
+              {eventsList.filter(event => {
                 const eventDate = getDateFromString(event.date);
                 return eventDate.getMonth() === currentCalendarDate.getMonth() && 
                        eventDate.getFullYear() === currentCalendarDate.getFullYear();
@@ -728,7 +741,7 @@ export const EventsPage = () => {
                 </div>
               ))}
               
-              {events.filter(event => {
+              {eventsList.filter(event => {
                 const eventDate = getDateFromString(event.date);
                 return eventDate.getMonth() === currentCalendarDate.getMonth() && 
                        eventDate.getFullYear() === currentCalendarDate.getFullYear();
@@ -746,6 +759,13 @@ export const EventsPage = () => {
         isOpen={isRegistrationModalOpen}
         onClose={() => setIsRegistrationModalOpen(false)}
         event={selectedEvent}
+      />
+      
+      <AddEventModal
+        isOpen={isAddEventModalOpen}
+        onClose={() => setIsAddEventModalOpen(false)}
+        onAddEvent={handleAddEvent}
+        selectedDate={currentCalendarDate}
       />
     </div>
   );
