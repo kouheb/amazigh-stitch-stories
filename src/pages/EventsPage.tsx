@@ -25,6 +25,7 @@ import {
 export const EventsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
+  const [timeFilter, setTimeFilter] = useState("all");
   const [rsvpEvents, setRsvpEvents] = useState<number[]>([]);
   const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
@@ -138,11 +139,41 @@ export const EventsPage = () => {
     }
   ];
 
+  const getDateFromString = (dateStr: string) => {
+    // Parse date strings like "March 15-17, 2024" or "March 22, 2024"
+    const year = new Date().getFullYear();
+    const monthMap: { [key: string]: number } = {
+      "january": 0, "february": 1, "march": 2, "april": 3, "may": 4, "june": 5,
+      "july": 6, "august": 7, "september": 8, "october": 9, "november": 10, "december": 11
+    };
+    
+    const parts = dateStr.toLowerCase().split(' ');
+    const month = monthMap[parts[0]];
+    const dayPart = parts[1].replace(',', '');
+    const day = parseInt(dayPart.split('-')[0]); // Get first day if it's a range
+    
+    return new Date(year, month, day);
+  };
+
   const filteredEvents = events.filter(event => {
     const matchesCategory = activeCategory === "all" || event.category === activeCategory;
     const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       event.location.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
+    
+    // Time filtering
+    const eventDate = getDateFromString(event.date);
+    const now = new Date();
+    const oneWeekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const oneMonthFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    
+    let matchesTime = true;
+    if (timeFilter === "week") {
+      matchesTime = eventDate >= now && eventDate <= oneWeekFromNow;
+    } else if (timeFilter === "month") {
+      matchesTime = eventDate >= now && eventDate <= oneMonthFromNow;
+    }
+    
+    return matchesCategory && matchesSearch && matchesTime;
   });
 
   const handleRSVP = (eventId: number) => {
@@ -285,9 +316,30 @@ export const EventsPage = () => {
                 Upcoming Events ({filteredEvents.length})
               </h2>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm">This Week</Button>
-                <Button variant="outline" size="sm">This Month</Button>
-                <Button variant="outline" size="sm">All</Button>
+                <Button 
+                  variant={timeFilter === "week" ? "default" : "outline"} 
+                  size="sm"
+                  onClick={() => setTimeFilter("week")}
+                  className={timeFilter === "week" ? "bg-black hover:bg-gray-800" : ""}
+                >
+                  This Week
+                </Button>
+                <Button 
+                  variant={timeFilter === "month" ? "default" : "outline"} 
+                  size="sm"
+                  onClick={() => setTimeFilter("month")}
+                  className={timeFilter === "month" ? "bg-black hover:bg-gray-800" : ""}
+                >
+                  This Month
+                </Button>
+                <Button 
+                  variant={timeFilter === "all" ? "default" : "outline"} 
+                  size="sm"
+                  onClick={() => setTimeFilter("all")}
+                  className={timeFilter === "all" ? "bg-black hover:bg-gray-800" : ""}
+                >
+                  All
+                </Button>
               </div>
             </div>
 
