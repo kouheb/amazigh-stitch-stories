@@ -19,7 +19,9 @@ import {
   Clock,
   Star,
   Plus,
-  ArrowRight
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 
 export const EventsPage = () => {
@@ -29,6 +31,7 @@ export const EventsPage = () => {
   const [rsvpEvents, setRsvpEvents] = useState<number[]>([]);
   const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [currentCalendarDate, setCurrentCalendarDate] = useState(new Date());
 
   const categories = [
     { id: "all", label: "All Events" },
@@ -187,6 +190,72 @@ export const EventsPage = () => {
   const handleEventRegistration = (event: any) => {
     setSelectedEvent(event);
     setIsRegistrationModalOpen(true);
+  };
+
+  // Calendar navigation functions
+  const navigateCalendar = (direction: 'prev' | 'next') => {
+    setCurrentCalendarDate(prev => {
+      const newDate = new Date(prev);
+      if (direction === 'prev') {
+        newDate.setMonth(newDate.getMonth() - 1);
+      } else {
+        newDate.setMonth(newDate.getMonth() + 1);
+      }
+      return newDate;
+    });
+  };
+
+  // Generate calendar days for current month
+  const generateCalendarDays = () => {
+    const year = currentCalendarDate.getFullYear();
+    const month = currentCalendarDate.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startDay = firstDay.getDay(); // 0 = Sunday
+
+    const days = [];
+    
+    // Add empty cells for days before month starts
+    for (let i = 0; i < startDay; i++) {
+      days.push(null);
+    }
+    
+    // Add days of the month
+    for (let day = 1; day <= daysInMonth; day++) {
+      days.push(day);
+    }
+    
+    return days;
+  };
+
+  // Check if a day has events
+  const dayHasEvents = (day: number) => {
+    if (!day) return false;
+    const year = currentCalendarDate.getFullYear();
+    const month = currentCalendarDate.getMonth();
+    const dayDate = new Date(year, month, day);
+    
+    return events.some(event => {
+      const eventDate = getDateFromString(event.date);
+      return eventDate.getDate() === day && 
+             eventDate.getMonth() === month && 
+             eventDate.getFullYear() === year;
+    });
+  };
+
+  // Get events for a specific day
+  const getEventsForDay = (day: number) => {
+    if (!day) return [];
+    const year = currentCalendarDate.getFullYear();
+    const month = currentCalendarDate.getMonth();
+    
+    return events.filter(event => {
+      const eventDate = getDateFromString(event.date);
+      return eventDate.getDate() === day && 
+             eventDate.getMonth() === month && 
+             eventDate.getFullYear() === year;
+    });
   };
 
   return (
@@ -498,39 +567,131 @@ export const EventsPage = () => {
         {/* Calendar Tab */}
         <TabsContent value="calendar" className="space-y-6">
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Event Calendar</h3>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold">Event Calendar</h3>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => navigateCalendar('prev')}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <span className="text-lg font-medium min-w-[180px] text-center">
+                  {currentCalendarDate.toLocaleDateString('en-US', { 
+                    month: 'long', 
+                    year: 'numeric' 
+                  })}
+                </span>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => navigateCalendar('next')}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            
+            {/* Calendar Grid */}
             <div className="grid grid-cols-7 gap-2 mb-4">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                <div key={day} className="text-center font-medium py-2">{day}</div>
+                <div key={day} className="text-center font-medium py-2 text-gray-600">{day}</div>
               ))}
             </div>
+            
             <div className="grid grid-cols-7 gap-2">
-              {Array.from({ length: 35 }, (_, i) => {
-                const day = i - 5; // Start from previous month
-                const isCurrentMonth = day > 0 && day <= 31;
-                const hasEvent = [15, 17, 22, 28].includes(day);
+              {generateCalendarDays().map((day, i) => {
+                const hasEvent = day ? dayHasEvents(day) : false;
+                const dayEvents = day ? getEventsForDay(day) : [];
                 
                 return (
                   <div
                     key={i}
-                    className={`aspect-square flex items-center justify-center text-sm border rounded ${
-                      isCurrentMonth 
+                    className={`aspect-square flex flex-col items-center justify-center text-sm border rounded cursor-pointer transition-colors ${
+                      day 
                         ? hasEvent 
-                          ? 'bg-gray-100 border-gray-300 text-gray-700 font-medium' 
-                          : 'border-gray-200 hover:bg-gray-50'
+                          ? 'bg-blue-50 border-blue-200 text-blue-700 font-medium hover:bg-blue-100' 
+                          : 'border-gray-200 hover:bg-gray-50 text-gray-700'
                         : 'text-gray-400 border-gray-100'
                     }`}
+                    onClick={() => {
+                      if (day && hasEvent && dayEvents.length > 0) {
+                        handleEventRegistration(dayEvents[0]);
+                      }
+                    }}
+                    title={day && hasEvent ? `${dayEvents.length} event(s) on this day` : ''}
                   >
-                    {day > 0 && day <= 31 ? day : ''}
+                    <span className="text-sm">{day || ''}</span>
+                    {hasEvent && (
+                      <div className="w-1 h-1 bg-blue-500 rounded-full mt-1"></div>
+                    )}
                   </div>
                 );
               })}
             </div>
-            <div className="mt-4 text-sm text-gray-600">
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-gray-100 border border-gray-300 rounded"></div>
-                <span>Events scheduled</span>
+            
+            {/* Legend */}
+            <div className="mt-6 flex items-center justify-between">
+              <div className="flex items-center gap-4 text-sm text-gray-600">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-blue-50 border border-blue-200 rounded"></div>
+                  <span>Events scheduled</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <span>Event indicator</span>
+                </div>
               </div>
+              <Button variant="outline" size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Event
+              </Button>
+            </div>
+          </Card>
+          
+          {/* Events for current month */}
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold mb-4">
+              Events in {currentCalendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            </h3>
+            <div className="space-y-3">
+              {events.filter(event => {
+                const eventDate = getDateFromString(event.date);
+                return eventDate.getMonth() === currentCalendarDate.getMonth() && 
+                       eventDate.getFullYear() === currentCalendarDate.getFullYear();
+              }).map((event) => (
+                <div 
+                  key={event.id} 
+                  className="flex items-center justify-between p-3 border rounded hover:bg-gray-50 cursor-pointer"
+                  onClick={() => handleEventRegistration(event)}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="text-2xl">{event.image}</div>
+                    <div>
+                      <h4 className="font-medium">{event.title}</h4>
+                      <div className="text-sm text-gray-600 flex items-center gap-4">
+                        <span>{event.date}</span>
+                        <span>{event.location}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline">{event.category}</Badge>
+                    <span className="text-sm font-medium text-green-600">{event.price}</span>
+                  </div>
+                </div>
+              ))}
+              
+              {events.filter(event => {
+                const eventDate = getDateFromString(event.date);
+                return eventDate.getMonth() === currentCalendarDate.getMonth() && 
+                       eventDate.getFullYear() === currentCalendarDate.getFullYear();
+              }).length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  No events scheduled for this month
+                </div>
+              )}
             </div>
           </Card>
         </TabsContent>
