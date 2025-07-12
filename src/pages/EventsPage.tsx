@@ -253,15 +253,18 @@ export const EventsPage = () => {
                   </Button>
                   <Button 
                     variant="outline"
-                    onClick={() => setSelectedEvent({
-                      id: "featured",
-                      title: "Global Artisan Festival 2024",
-                      description: "Connect with artisans worldwide in our biggest celebration of traditional crafts and modern innovation.",
-                      date: "March 15-17, 2024",
-                      location: "Marrakech Cultural Center",
-                      price: 299,
-                      attendees: 500
-                    })}
+                    onClick={() => {
+                      setSelectedEvent({
+                        id: "featured",
+                        title: "Global Artisan Festival 2024",
+                        description: "Connect with artisans worldwide in our biggest celebration of traditional crafts and modern innovation.",
+                        date: "March 15-17, 2024",
+                        location: "Marrakech Cultural Center",
+                        price: 299,
+                        attendees: 500
+                      });
+                      setIsRegistrationModalOpen(true);
+                    }}
                   >
                     Learn More
                   </Button>
