@@ -258,6 +258,31 @@ export const EventsPage = () => {
     });
   };
 
+  // Community feature handlers
+  const handleCommunityFeature = (feature: string) => {
+    console.log(`Opening ${feature}...`);
+    // You can add specific navigation or modal logic here
+    switch (feature) {
+      case 'forums':
+        alert('Opening Discussion Forums - Feature coming soon!');
+        break;
+      case 'groups':
+        alert('Opening Craft-Specific Groups - Feature coming soon!');
+        break;
+      case 'projects':
+        alert('Opening Share Projects - Feature coming soon!');
+        break;
+      case 'partnerships':
+        alert('Opening Studio Partnerships - Feature coming soon!');
+        break;
+      case 'notifications':
+        alert('Opening Event Notifications - Feature coming soon!');
+        break;
+      default:
+        alert('Feature coming soon!');
+    }
+  };
+
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-8">
       {/* Header */}
@@ -483,27 +508,47 @@ export const EventsPage = () => {
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">Community Features</h3>
               <div className="space-y-3">
-                <Button className="w-full justify-start" variant="outline">
+                <Button 
+                  className="w-full justify-start" 
+                  variant="outline"
+                  onClick={() => handleCommunityFeature('forums')}
+                >
                   <MessageSquare className="h-4 w-4 mr-2" />
                   Discussion Forums
                   <Badge className="ml-auto">24 new</Badge>
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={() => handleCommunityFeature('groups')}
+                >
                   <Users className="h-4 w-4 mr-2" />
                   Craft-Specific Groups
                   <Badge variant="secondary" className="ml-auto">12</Badge>
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={() => handleCommunityFeature('projects')}
+                >
                   <Share className="h-4 w-4 mr-2" />
                   Share Projects
                   <Badge variant="secondary" className="ml-auto">156</Badge>
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={() => handleCommunityFeature('partnerships')}
+                >
                   <Building className="h-4 w-4 mr-2" />
                   Studio Partnerships
                   <Badge variant="secondary" className="ml-auto">25</Badge>
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={() => handleCommunityFeature('notifications')}
+                >
                   <Bell className="h-4 w-4 mr-2" />
                   Event Notifications
                 </Button>
