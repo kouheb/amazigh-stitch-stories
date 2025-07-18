@@ -11,6 +11,7 @@ import { CallModal } from "../calls/CallModal";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import type { CallType } from "@/utils/webrtc";
 
 interface Conversation {
@@ -48,6 +49,7 @@ interface ChatWindowProps {
 
 export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [messageList, setMessageList] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -204,8 +206,8 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
 
   const handleShowInfo = () => {
     console.log(`Showing info for ${conversation.participant.name}`);
-    // Navigate to the user's profile
-    window.open(`/profile/${recipientId}`, '_blank');
+    // Navigate to the user's profile in the same tab
+    navigate(`/profile/${recipientId}`);
     toast.info(`Opening ${conversation.participant.name}'s profile`);
   };
 
