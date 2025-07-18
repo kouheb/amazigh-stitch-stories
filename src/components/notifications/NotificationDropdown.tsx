@@ -221,14 +221,13 @@ export const NotificationDropdown = ({ notificationCount, onNotificationCountCha
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="secondary"
+          variant="ghost"
           size="sm"
-          className="relative bg-white/20 backdrop-blur-sm hover:bg-gray-300 text-white border-white/30 hover:text-black"
+          className="relative text-gray-700 hover:text-black hover:bg-gray-100"
         >
-          <Bell className="h-4 w-4 mr-2" />
-          Notifications
+          <Bell className="h-5 w-5" />
           {notificationCount > 0 && (
-            <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+            <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-red-600 hover:bg-red-700 text-white text-xs">
               {notificationCount > 99 ? '99+' : notificationCount}
             </Badge>
           )}
