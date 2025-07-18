@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +30,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const ProfilePage = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
   const [isOwnProfile] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -222,7 +224,8 @@ export const ProfilePage = () => {
 
   const handleMessageClick = () => {
     console.log("Message clicked");
-    toast.info("Messaging feature coming soon");
+    // For own profile, redirect to messaging page
+    navigate('/messaging');
   };
 
   const handleFollowClick = () => {
