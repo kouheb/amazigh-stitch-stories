@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Search, Plus, MoreVertical, ArrowLeft } from "lucide-react";
 import { ChatWindow } from "@/components/messaging/ChatWindow";
 import { ChatList } from "@/components/messaging/ChatList";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface Conversation {
   id: string;
@@ -35,61 +37,129 @@ interface Message {
 
 export const MessagingPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const userId = searchParams.get('user');
   const [selectedConversationId, setSelectedConversationId] = useState<string>("1");
   const [searchQuery, setSearchQuery] = useState("");
+  const [targetUser, setTargetUser] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (userId) {
+      loadUserProfile(userId);
+    }
+  }, [userId]);
+
+  const loadUserProfile = async (userId: string) => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error loading user profile:', error);
+        toast.error('User not found');
+        return;
+      }
+
+      setTargetUser(data);
+      // Start conversation with this user
+      if (data) {
+        const newConversation = {
+          id: userId,
+          participant: {
+            name: data.display_name || data.full_name || data.email || 'Unknown User',
+            avatar: data.avatar_url || "",
+            status: "offline" as const,
+            lastSeen: "recently"
+          },
+          lastMessage: {
+            text: "Start a conversation...",
+            timestamp: "now",
+            isRead: true
+          },
+          unreadCount: 0
+        };
+        setSelectedConversationId(userId);
+      }
+    } catch (error) {
+      console.error('Error loading user profile:', error);
+      toast.error('Failed to load user profile');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleBackToApp = () => {
     navigate('/app');
   };
 
-  // Mock data - in real app this would come from your backend
-  const conversations: Conversation[] = [
-    {
-      id: "1",
-      participant: {
-        name: "Fatima Al-Maghribi",
-        avatar: "/api/placeholder/40/40",
-        status: "online",
-        lastSeen: "now"
+  // Generate conversations list including the target user if provided
+  const generateConversations = (): Conversation[] => {
+    const baseConversations: Conversation[] = [
+      {
+        id: "1",
+        participant: {
+          name: "Fatima Al-Maghribi",
+          avatar: "/api/placeholder/40/40",
+          status: "online",
+          lastSeen: "now"
+        },
+        lastMessage: {
+          text: "I'd love to learn more about traditional Zardozi techniques",
+          timestamp: "2m ago",
+          isRead: false
+        },
+        unreadCount: 2
       },
-      lastMessage: {
-        text: "I'd love to learn more about traditional Zardozi techniques",
-        timestamp: "2m ago",
-        isRead: false
-      },
-      unreadCount: 2
-    },
-    {
-      id: "2",
-      participant: {
-        name: "Ahmed Ben Hassan",
-        avatar: "/api/placeholder/40/40",
-        status: "offline",
-        lastSeen: "1h ago"
-      },
-      lastMessage: {
-        text: "The beading workshop was amazing, thank you!",
-        timestamp: "1h ago",
-        isRead: true
-      },
-      unreadCount: 0
-    },
-    {
-      id: "3",
-      participant: {
-        name: "Aicha Berber",
-        avatar: "/api/placeholder/40/40",
-        status: "online",
-        lastSeen: "now"
-      },
-      lastMessage: {
-        text: "When is the next cultural event?",
-        timestamp: "3h ago",
-        isRead: true
-      },
-      unreadCount: 0
+      {
+        id: "2",
+        participant: {
+          name: "Ahmed Ben Hassan",
+          avatar: "/api/placeholder/40/40",
+          status: "offline",
+          lastSeen: "1h ago"
+        },
+        lastMessage: {
+          text: "The beading workshop was amazing, thank you!",
+          timestamp: "1h ago",
+          isRead: true
+        },
+        unreadCount: 0
+      }
+    ];
+
+    // Add target user conversation if we have one
+    if (targetUser) {
+      const targetConversation: Conversation = {
+        id: targetUser.id,
+        participant: {
+          name: targetUser.display_name || targetUser.full_name || targetUser.email || 'Unknown User',
+          avatar: targetUser.avatar_url || "",
+          status: "offline",
+          lastSeen: "recently"
+        },
+        lastMessage: {
+          text: "Start a conversation...",
+          timestamp: "now",
+          isRead: true
+        },
+        unreadCount: 0
+      };
+
+      // Add at the beginning if it's not already there
+      if (!baseConversations.find(c => c.id === targetUser.id)) {
+        return [targetConversation, ...baseConversations];
+      }
     }
-  ];
+
+    return baseConversations;
+  };
+
+  const conversations = generateConversations();
 
   const messages: Message[] = [
     {
