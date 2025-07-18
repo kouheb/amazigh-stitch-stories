@@ -48,6 +48,8 @@ export const CallModal = ({
   
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  const remoteAudioRef = useRef<HTMLAudioElement>(null);
+  const ringtonRef = useRef<HTMLAudioElement>(null);
   const webrtcCallRef = useRef<WebRTCCall | null>(null);
   const callStartTimeRef = useRef<number>(0);
 
@@ -67,12 +69,38 @@ export const CallModal = ({
   }, [callState]);
 
   useEffect(() => {
-    if (isOpen && !isIncoming) {
-      initializeCall();
+    if (isOpen) {
+      // Create audio elements
+      if (!remoteAudioRef.current) {
+        const remoteAudio = document.createElement('audio');
+        remoteAudio.autoplay = true;
+        remoteAudio.controls = false;
+        document.body.appendChild(remoteAudio);
+        remoteAudioRef.current = remoteAudio;
+      }
+
+      // Create ringtone
+      if (!ringtonRef.current) {
+        const ringtone = document.createElement('audio');
+        ringtone.loop = true;
+        ringtone.volume = 0.5;
+        // Using a simple beep tone data URL
+        ringtone.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+D2u2AZBzyA0fDZdSEEL4bU8NiINAcZa7zj451KEQ1QqN/xt2EcBj6a3PfKdikGLIXQ6tuaQAkUcLzu58xGFBV9s+nyq1kXCUaj6faXOhEHMo7Y7+CFQR8I+3w='
+        document.body.appendChild(ringtone);
+        ringtonRef.current = ringtone;
+      }
+
+      if (!isIncoming) {
+        initializeCall();
+      } else {
+        // Play ringtone for incoming calls
+        startRingtone();
+      }
     }
 
     return () => {
       cleanupCall();
+      stopRingtone();
     };
   }, [isOpen, isIncoming]);
 
@@ -92,7 +120,7 @@ export const CallModal = ({
       
       const localStream = await webrtcCall.initializeLocalStream();
       
-      if (localVideoRef.current) {
+      if (localVideoRef.current && callType === 'video') {
         localVideoRef.current.srcObject = localStream;
       }
 
@@ -101,6 +129,9 @@ export const CallModal = ({
         const offer = await webrtcCall.createOffer();
         // In a real implementation, send this offer through signaling server
         console.log('Created offer:', offer);
+        
+        // Start call ringing sound for outgoing calls
+        startRingtone();
       }
 
       toast.success(`${callType === 'video' ? 'Video' : 'Voice'} call initiated`);
@@ -112,9 +143,23 @@ export const CallModal = ({
   };
 
   const handleRemoteStream = (stream: MediaStream) => {
-    if (remoteVideoRef.current) {
+    console.log('Received remote stream:', stream);
+    
+    // Handle video stream
+    if (remoteVideoRef.current && callType === 'video') {
       remoteVideoRef.current.srcObject = stream;
     }
+    
+    // Handle audio stream (always present)
+    if (remoteAudioRef.current) {
+      remoteAudioRef.current.srcObject = stream;
+      // Ensure audio plays
+      remoteAudioRef.current.play().catch(e => {
+        console.error('Error playing remote audio:', e);
+      });
+    }
+    
+    stopRingtone();
     setCallState('connected');
   };
 
@@ -143,9 +188,26 @@ export const CallModal = ({
   };
 
   const handleAccept = async () => {
+    stopRingtone();
     if (onAccept) {
       onAccept();
       await initializeCall();
+    }
+  };
+
+  const startRingtone = () => {
+    if (ringtonRef.current) {
+      ringtonRef.current.currentTime = 0;
+      ringtonRef.current.play().catch(e => {
+        console.error('Error playing ringtone:', e);
+      });
+    }
+  };
+
+  const stopRingtone = () => {
+    if (ringtonRef.current) {
+      ringtonRef.current.pause();
+      ringtonRef.current.currentTime = 0;
     }
   };
 
@@ -189,6 +251,9 @@ export const CallModal = ({
     // Calculate call duration if the call was connected
     const duration = callState === 'connected' ? callDuration : 0;
     
+    // Stop ringtone
+    stopRingtone();
+    
     // Notify parent component about call completion
     if (onCallComplete && duration > 0) {
       onCallComplete(duration, callType);
@@ -199,9 +264,23 @@ export const CallModal = ({
   };
 
   const cleanupCall = () => {
+    stopRingtone();
+    
     if (webrtcCallRef.current) {
       webrtcCallRef.current.endCall();
       webrtcCallRef.current = null;
+    }
+    
+    // Clean up audio elements
+    if (remoteAudioRef.current) {
+      remoteAudioRef.current.srcObject = null;
+      remoteAudioRef.current.remove();
+      remoteAudioRef.current = null;
+    }
+    
+    if (ringtonRef.current) {
+      ringtonRef.current.remove();
+      ringtonRef.current = null;
     }
   };
 
@@ -282,7 +361,10 @@ export const CallModal = ({
             // Incoming call buttons
             <>
               <Button
-                onClick={onDecline}
+                onClick={() => {
+                  stopRingtone();
+                  onDecline();
+                }}
                 variant="destructive"
                 size="lg"
                 className="rounded-full h-12 w-12 p-0"
