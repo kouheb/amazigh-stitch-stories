@@ -52,7 +52,39 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
   useEffect(() => {
     if (user && recipientId) {
       loadMessages();
-      setupRealTimeSubscription();
+      
+      // Set up real-time subscription
+      const channel = supabase
+        .channel(`messages-${user.id}-${recipientId}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'messages',
+            filter: `or(and(sender_id.eq.${user.id},recipient_id.eq.${recipientId}),and(sender_id.eq.${recipientId},recipient_id.eq.${user.id}))`
+          },
+          (payload) => {
+            const newMessage: Message = {
+              id: payload.new.id,
+              senderId: payload.new.sender_id,
+              text: payload.new.content,
+              timestamp: new Date(payload.new.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              isRead: payload.new.is_read,
+              type: payload.new.message_type,
+              fileUrl: payload.new.file_url || undefined,
+              fileName: payload.new.file_name || undefined
+            };
+            
+            setMessageList(prev => [...prev, newMessage]);
+          }
+        )
+        .subscribe();
+
+      // Return cleanup function
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [user, recipientId]);
 
@@ -93,40 +125,6 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
     }
   };
 
-  const setupRealTimeSubscription = () => {
-    if (!user) return;
-
-    const channel = supabase
-      .channel('messages')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-          filter: `or(and(sender_id.eq.${user.id},recipient_id.eq.${recipientId}),and(sender_id.eq.${recipientId},recipient_id.eq.${user.id}))`
-        },
-        (payload) => {
-          const newMessage: Message = {
-            id: payload.new.id,
-            senderId: payload.new.sender_id,
-            text: payload.new.content,
-            timestamp: new Date(payload.new.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            isRead: payload.new.is_read,
-            type: payload.new.message_type,
-            fileUrl: payload.new.file_url || undefined,
-            fileName: payload.new.file_name || undefined
-          };
-          
-          setMessageList(prev => [...prev, newMessage]);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  };
 
   const handleSendMessage = async (text: string, type: "text" | "image" | "file" = "text", fileUrl?: string, fileName?: string) => {
     if (!user || !text.trim()) return;
