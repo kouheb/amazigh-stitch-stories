@@ -49,24 +49,26 @@ export const SearchBar = ({ className = "", isMobile = false }: SearchBarProps) 
     try {
       const searchResults: SearchResult[] = [];
 
-      // Search profiles
+      // Search profiles by name, email, and bio
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, display_name, full_name, bio, avatar_url')
-        .or(`display_name.ilike.%${searchQuery}%,full_name.ilike.%${searchQuery}%,bio.ilike.%${searchQuery}%`)
-        .limit(5);
+        .select('id, display_name, full_name, bio, avatar_url, email')
+        .or(`display_name.ilike.%${searchQuery}%,full_name.ilike.%${searchQuery}%,bio.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`)
+        .limit(10);
 
       if (!profilesError && profiles) {
         profiles.forEach(profile => {
           searchResults.push({
             id: profile.id,
             type: 'profile',
-            title: profile.display_name || profile.full_name || 'Unknown User',
-            subtitle: 'Profile',
+            title: profile.display_name || profile.full_name || profile.email || 'Unknown User',
+            subtitle: `Profile • ${profile.email || ''}`,
             avatar: profile.avatar_url,
-            description: profile.bio
+            description: profile.bio || 'Artisan profile'
           });
         });
+      } else if (profilesError) {
+        console.error('Profile search error:', profilesError);
       }
 
       // Search portfolio items
@@ -121,6 +123,7 @@ export const SearchBar = ({ className = "", isMobile = false }: SearchBarProps) 
   const handleResultClick = (result: SearchResult) => {
     switch (result.type) {
       case 'profile':
+        // Navigate to public profile page using the user ID
         navigate(`/profile/${result.id}`);
         break;
       case 'portfolio':
