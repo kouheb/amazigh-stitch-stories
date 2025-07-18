@@ -12,7 +12,8 @@ import {
   Settings, 
   User, 
   LogOut,
-  Plus
+  Plus,
+  Bell
 } from "lucide-react";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { useLanguage } from "@/contexts/LanguageContext";
