@@ -7,12 +7,11 @@ import { MessageInput } from "./MessageInput";
 import { MessageBubble } from "./MessageBubble";
 import { TypingIndicator } from "./TypingIndicator";
 import { ChatOptionsMenu } from "./ChatOptionsMenu";
-import { CallModal } from "../calls/CallModal";
+import { useCallSystem } from "@/hooks/useCallSystem";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import type { CallType } from "@/utils/webrtc";
 
 interface Conversation {
   id: string;
@@ -50,12 +49,10 @@ interface ChatWindowProps {
 export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { initiateCall } = useCallSystem();
   const [messageList, setMessageList] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [showCallModal, setShowCallModal] = useState(false);
-  const [callType, setCallType] = useState<CallType>('voice');
-  const [isIncomingCall, setIsIncomingCall] = useState(false);
   const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(true);
 
   useEffect(() => {
@@ -198,20 +195,14 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
     }
   };
 
-  const handleVoiceCall = () => {
+  const handleVoiceCall = async () => {
     console.log(`Starting voice call with ${conversation.participant.name}`);
-    setCallType('voice');
-    setIsIncomingCall(false);
-    setShowCallModal(true);
-    toast.success(`Starting voice call with ${conversation.participant.name}...`);
+    await initiateCall(recipientId, 'voice');
   };
 
-  const handleVideoCall = () => {
+  const handleVideoCall = async () => {
     console.log(`Starting video call with ${conversation.participant.name}`);
-    setCallType('video');
-    setIsIncomingCall(false);
-    setShowCallModal(true);
-    toast.success(`Starting video call with ${conversation.participant.name}...`);
+    await initiateCall(recipientId, 'video');
   };
 
   const handleShowInfo = () => {
@@ -219,55 +210,6 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
     // Navigate to the user's profile in the same tab
     navigate(`/profile/${recipientId}`);
     toast.info(`Opening ${conversation.participant.name}'s profile`);
-  };
-
-  const handleEndCall = () => {
-    setShowCallModal(false);
-    toast.info('Call ended');
-  };
-
-  const handleCallComplete = async (duration: number, callType: CallType) => {
-    if (!user) {
-      console.error('No user found for call completion');
-      return;
-    }
-    
-    console.log('Call completed:', { duration, callType, user: user.id, recipient: recipientId });
-    
-    try {
-      // Create call history message
-      const callIcon = callType === 'video' ? '📹' : '📞';
-      const callTypeText = callType === 'video' ? 'Video call' : 'Voice call';
-      const durationText = formatCallDuration(duration);
-      const callMessage = `${callIcon} ${callTypeText} - ${durationText}`;
-      
-      console.log('Saving call message:', callMessage);
-      
-      // Save call record to messages table
-      const { data: messageData, error: messageError } = await supabase
-        .from('messages')
-        .insert({
-          sender_id: user.id,
-          recipient_id: recipientId,
-          content: callMessage,
-          message_type: 'text'
-        })
-        .select()
-        .single();
-
-      if (messageError) {
-        console.error('Error saving call record:', messageError);
-        toast.error('Failed to save call history');
-        return;
-      }
-
-      console.log('Call history saved successfully:', messageData);
-      toast.success('Call completed and saved to history');
-      
-    } catch (error) {
-      console.error('Error in handleCallComplete:', error);
-      toast.error('Failed to save call history');
-    }
   };
 
   const formatCallDuration = (seconds: number) => {
@@ -279,15 +221,6 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
     } else {
       return `${mins}m ${secs}s`;
     }
-  };
-
-  const handleAcceptCall = () => {
-    toast.success('Call accepted');
-  };
-
-  const handleDeclineCall = () => {
-    setShowCallModal(false);
-    toast.info('Call declined');
   };
 
   // Chat options handlers
@@ -403,22 +336,6 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
 
       {/* Message Input */}
       <MessageInput onSend={handleSendMessage} />
-
-      {/* Call Modal */}
-      <CallModal
-        isOpen={showCallModal}
-        callType={callType}
-        participant={{
-          id: recipientId,
-          name: conversation.participant.name,
-          avatar: conversation.participant.avatar
-        }}
-        isIncoming={isIncomingCall}
-        onAccept={handleAcceptCall}
-        onDecline={handleDeclineCall}
-        onEnd={handleEndCall}
-        onCallComplete={handleCallComplete}
-      />
     </>
   );
 };
