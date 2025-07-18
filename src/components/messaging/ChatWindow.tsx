@@ -7,7 +7,7 @@ import { MessageInput } from "./MessageInput";
 import { MessageBubble } from "./MessageBubble";
 import { TypingIndicator } from "./TypingIndicator";
 import { ChatOptionsMenu } from "./ChatOptionsMenu";
-import { useCallSystem } from "@/hooks/useCallSystem";
+import { useCall } from "@/contexts/CallContext";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -49,7 +49,7 @@ interface ChatWindowProps {
 export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { initiateCall } = useCallSystem();
+  const { initiateCall } = useCall();
   const [messageList, setMessageList] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [loading, setLoading] = useState(true);

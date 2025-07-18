@@ -5,6 +5,7 @@ import { Sidebar } from "@/components/navigation/Sidebar";
 import { BottomNavigation } from "@/components/navigation/BottomNavigation";
 import { Footer } from "@/components/layout/Footer";
 import { GlobalCallPopup } from "@/components/calls/GlobalCallPopup";
+import { CallProvider } from "@/contexts/CallContext";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -31,36 +32,38 @@ export const AppLayout = ({ children, activeTab, onTabChange }: AppLayoutProps) 
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <MainNavbar 
-        onMenuToggle={handleMenuToggle}
-        onCreateClick={handleCreateClick}
-        onTabChange={handleTabChange}
-      />
-      
-      <div className="flex flex-1">
-        <Sidebar 
-          activeTab={activeTab}
+    <CallProvider>
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <MainNavbar 
+          onMenuToggle={handleMenuToggle}
+          onCreateClick={handleCreateClick}
           onTabChange={handleTabChange}
         />
         
-        <main className="flex-1 lg:ml-64 flex flex-col">
-          <div className="flex-1">
-            {children}
-          </div>
-          <Footer />
-        </main>
-      </div>
+        <div className="flex flex-1">
+          <Sidebar 
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+          />
+          
+          <main className="flex-1 lg:ml-64 flex flex-col">
+            <div className="flex-1">
+              {children}
+            </div>
+            <Footer />
+          </main>
+        </div>
 
-      <div className="lg:hidden">
-        <BottomNavigation 
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-        />
-      </div>
+        <div className="lg:hidden">
+          <BottomNavigation 
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+          />
+        </div>
 
-      {/* Global Call Popup */}
-      <GlobalCallPopup />
-    </div>
+        {/* Global Call Popup */}
+        <GlobalCallPopup />
+      </div>
+    </CallProvider>
   );
 };

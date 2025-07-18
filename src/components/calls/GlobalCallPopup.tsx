@@ -1,5 +1,5 @@
 import { CallModal } from './CallModal';
-import { useCallSystem } from '@/hooks/useCallSystem';
+import { useCall } from '@/contexts/CallContext';
 
 export const GlobalCallPopup = () => {
   const {
@@ -12,7 +12,7 @@ export const GlobalCallPopup = () => {
     acceptCall,
     rejectCall,
     endCall
-  } = useCallSystem();
+  } = useCall();
 
   if (!showCallModal) {
     console.log('GlobalCallPopup: Modal not showing because showCallModal is false');
