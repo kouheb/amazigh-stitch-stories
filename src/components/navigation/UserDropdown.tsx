@@ -1,4 +1,5 @@
 
+import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +20,7 @@ import {
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 interface UserDropdownProps {
@@ -30,6 +32,32 @@ export const UserDropdown = ({ onCreateClick, onTabChange }: UserDropdownProps) 
   const { t } = useLanguage();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const [notificationCount, setNotificationCount] = useState(0);
+
+  // Load notification count from database
+  useEffect(() => {
+    const loadNotificationCount = async () => {
+      if (!user) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('user_stats')
+          .select('notifications_count')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (error) {
+          console.error("Error loading notification count:", error);
+        } else if (data) {
+          setNotificationCount(data.notifications_count || 0);
+        }
+      } catch (error) {
+        console.error("Error loading notification count:", error);
+      }
+    };
+
+    loadNotificationCount();
+  }, [user]);
 
   const handleSignOut = async () => {
     console.log("Sign out clicked");
@@ -93,9 +121,11 @@ export const UserDropdown = ({ onCreateClick, onTabChange }: UserDropdownProps) 
         onClick={handleNotificationsClick}
       >
         <Bell className="h-5 w-5" />
-        <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-gray-800 hover:bg-gray-700 text-white text-xs">
-          3
-        </Badge>
+        {notificationCount > 0 && (
+          <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-red-600 hover:bg-red-700 text-white text-xs">
+            {notificationCount > 99 ? '99+' : notificationCount}
+          </Badge>
+        )}
       </Button>
 
       {/* Profile Dropdown */}

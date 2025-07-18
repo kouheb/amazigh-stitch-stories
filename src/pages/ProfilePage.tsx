@@ -59,37 +59,46 @@ export const ProfilePage = () => {
     bio: user?.user_metadata?.bio || "Welcome to my profile! I'm passionate about creative work and looking forward to connecting with fellow artists and designers.",
     avatar: user?.user_metadata?.avatar_url || "https://images.unsplash.com/photo-1494790108755-2616c163f505?w=150&h=150&fit=crop&crop=face",
     coverImage: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=300&fit=crop",
-    followers: 2847,
-    following: 456,
-    likes: 15420,
-    experience: "15+ Years",
-    skills: ["Creative Design", "Digital Arts", "Traditional Crafts", "Pattern Making", "Cultural Research", "Teaching"],
-    specialties: ["Traditional Arts", "Contemporary Fusion", "Cultural Preservation", "Artisan Training"],
-    verified: true,
-    rating: 4.9,
-    reviewCount: 127,
+    followers: 0,
+    following: 0,
+    likes: 0,
+    experience: "New User",
+    skills: [],
+    specialties: [],
+    verified: false,
+    rating: 0,
+    reviewCount: 0,
     email: user?.email || "",
     phone: user?.user_metadata?.phone || ""
   });
 
-  // Load profile data from database on component mount
+  const [userStats, setUserStats] = useState({
+    followers: 0,
+    following: 0,
+    likes: 0,
+    views: 0,
+    connections: 0,
+    books: 0,
+    messages: 0,
+    notifications: 0
+  });
+
+  // Load profile data and user stats from database on component mount
   useEffect(() => {
     const loadProfileData = async () => {
       if (!user) return;
 
       try {
-        const { data: profile, error } = await supabase
+        // Load profile data
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', user.id)
           .maybeSingle();
 
-        if (error) {
-          console.error("Error loading profile:", error);
-          return;
-        }
-
-        if (profile) {
+        if (profileError) {
+          console.error("Error loading profile:", profileError);
+        } else if (profile) {
           console.log("Loaded profile data:", profile);
           setProfileData(prev => ({
             ...prev,
@@ -101,8 +110,67 @@ export const ProfilePage = () => {
             email: profile.email || user.email || "",
           }));
         }
+
+        // Load user stats
+        const { data: stats, error: statsError } = await supabase
+          .from('user_stats')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (statsError) {
+          console.error("Error loading user stats:", statsError);
+          // Create initial stats if they don't exist
+          const { error: insertError } = await supabase
+            .from('user_stats')
+            .insert({ user_id: user.id });
+          
+          if (insertError) {
+            console.error("Error creating user stats:", insertError);
+          }
+        } else if (stats) {
+          console.log("Loaded user stats:", stats);
+          setUserStats({
+            followers: stats.followers_count,
+            following: stats.following_count,
+            likes: stats.likes_received,
+            views: stats.profile_views,
+            connections: stats.connections_count,
+            books: stats.books_count,
+            messages: stats.messages_count,
+            notifications: stats.notifications_count
+          });
+          
+          // Update profile data with stats
+          setProfileData(prev => ({
+            ...prev,
+            followers: stats.followers_count,
+            following: stats.following_count,
+            likes: stats.likes_received,
+            experience: stats.experience_years > 0 ? `${stats.experience_years}+ Years` : "New User"
+          }));
+        }
+
+        // Load user skills
+        const { data: skills, error: skillsError } = await supabase
+          .from('user_skills')
+          .select('*')
+          .eq('user_id', user.id);
+
+        if (skillsError) {
+          console.error("Error loading user skills:", skillsError);
+        } else if (skills) {
+          const userSkills = skills.filter(s => s.skill_type === 'skill').map(s => s.skill_name);
+          const userSpecialties = skills.filter(s => s.skill_type === 'specialty').map(s => s.skill_name);
+          
+          setProfileData(prev => ({
+            ...prev,
+            skills: userSkills,
+            specialties: userSpecialties
+          }));
+        }
       } catch (error) {
-        console.error("Unexpected error loading profile:", error);
+        console.error("Unexpected error loading profile data:", error);
       } finally {
         setIsLoading(false);
       }
@@ -283,9 +351,9 @@ export const ProfilePage = () => {
       <div className="max-w-6xl mx-auto px-6 mt-20">
         {/* Profile Stats */}
         <ProfileStats 
-          followers={profileData.followers}
-          following={profileData.following}
-          likes={profileData.likes}
+          followers={userStats.followers}
+          following={userStats.following}
+          likes={userStats.likes}
           experience={profileData.experience}
         />
 

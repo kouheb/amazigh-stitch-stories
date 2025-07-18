@@ -203,6 +203,54 @@ export type Database = {
         }
         Relationships: []
       }
+      user_stats: {
+        Row: {
+          books_count: number
+          connections_count: number
+          created_at: string
+          experience_years: number | null
+          followers_count: number
+          following_count: number
+          id: string
+          likes_received: number
+          messages_count: number
+          notifications_count: number
+          profile_views: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          books_count?: number
+          connections_count?: number
+          created_at?: string
+          experience_years?: number | null
+          followers_count?: number
+          following_count?: number
+          id?: string
+          likes_received?: number
+          messages_count?: number
+          notifications_count?: number
+          profile_views?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          books_count?: number
+          connections_count?: number
+          created_at?: string
+          experience_years?: number | null
+          followers_count?: number
+          following_count?: number
+          id?: string
+          likes_received?: number
+          messages_count?: number
+          notifications_count?: number
+          profile_views?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
