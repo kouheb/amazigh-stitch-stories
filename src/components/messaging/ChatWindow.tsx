@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -7,6 +7,8 @@ import { MessageInput } from "./MessageInput";
 import { MessageBubble } from "./MessageBubble";
 import { TypingIndicator } from "./TypingIndicator";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Conversation {
   id: string;
@@ -38,43 +40,145 @@ interface Message {
 
 interface ChatWindowProps {
   conversation: Conversation;
-  messages: Message[];
+  recipientId: string;
 }
 
-export const ChatWindow = ({ conversation, messages }: ChatWindowProps) => {
-  const [messageList, setMessageList] = useState<Message[]>(messages);
+export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
+  const { user } = useAuth();
+  const [messageList, setMessageList] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const handleSendMessage = (text: string, type: "text" | "image" | "file" = "text", fileUrl?: string, fileName?: string) => {
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      senderId: "me",
-      text,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      isRead: false,
-      status: "sending",
-      type,
-      fileUrl,
-      fileName
+  useEffect(() => {
+    if (user && recipientId) {
+      loadMessages();
+      setupRealTimeSubscription();
+    }
+  }, [user, recipientId]);
+
+  const loadMessages = async () => {
+    if (!user) return;
+    
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .or(`and(sender_id.eq.${user.id},recipient_id.eq.${recipientId}),and(sender_id.eq.${recipientId},recipient_id.eq.${user.id})`)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        console.error('Error loading messages:', error);
+        toast.error('Failed to load messages');
+        return;
+      }
+
+      const formattedMessages: Message[] = data.map(msg => ({
+        id: msg.id,
+        senderId: msg.sender_id,
+        text: msg.content,
+        timestamp: new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        isRead: msg.is_read,
+        type: msg.message_type as "text" | "image" | "file",
+        fileUrl: msg.file_url || undefined,
+        fileName: msg.file_name || undefined
+      }));
+
+      setMessageList(formattedMessages);
+    } catch (error) {
+      console.error('Error loading messages:', error);
+      toast.error('Failed to load messages');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const setupRealTimeSubscription = () => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('messages')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `or(and(sender_id.eq.${user.id},recipient_id.eq.${recipientId}),and(sender_id.eq.${recipientId},recipient_id.eq.${user.id}))`
+        },
+        (payload) => {
+          const newMessage: Message = {
+            id: payload.new.id,
+            senderId: payload.new.sender_id,
+            text: payload.new.content,
+            timestamp: new Date(payload.new.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            isRead: payload.new.is_read,
+            type: payload.new.message_type,
+            fileUrl: payload.new.file_url || undefined,
+            fileName: payload.new.file_name || undefined
+          };
+          
+          setMessageList(prev => [...prev, newMessage]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
     };
-    
-    setMessageList([...messageList, newMessage]);
-    
-    // Simulate message delivery
-    setTimeout(() => {
-      setMessageList(prev => prev.map(msg => 
-        msg.id === newMessage.id ? { ...msg, status: "sent" } : msg
-      ));
-    }, 500);
-    
-    setTimeout(() => {
-      setMessageList(prev => prev.map(msg => 
-        msg.id === newMessage.id ? { ...msg, status: "delivered" } : msg
-      ));
-    }, 1000);
+  };
 
-    // Message sent - real person will reply when they see it
-    toast.success("Message sent!");
+  const handleSendMessage = async (text: string, type: "text" | "image" | "file" = "text", fileUrl?: string, fileName?: string) => {
+    if (!user || !text.trim()) return;
+    
+    try {
+      // Insert message into database
+      const { data: messageData, error: messageError } = await supabase
+        .from('messages')
+        .insert({
+          sender_id: user.id,
+          recipient_id: recipientId,
+          content: text,
+          message_type: type,
+          file_url: fileUrl,
+          file_name: fileName
+        })
+        .select()
+        .single();
+
+      if (messageError) {
+        console.error('Error sending message:', messageError);
+        toast.error('Failed to send message');
+        return;
+      }
+
+      // Send email notification
+      try {
+        const { data: senderProfile } = await supabase
+          .from('profiles')
+          .select('display_name, full_name')
+          .eq('id', user.id)
+          .single();
+
+        const senderName = senderProfile?.display_name || senderProfile?.full_name || 'Someone';
+
+        await supabase.functions.invoke('send-message-notification', {
+          body: {
+            recipientId,
+            senderName,
+            messageContent: text
+          }
+        });
+      } catch (emailError) {
+        console.error('Failed to send email notification:', emailError);
+        // Don't show error to user as message was sent successfully
+      }
+
+      toast.success("Message sent!");
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast.error('Failed to send message');
+    }
   };
 
   const handleVoiceCall = () => {
@@ -162,13 +266,26 @@ export const ChatWindow = ({ conversation, messages }: ChatWindowProps) => {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-        {messageList.map((message) => (
-          <MessageBubble
-            key={message.id}
-            message={message}
-            isOwn={message.senderId === "me"}
-          />
-        ))}
+        {loading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-gray-500">Loading messages...</div>
+          </div>
+        ) : messageList.length === 0 ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center text-gray-500">
+              <p>No messages yet</p>
+              <p className="text-sm">Start the conversation!</p>
+            </div>
+          </div>
+        ) : (
+          messageList.map((message) => (
+            <MessageBubble
+              key={message.id}
+              message={message}
+              isOwn={message.senderId === user?.id}
+            />
+          ))
+        )}
         {isTyping && <TypingIndicator />}
       </div>
 

@@ -10,6 +10,7 @@ import { ChatList } from "@/components/messaging/ChatList";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Conversation {
   id: string;
@@ -36,109 +37,130 @@ interface Message {
 }
 
 export const MessagingPage = () => {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const userId = searchParams.get('user');
-  const [selectedConversationId, setSelectedConversationId] = useState<string>("1");
+  const [selectedConversationId, setSelectedConversationId] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [targetUser, setTargetUser] = useState<any>(null);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (userId) {
-      loadUserProfile(userId);
+    if (user) {
+      loadConversations();
     }
-  }, [userId]);
+  }, [user]);
 
-  const loadUserProfile = async (userId: string) => {
+  const loadConversations = async () => {
+    if (!user) return;
+    
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('profiles')
+      // Get all conversations for the current user
+      const { data: conversationsData, error: conversationsError } = await supabase
+        .from('conversations')
         .select('*')
-        .eq('id', userId)
-        .single();
+        .or(`participant_1_id.eq.${user.id},participant_2_id.eq.${user.id}`)
+        .order('updated_at', { ascending: false });
 
-      if (error) {
-        console.error('Error loading user profile:', error);
-        toast.error('User not found');
+      if (conversationsError) {
+        console.error('Error loading conversations:', conversationsError);
         return;
       }
 
-      setTargetUser(data);
-      // Start conversation with this user
-      if (data) {
-        const newConversation = {
-          id: userId,
+      if (!conversationsData || conversationsData.length === 0) {
+        setConversations([]);
+        return;
+      }
+
+      // Get all participant IDs except current user
+      const participantIds = conversationsData.flatMap(conv => 
+        [conv.participant_1_id, conv.participant_2_id].filter(id => id !== user.id)
+      );
+
+      // Get participant profiles
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('*')
+        .in('id', participantIds);
+
+      if (profilesError) {
+        console.error('Error loading participant profiles:', profilesError);
+        return;
+      }
+
+      const formattedConversations: Conversation[] = conversationsData.map(conv => {
+        const otherParticipantId = conv.participant_1_id === user.id ? conv.participant_2_id : conv.participant_1_id;
+        const otherParticipant = profiles?.find(p => p.id === otherParticipantId);
+        
+        return {
+          id: otherParticipantId,
           participant: {
-            name: data.display_name || data.full_name || data.email || 'Unknown User',
-            avatar: data.avatar_url || "",
+            name: otherParticipant?.display_name || otherParticipant?.full_name || otherParticipant?.email || 'Unknown User',
+            avatar: otherParticipant?.avatar_url || "",
             status: "offline" as const,
             lastSeen: "recently"
           },
           lastMessage: {
-            text: "Start a conversation...",
-            timestamp: "now",
+            text: "No messages yet",
+            timestamp: "",
             isRead: true
           },
           unreadCount: 0
         };
+      });
+
+      setConversations(formattedConversations);
+      
+      // Auto-select conversation if userId is provided
+      if (userId && formattedConversations.some(c => c.id === userId)) {
         setSelectedConversationId(userId);
       }
     } catch (error) {
-      console.error('Error loading user profile:', error);
-      toast.error('Failed to load user profile');
+      console.error('Error loading conversations:', error);
+      toast.error('Failed to load conversations');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleBackToApp = () => {
-    navigate('/app');
-  };
+  useEffect(() => {
+    if (userId && user) {
+      startConversationWithUser(userId);
+    }
+  }, [userId, user]);
 
-  // Generate conversations list including the target user if provided
-  const generateConversations = (): Conversation[] => {
-    const baseConversations: Conversation[] = [
-      {
-        id: "1",
-        participant: {
-          name: "Fatima Al-Maghribi",
-          avatar: "/api/placeholder/40/40",
-          status: "online",
-          lastSeen: "now"
-        },
-        lastMessage: {
-          text: "I'd love to learn more about traditional Zardozi techniques",
-          timestamp: "2m ago",
-          isRead: false
-        },
-        unreadCount: 2
-      },
-      {
-        id: "2",
-        participant: {
-          name: "Ahmed Ben Hassan",
-          avatar: "/api/placeholder/40/40",
-          status: "offline",
-          lastSeen: "1h ago"
-        },
-        lastMessage: {
-          text: "The beading workshop was amazing, thank you!",
-          timestamp: "1h ago",
-          isRead: true
-        },
-        unreadCount: 0
+  const startConversationWithUser = async (targetUserId: string) => {
+    if (!user) return;
+    
+    try {
+      // Check if conversation already exists
+      const existingConversation = conversations.find(c => c.id === targetUserId);
+      if (existingConversation) {
+        setSelectedConversationId(targetUserId);
+        return;
       }
-    ];
 
-    // Add target user conversation if we have one
-    if (targetUser) {
-      const targetConversation: Conversation = {
-        id: targetUser.id,
+      // Get target user profile
+      const { data: targetProfile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', targetUserId)
+        .single();
+
+      if (error || !targetProfile) {
+        console.error('Error loading target user:', error);
+        toast.error('User not found');
+        return;
+      }
+
+      // Create new conversation in the UI
+      const newConversation: Conversation = {
+        id: targetUserId,
         participant: {
-          name: targetUser.display_name || targetUser.full_name || targetUser.email || 'Unknown User',
-          avatar: targetUser.avatar_url || "",
+          name: targetProfile.display_name || targetProfile.full_name || targetProfile.email || 'Unknown User',
+          avatar: targetProfile.avatar_url || "",
           status: "offline",
           lastSeen: "recently"
         },
@@ -150,40 +172,18 @@ export const MessagingPage = () => {
         unreadCount: 0
       };
 
-      // Add at the beginning if it's not already there
-      if (!baseConversations.find(c => c.id === targetUser.id)) {
-        return [targetConversation, ...baseConversations];
-      }
+      setConversations(prev => [newConversation, ...prev]);
+      setSelectedConversationId(targetUserId);
+    } catch (error) {
+      console.error('Error starting conversation:', error);
+      toast.error('Failed to start conversation');
     }
-
-    return baseConversations;
   };
 
-  const conversations = generateConversations();
+  const handleBackToApp = () => {
+    navigate('/app');
+  };
 
-  const messages: Message[] = [
-    {
-      id: "1",
-      senderId: "other",
-      text: "Hello! I saw your profile and I'm really interested in learning traditional Amazigh crafts.",
-      timestamp: "10:30 AM",
-      isRead: true
-    },
-    {
-      id: "2",
-      senderId: "me",
-      text: "That's wonderful! I'd be happy to help you get started. What specific techniques are you most interested in?",
-      timestamp: "10:32 AM",
-      isRead: true
-    },
-    {
-      id: "3",
-      senderId: "other",
-      text: "I'd love to learn more about traditional Zardozi techniques",
-      timestamp: "10:35 AM",
-      isRead: false
-    }
-  ];
 
   const selectedConversation = conversations.find(c => c.id === selectedConversationId);
 
@@ -255,7 +255,7 @@ export const MessagingPage = () => {
         {selectedConversation ? (
           <ChatWindow
             conversation={selectedConversation}
-            messages={messages}
+            recipientId={selectedConversationId}
           />
         ) : (
           <div className="flex-1 flex items-center justify-center bg-gray-50">
