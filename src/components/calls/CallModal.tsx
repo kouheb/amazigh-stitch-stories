@@ -27,6 +27,7 @@ interface CallModalProps {
   onAccept?: () => void;
   onDecline: () => void;
   onEnd: () => void;
+  onCallComplete?: (duration: number, callType: CallType) => void;
 }
 
 export const CallModal = ({ 
@@ -36,7 +37,8 @@ export const CallModal = ({
   isIncoming, 
   onAccept, 
   onDecline,
-  onEnd 
+  onEnd,
+  onCallComplete
 }: CallModalProps) => {
   const [callState, setCallState] = useState<'ringing' | 'connecting' | 'connected' | 'ended'>('ringing');
   const [isMuted, setIsMuted] = useState(false);
@@ -184,6 +186,14 @@ export const CallModal = ({
   };
 
   const handleEndCall = () => {
+    // Calculate call duration if the call was connected
+    const duration = callState === 'connected' ? callDuration : 0;
+    
+    // Notify parent component about call completion
+    if (onCallComplete && duration > 0) {
+      onCallComplete(duration, callType);
+    }
+    
     cleanupCall();
     onEnd();
   };
@@ -204,27 +214,42 @@ export const CallModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center">
-      <Card className="w-full max-w-md mx-4 p-6 bg-white">
+    <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
+      <Card className="w-full max-w-2xl mx-4 p-6 bg-white">
         {/* Video containers */}
-        {callType === 'video' && callState === 'connected' && (
-          <div className="relative mb-6">
-            {/* Remote video */}
+        {callType === 'video' && (callState === 'connected' || callState === 'connecting') && (
+          <div className="relative mb-6 bg-gray-900 rounded-lg overflow-hidden">
+            {/* Remote video - Main display */}
             <video
               ref={remoteVideoRef}
               autoPlay
               playsInline
-              className="w-full h-64 bg-gray-900 rounded-lg object-cover"
+              className="w-full h-80 bg-gray-900 object-cover"
             />
             
-            {/* Local video (picture-in-picture) */}
-            <video
-              ref={localVideoRef}
-              autoPlay
-              playsInline
-              muted
-              className="absolute top-4 right-4 w-20 h-28 bg-gray-800 rounded-lg object-cover border-2 border-white"
-            />
+            {/* Local video - Picture-in-picture in bottom right */}
+            <div className="absolute bottom-4 right-4 w-32 h-24 bg-gray-800 rounded-lg overflow-hidden border-2 border-white shadow-lg">
+              <video
+                ref={localVideoRef}
+                autoPlay
+                playsInline
+                muted
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute top-1 left-1 text-white text-xs bg-black bg-opacity-50 px-1 rounded">
+                You
+              </div>
+            </div>
+            
+            {/* Connection status overlay */}
+            {callState === 'connecting' && (
+              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                <div className="text-white text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-2"></div>
+                  <p>Connecting...</p>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

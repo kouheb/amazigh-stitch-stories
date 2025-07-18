@@ -85,8 +85,16 @@ export class WebRTCCall {
   async initializeLocalStream(): Promise<MediaStream> {
     try {
       const constraints: MediaStreamConstraints = {
-        audio: true,
-        video: this.callType === 'video'
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        },
+        video: this.callType === 'video' ? {
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          frameRate: { ideal: 30 }
+        } : false
       };
 
       this.localStream = await navigator.mediaDevices.getUserMedia(constraints);

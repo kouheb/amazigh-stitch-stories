@@ -214,6 +214,43 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
     toast.info('Call ended');
   };
 
+  const handleCallComplete = async (duration: number, callType: CallType) => {
+    if (!user) return;
+    
+    try {
+      // Save call record to messages
+      const callMessage = `${callType === 'video' ? '📹' : '📞'} ${callType === 'video' ? 'Video' : 'Voice'} call - ${formatCallDuration(duration)}`;
+      
+      const { error } = await supabase
+        .from('messages')
+        .insert({
+          sender_id: user.id,
+          recipient_id: recipientId,
+          content: callMessage,
+          message_type: 'text'
+        });
+
+      if (error) {
+        console.error('Error saving call record:', error);
+      } else {
+        toast.success('Call completed');
+      }
+    } catch (error) {
+      console.error('Error saving call record:', error);
+    }
+  };
+
+  const formatCallDuration = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    
+    if (mins === 0) {
+      return `${secs}s`;
+    } else {
+      return `${mins}m ${secs}s`;
+    }
+  };
+
   const handleAcceptCall = () => {
     toast.success('Call accepted');
   };
@@ -350,6 +387,7 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
         onAccept={handleAcceptCall}
         onDecline={handleDeclineCall}
         onEnd={handleEndCall}
+        onCallComplete={handleCallComplete}
       />
     </>
   );
