@@ -142,6 +142,51 @@ export const useCallSystem = () => {
     };
   }, [user]);
 
+  // Helper function to save call to chat history
+  const saveCallToHistory = async (call: CallData, duration: number) => {
+    if (!user) return;
+
+    try {
+      console.log('💾 Saving call to chat history:', call.id);
+
+      // Create call history message
+      const callIcon = call.call_type === 'video' ? '📹' : '📞';
+      const callTypeText = call.call_type === 'video' ? 'Video call' : 'Voice call';
+      const durationText = formatCallDuration(duration);
+      const callMessage = `${callIcon} ${callTypeText} - ${durationText}`;
+
+      // Save call history message to chat (only once from the caller's perspective)
+      const { error: messageError } = await supabase
+        .from('messages')
+        .insert({
+          sender_id: call.caller_id,
+          recipient_id: call.recipient_id,
+          content: callMessage,
+          message_type: 'text'
+        });
+
+      if (messageError) {
+        console.error('❌ Error saving call message:', messageError);
+      } else {
+        console.log('✅ Call history saved successfully');
+      }
+    } catch (error) {
+      console.error('❌ Error saving call to history:', error);
+    }
+  };
+
+  // Helper function to format call duration
+  const formatCallDuration = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    
+    if (mins === 0) {
+      return `${secs}s`;
+    } else {
+      return `${mins}m ${secs}s`;
+    }
+  };
+
   const initiateCall = async (recipientId: string, callType: 'voice' | 'video') => {
     if (!user) {
       toast.error('You must be logged in to make calls');
@@ -293,6 +338,11 @@ export const useCallSystem = () => {
         console.error('❌ Error ending call:', error);
         toast.error('Failed to end call');
         return;
+      }
+
+      // Save call history to messages if the call had a duration > 0
+      if (duration > 0 && user) {
+        await saveCallToHistory(currentCall, duration);
       }
 
       setShowCallModal(false);
