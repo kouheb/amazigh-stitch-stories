@@ -6,6 +6,7 @@ import { Phone, Video, MoreVertical, Info } from "lucide-react";
 import { MessageInput } from "./MessageInput";
 import { MessageBubble } from "./MessageBubble";
 import { TypingIndicator } from "./TypingIndicator";
+import { ChatOptionsMenu } from "./ChatOptionsMenu";
 import { CallModal } from "../calls/CallModal";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -53,6 +54,7 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
   const [showCallModal, setShowCallModal] = useState(false);
   const [callType, setCallType] = useState<CallType>('voice');
   const [isIncomingCall, setIsIncomingCall] = useState(false);
+  const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(true);
 
   useEffect(() => {
     if (user && recipientId) {
@@ -202,7 +204,9 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
 
   const handleShowInfo = () => {
     console.log(`Showing info for ${conversation.participant.name}`);
-    toast.info(`Showing profile info for ${conversation.participant.name}`);
+    // Navigate to the user's profile
+    window.open(`/profile/${recipientId}`, '_blank');
+    toast.info(`Opening ${conversation.participant.name}'s profile`);
   };
 
   const handleEndCall = () => {
@@ -217,6 +221,28 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
   const handleDeclineCall = () => {
     setShowCallModal(false);
     toast.info('Call declined');
+  };
+
+  // Chat options handlers
+  const handleToggleNotifications = () => {
+    setIsNotificationsEnabled(!isNotificationsEnabled);
+    toast.success(isNotificationsEnabled ? 'Notifications muted' : 'Notifications enabled');
+  };
+
+  const handleBlockUser = () => {
+    toast.warning(`${conversation.participant.name} has been blocked`);
+  };
+
+  const handleReportUser = () => {
+    toast.warning(`Report sent for ${conversation.participant.name}`);
+  };
+
+  const handleArchiveChat = () => {
+    toast.info('Chat archived');
+  };
+
+  const handleDeleteChat = () => {
+    toast.error('Chat deleted');
   };
 
   return (
@@ -270,14 +296,15 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
             >
               <Info className="h-4 w-4" />
             </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => toast.info("More options coming soon")}
-              className="hover:bg-gray-50"
-            >
-              <MoreVertical className="h-4 w-4" />
-            </Button>
+            <ChatOptionsMenu
+              participantName={conversation.participant.name}
+              isNotificationsEnabled={isNotificationsEnabled}
+              onToggleNotifications={handleToggleNotifications}
+              onBlockUser={handleBlockUser}
+              onReportUser={handleReportUser}
+              onArchiveChat={handleArchiveChat}
+              onDeleteChat={handleDeleteChat}
+            />
           </div>
         </div>
       </div>
