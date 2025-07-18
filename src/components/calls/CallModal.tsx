@@ -53,56 +53,51 @@ export const CallModal = ({
   const webrtcCallRef = useRef<WebRTCCall | null>(null);
   const callStartTimeRef = useRef<number>(0);
 
-  // Generate a Facebook-like ringtone
-  const generateFacebookLikeRingtone = () => {
+  // Generate a realistic phone ringing sound
+  const generatePhoneRingtone = () => {
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const duration = 2.5; // Duration of one ring cycle
+    const duration = 6; // 6 seconds: ring-pause-ring-pause pattern
     const sampleRate = audioContext.sampleRate;
     const numSamples = duration * sampleRate;
     
     const audioBuffer = audioContext.createBuffer(1, numSamples, sampleRate);
     const channelData = audioBuffer.getChannelData(0);
     
-    // Create a pleasant dual-tone ringtone (similar to Facebook)
+    // Classic phone ring frequencies
+    const freq1 = 440; // A4 note
+    const freq2 = 480; // Slightly higher for dual-tone
+    
     for (let i = 0; i < numSamples; i++) {
       const time = i / sampleRate;
-      const fadeIn = Math.min(time * 10, 1);
-      const fadeOut = Math.max(1 - (time - 2) * 10, 0);
-      const envelope = fadeIn * fadeOut;
       
-      // Two pleasant frequencies mixed together
-      const freq1 = 800; // Main tone
-      const freq2 = 1000; // Harmony tone
+      // Create ring pattern: 1 sec ring, 0.5 sec pause, 1 sec ring, 3.5 sec pause
+      let amplitude = 0;
+      const cycleTime = time % 6;
       
+      if ((cycleTime >= 0 && cycleTime < 1) || (cycleTime >= 1.5 && cycleTime < 2.5)) {
+        // Ring periods with fade in/out
+        const ringTime = cycleTime < 1.5 ? cycleTime : cycleTime - 1.5;
+        const fadeIn = Math.min(ringTime * 20, 1);
+        const fadeOut = Math.min((1 - ringTime) * 20, 1);
+        amplitude = fadeIn * fadeOut * 0.4;
+      }
+      
+      // Mix two frequencies for classic phone sound
       const wave1 = Math.sin(2 * Math.PI * freq1 * time);
-      const wave2 = Math.sin(2 * Math.PI * freq2 * time) * 0.5;
+      const wave2 = Math.sin(2 * Math.PI * freq2 * time);
       
-      // Add some vibrato for richness
-      const vibrato = 1 + 0.1 * Math.sin(2 * Math.PI * 5 * time);
-      
-      channelData[i] = (wave1 + wave2) * envelope * vibrato * 0.3;
+      channelData[i] = (wave1 + wave2 * 0.7) * amplitude;
     }
     
-    // Convert to data URL
-    const offlineContext = new OfflineAudioContext(1, numSamples, sampleRate);
-    const source = offlineContext.createBufferSource();
-    source.buffer = audioBuffer;
-    source.connect(offlineContext.destination);
-    source.start();
+    // Convert to blob and create audio element
+    const wavBlob = audioBufferToWav(audioBuffer);
+    const ringtone = document.createElement('audio');
+    ringtone.loop = true;
+    ringtone.volume = 0.7;
+    ringtone.src = URL.createObjectURL(wavBlob);
     
-    offlineContext.startRendering().then(renderedBuffer => {
-      // Create audio element
-      const ringtone = document.createElement('audio');
-      ringtone.loop = true;
-      ringtone.volume = 0.6;
-      
-      // Convert audio buffer to blob and create URL
-      const wavBlob = audioBufferToWav(renderedBuffer);
-      ringtone.src = URL.createObjectURL(wavBlob);
-      
-      document.body.appendChild(ringtone);
-      ringtonRef.current = ringtone;
-    });
+    document.body.appendChild(ringtone);
+    ringtonRef.current = ringtone;
   };
 
   // Helper function to convert AudioBuffer to WAV blob
@@ -110,8 +105,6 @@ export const CallModal = ({
     const length = buffer.length;
     const arrayBuffer = new ArrayBuffer(44 + length * 2);
     const view = new DataView(arrayBuffer);
-    const channels = buffer.numberOfChannels;
-    const sampleRate = buffer.sampleRate;
     
     // WAV header
     const writeString = (offset: number, string: string) => {
@@ -126,9 +119,9 @@ export const CallModal = ({
     writeString(12, 'fmt ');
     view.setUint32(16, 16, true);
     view.setUint16(20, 1, true);
-    view.setUint16(22, channels, true);
-    view.setUint32(24, sampleRate, true);
-    view.setUint32(28, sampleRate * 2, true);
+    view.setUint16(22, 1, true);
+    view.setUint32(24, buffer.sampleRate, true);
+    view.setUint32(28, buffer.sampleRate * 2, true);
     view.setUint16(32, 2, true);
     view.setUint16(34, 16, true);
     writeString(36, 'data');
@@ -172,10 +165,10 @@ export const CallModal = ({
         remoteAudioRef.current = remoteAudio;
       }
 
-      // Create ringtone with a Facebook-like sound
+      // Create realistic phone ringtone
       if (!ringtonRef.current) {
-        // Generate a Facebook-like ringtone using Web Audio API
-        generateFacebookLikeRingtone();
+        // Generate a realistic phone ringtone using Web Audio API
+        generatePhoneRingtone();
       }
 
       if (!isIncoming) {
