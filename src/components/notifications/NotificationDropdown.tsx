@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   DropdownMenu,
@@ -19,168 +18,36 @@ import {
   AlertTriangle
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { useNotifications } from "@/contexts/NotificationContext";
 import { useNavigate } from "react-router-dom";
-
-interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type: 'info' | 'success' | 'warning' | 'error';
-  is_read: boolean;
-  action_url?: string;
-  created_at: string;
-}
 
 interface NotificationDropdownProps {
   notificationCount: number;
   onNotificationCountChange: (count: number) => void;
 }
 
-export const NotificationDropdown = ({ notificationCount, onNotificationCountChange }: NotificationDropdownProps) => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(false);
+export const NotificationDropdown = ({ notificationCount }: NotificationDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { 
+    notifications, 
+    loading, 
+    loadNotifications, 
+    markAsRead, 
+    markAllAsRead, 
+    deleteNotification 
+  } = useNotifications();
 
   // Load notifications when dropdown opens
-  useEffect(() => {
-    if (isOpen && user) {
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (open && user) {
       loadNotifications();
     }
-  }, [isOpen, user]);
-
-  const loadNotifications = async () => {
-    if (!user) return;
-
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('notifications')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(20);
-
-      if (error) {
-        console.error('Error loading notifications:', error);
-        toast.error('Failed to load notifications');
-        return;
-      }
-
-      setNotifications((data || []).map((item: any) => ({
-        id: item.id,
-        title: item.title,
-        message: item.message,
-        type: item.type as 'info' | 'success' | 'warning' | 'error',
-        is_read: item.is_read,
-        action_url: item.action_url,
-        created_at: item.created_at
-      })));
-    } catch (error) {
-      console.error('Error loading notifications:', error);
-      toast.error('Failed to load notifications');
-    } finally {
-      setLoading(false);
-    }
   };
 
-  const markAsRead = async (notificationId: string) => {
-    if (!user) return;
-
-    try {
-      const { error } = await supabase
-        .from('notifications')
-        .update({ is_read: true })
-        .eq('id', notificationId)
-        .eq('user_id', user.id);
-
-      if (error) {
-        console.error('Error marking notification as read:', error);
-        return;
-      }
-
-      // Update local state
-      setNotifications(prev =>
-        prev.map(notif =>
-          notif.id === notificationId ? { ...notif, is_read: true } : notif
-        )
-      );
-
-      // Update notification count
-      const newCount = Math.max(0, notificationCount - 1);
-      onNotificationCountChange(newCount);
-    } catch (error) {
-      console.error('Error marking notification as read:', error);
-    }
-  };
-
-  const markAllAsRead = async () => {
-    if (!user) return;
-
-    try {
-      const { error } = await supabase
-        .from('notifications')
-        .update({ is_read: true })
-        .eq('user_id', user.id)
-        .eq('is_read', false);
-
-      if (error) {
-        console.error('Error marking all notifications as read:', error);
-        toast.error('Failed to mark all as read');
-        return;
-      }
-
-      // Update local state
-      setNotifications(prev =>
-        prev.map(notif => ({ ...notif, is_read: true }))
-      );
-
-      // Reset notification count
-      onNotificationCountChange(0);
-      toast.success('All notifications marked as read');
-    } catch (error) {
-      console.error('Error marking all notifications as read:', error);
-      toast.error('Failed to mark all as read');
-    }
-  };
-
-  const deleteNotification = async (notificationId: string) => {
-    if (!user) return;
-
-    try {
-      const { error } = await supabase
-        .from('notifications')
-        .delete()
-        .eq('id', notificationId)
-        .eq('user_id', user.id);
-
-      if (error) {
-        console.error('Error deleting notification:', error);
-        toast.error('Failed to delete notification');
-        return;
-      }
-
-      // Update local state
-      const deletedNotification = notifications.find(n => n.id === notificationId);
-      setNotifications(prev => prev.filter(notif => notif.id !== notificationId));
-
-      // Update notification count if it was unread
-      if (deletedNotification && !deletedNotification.is_read) {
-        const newCount = Math.max(0, notificationCount - 1);
-        onNotificationCountChange(newCount);
-      }
-
-      toast.success('Notification deleted');
-    } catch (error) {
-      console.error('Error deleting notification:', error);
-      toast.error('Failed to delete notification');
-    }
-  };
-
-  const handleNotificationClick = (notification: Notification) => {
+  const handleNotificationClick = (notification: any) => {
     // Mark as read if not already read
     if (!notification.is_read) {
       markAsRead(notification.id);
@@ -218,7 +85,7 @@ export const NotificationDropdown = ({ notificationCount, onNotificationCountCha
   };
 
   return (
-    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+    <DropdownMenu open={isOpen} onOpenChange={handleOpenChange}>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"

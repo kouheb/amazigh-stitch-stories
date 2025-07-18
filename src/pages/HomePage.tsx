@@ -24,37 +24,13 @@ import { RecommendationEngine } from "@/components/ai/RecommendationEngine";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 import { CollaborationHub } from "@/components/collaboration/CollaborationHub";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNotifications } from "@/contexts/NotificationContext";
 import { supabase } from "@/integrations/supabase/client";
 
 export const HomePage = () => {
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notificationCount, setNotificationCount] = useState(0);
   const { user } = useAuth();
-
-  // Load notification count from database
-  useEffect(() => {
-    const loadNotificationCount = async () => {
-      if (!user) return;
-
-      try {
-        const { data, error } = await supabase
-          .from('notifications')
-          .select('id', { count: 'exact' })
-          .eq('user_id', user.id)
-          .eq('is_read', false);
-
-        if (error) {
-          console.error("Error loading notification count:", error);
-        } else {
-          setNotificationCount(data?.length || 0);
-        }
-      } catch (error) {
-        console.error("Error loading notification count:", error);
-      }
-    };
-
-    loadNotificationCount();
-  }, [user]);
+  const { notificationCount } = useNotifications();
 
   // Get user's display name or fall back to email or default
   const getUserDisplayName = () => {

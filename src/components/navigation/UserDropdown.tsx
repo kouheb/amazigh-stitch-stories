@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { 
@@ -12,14 +11,13 @@ import {
   Settings, 
   User, 
   LogOut,
-  Plus,
-  Bell
+  Plus
 } from "lucide-react";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNotifications } from "@/contexts/NotificationContext";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 interface UserDropdownProps {
@@ -31,36 +29,7 @@ export const UserDropdown = ({ onCreateClick, onTabChange }: UserDropdownProps) 
   const { t } = useLanguage();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const [notificationCount, setNotificationCount] = useState(0);
-
-  // Load notification count from database
-  useEffect(() => {
-    const loadNotificationCount = async () => {
-      if (!user) return;
-
-      try {
-        const { data, error } = await supabase
-          .from('notifications')
-          .select('id', { count: 'exact' })
-          .eq('user_id', user.id)
-          .eq('is_read', false);
-
-        if (error) {
-          console.error("Error loading notification count:", error);
-        } else {
-          setNotificationCount(data?.length || 0);
-        }
-      } catch (error) {
-        console.error("Error loading notification count:", error);
-      }
-    };
-
-    loadNotificationCount();
-  }, [user]);
-
-  const handleNotificationCountChange = (newCount: number) => {
-    setNotificationCount(newCount);
-  };
+  const { notificationCount } = useNotifications();
 
   const handleSignOut = async () => {
     console.log("Sign out clicked");
@@ -114,7 +83,7 @@ export const UserDropdown = ({ onCreateClick, onTabChange }: UserDropdownProps) 
       {/* Notifications */}
       <NotificationDropdown 
         notificationCount={notificationCount}
-        onNotificationCountChange={handleNotificationCountChange}
+        onNotificationCountChange={() => {}} // No longer needed since we use shared state
       />
 
       {/* Profile Dropdown */}
