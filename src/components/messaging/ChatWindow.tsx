@@ -73,24 +73,8 @@ export const ChatWindow = ({ conversation, messages }: ChatWindowProps) => {
       ));
     }, 1000);
 
-    // Simulate typing response
-    setTimeout(() => {
-      setIsTyping(true);
-    }, 2000);
-
-    setTimeout(() => {
-      setIsTyping(false);
-      const responseMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        senderId: "other",
-        text: "Thank you for sharing! That looks beautiful.",
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        isRead: true,
-        status: "read",
-        type: "text"
-      };
-      setMessageList(prev => [...prev, responseMessage]);
-    }, 4000);
+    // Message sent - real person will reply when they see it
+    toast.success("Message sent!");
   };
 
   const handleVoiceCall = () => {
