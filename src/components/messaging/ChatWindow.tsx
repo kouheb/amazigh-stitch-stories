@@ -6,9 +6,11 @@ import { Phone, Video, MoreVertical, Info } from "lucide-react";
 import { MessageInput } from "./MessageInput";
 import { MessageBubble } from "./MessageBubble";
 import { TypingIndicator } from "./TypingIndicator";
+import { CallModal } from "../calls/CallModal";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import type { CallType } from "@/utils/webrtc";
 
 interface Conversation {
   id: string;
@@ -48,6 +50,9 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
   const [messageList, setMessageList] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showCallModal, setShowCallModal] = useState(false);
+  const [callType, setCallType] = useState<CallType>('voice');
+  const [isIncomingCall, setIsIncomingCall] = useState(false);
 
   useEffect(() => {
     if (user && recipientId) {
@@ -181,12 +186,18 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
 
   const handleVoiceCall = () => {
     console.log(`Starting voice call with ${conversation.participant.name}`);
-    toast.success(`Connecting voice call with ${conversation.participant.name}...`);
+    setCallType('voice');
+    setIsIncomingCall(false);
+    setShowCallModal(true);
+    toast.success(`Starting voice call with ${conversation.participant.name}...`);
   };
 
   const handleVideoCall = () => {
     console.log(`Starting video call with ${conversation.participant.name}`);
-    toast.success(`Connecting video call with ${conversation.participant.name}...`);
+    setCallType('video');
+    setIsIncomingCall(false);
+    setShowCallModal(true);
+    toast.success(`Starting video call with ${conversation.participant.name}...`);
   };
 
   const handleShowInfo = () => {
@@ -194,9 +205,18 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
     toast.info(`Showing profile info for ${conversation.participant.name}`);
   };
 
-  const handleMoreOptions = () => {
-    console.log(`Opening more options for ${conversation.participant.name}`);
-    toast.info("More options menu opened");
+  const handleEndCall = () => {
+    setShowCallModal(false);
+    toast.info('Call ended');
+  };
+
+  const handleAcceptCall = () => {
+    toast.success('Call accepted');
+  };
+
+  const handleDeclineCall = () => {
+    setShowCallModal(false);
+    toast.info('Call declined');
   };
 
   return (
@@ -253,7 +273,7 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
             <Button 
               variant="ghost" 
               size="sm"
-              onClick={handleMoreOptions}
+              onClick={() => toast.info("More options coming soon")}
               className="hover:bg-gray-50"
             >
               <MoreVertical className="h-4 w-4" />
@@ -289,6 +309,21 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
 
       {/* Message Input */}
       <MessageInput onSend={handleSendMessage} />
+
+      {/* Call Modal */}
+      <CallModal
+        isOpen={showCallModal}
+        callType={callType}
+        participant={{
+          id: recipientId,
+          name: conversation.participant.name,
+          avatar: conversation.participant.avatar
+        }}
+        isIncoming={isIncomingCall}
+        onAccept={handleAcceptCall}
+        onDecline={handleDeclineCall}
+        onEnd={handleEndCall}
+      />
     </>
   );
 };
