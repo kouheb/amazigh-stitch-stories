@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,10 +24,37 @@ import { RecommendationEngine } from "@/components/ai/RecommendationEngine";
 import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 import { CollaborationHub } from "@/components/collaboration/CollaborationHub";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 export const HomePage = () => {
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0);
   const { user } = useAuth();
+
+  // Load notification count from database
+  useEffect(() => {
+    const loadNotificationCount = async () => {
+      if (!user) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('notifications')
+          .select('id', { count: 'exact' })
+          .eq('user_id', user.id)
+          .eq('is_read', false);
+
+        if (error) {
+          console.error("Error loading notification count:", error);
+        } else {
+          setNotificationCount(data?.length || 0);
+        }
+      } catch (error) {
+        console.error("Error loading notification count:", error);
+      }
+    };
+
+    loadNotificationCount();
+  }, [user]);
 
   // Get user's display name or fall back to email or default
   const getUserDisplayName = () => {
@@ -191,9 +218,11 @@ export const HomePage = () => {
                 >
                   <Bell className="h-4 w-4 mr-2" />
                   Notifications
-                  <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
-                    3
-                  </Badge>
+                  {notificationCount > 0 && (
+                    <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+                      {notificationCount > 99 ? '99+' : notificationCount}
+                    </Badge>
+                  )}
                 </Button>
                 <Button 
                   variant="outline" 
