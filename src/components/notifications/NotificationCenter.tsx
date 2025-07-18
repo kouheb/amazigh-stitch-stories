@@ -16,16 +16,18 @@ import {
   Award,
   Settings
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface Notification {
   id: string;
-  type: 'message' | 'like' | 'follow' | 'booking' | 'event' | 'achievement';
+  type: 'info' | 'success' | 'warning' | 'error';
   title: string;
   message: string;
-  timestamp: string;
-  read: boolean;
-  avatar?: string;
-  actionUrl?: string;
+  created_at: string;
+  is_read: boolean;
+  action_url?: string;
 }
 
 interface NotificationCenterProps {
@@ -36,79 +38,59 @@ interface NotificationCenterProps {
 export const NotificationCenter = ({ isOpen, onClose }: NotificationCenterProps) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
+  const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
 
-  const mockNotifications: Notification[] = [
-    {
-      id: "1",
-      type: "message",
-      title: "New message from Fatima",
-      message: "I'd love to discuss your embroidery project...",
-      timestamp: "2 minutes ago",
-      read: false,
-      avatar: "/api/placeholder/40/40"
-    },
-    {
-      id: "2",
-      type: "like",
-      title: "Someone liked your work",
-      message: "Ahmed liked your 'Traditional Berber Carpet' post",
-      timestamp: "1 hour ago",
-      read: false,
-      avatar: "/api/placeholder/40/40"
-    },
-    {
-      id: "3",
-      type: "booking",
-      title: "Booking confirmation",
-      message: "Your consultation with Zahra is confirmed for tomorrow",
-      timestamp: "3 hours ago",
-      read: true
-    },
-    {
-      id: "4",
-      type: "follow",
-      title: "New follower",
-      message: "Sarah started following you",
-      timestamp: "5 hours ago",
-      read: true,
-      avatar: "/api/placeholder/40/40"
-    },
-    {
-      id: "5",
-      type: "event",
-      title: "Event reminder",
-      message: "Fez Artisan Festival starts tomorrow",
-      timestamp: "1 day ago",
-      read: true
-    },
-    {
-      id: "6",
-      type: "achievement",
-      title: "Achievement unlocked!",
-      message: "You've completed 10 projects this month",
-      timestamp: "2 days ago",
-      read: true
-    }
-  ];
-
+  // Load notifications from database
   useEffect(() => {
-    setNotifications(mockNotifications);
-  }, []);
+    if (isOpen && user) {
+      loadNotifications();
+    }
+  }, [isOpen, user]);
+
+  const loadNotifications = async () => {
+    if (!user) return;
+
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (error) {
+        console.error('Error loading notifications:', error);
+        toast.error('Failed to load notifications');
+        return;
+      }
+
+      setNotifications((data || []).map((item: any) => ({
+        id: item.id,
+        type: item.type as 'info' | 'success' | 'warning' | 'error',
+        title: item.title,
+        message: item.message,
+        created_at: item.created_at,
+        is_read: item.is_read,
+        action_url: item.action_url
+      })));
+    } catch (error) {
+      console.error('Error loading notifications:', error);
+      toast.error('Failed to load notifications');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getIcon = (type: string) => {
     switch (type) {
-      case 'message':
-        return MessageCircle;
-      case 'like':
-        return Heart;
-      case 'follow':
-        return Users;
-      case 'booking':
-        return ShoppingBag;
-      case 'event':
-        return Calendar;
-      case 'achievement':
-        return Award;
+      case 'success':
+        return Check;
+      case 'warning':
+        return Bell;
+      case 'error':
+        return X;
       default:
         return Bell;
     }
@@ -116,46 +98,108 @@ export const NotificationCenter = ({ isOpen, onClose }: NotificationCenterProps)
 
   const getIconColor = (type: string) => {
     switch (type) {
-      case 'message':
-        return 'text-blue-600';
-      case 'like':
-        return 'text-red-600';
-      case 'follow':
+      case 'success':
         return 'text-green-600';
-      case 'booking':
-        return 'text-orange-600';
-      case 'event':
-        return 'text-purple-600';
-      case 'achievement':
+      case 'warning':
         return 'text-yellow-600';
+      case 'error':
+        return 'text-red-600';
       default:
-        return 'text-gray-600';
+        return 'text-blue-600';
     }
   };
 
-  const markAsRead = (id: string) => {
-    setNotifications(prev => 
-      prev.map(notif => 
-        notif.id === id ? { ...notif, read: true } : notif
-      )
-    );
+  const markAsRead = async (id: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('id', id)
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error marking notification as read:', error);
+        return;
+      }
+
+      setNotifications(prev => 
+        prev.map(notif => 
+          notif.id === id ? { ...notif, is_read: true } : notif
+        )
+      );
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    }
   };
 
-  const markAllAsRead = () => {
-    setNotifications(prev => 
-      prev.map(notif => ({ ...notif, read: true }))
-    );
+  const markAllAsRead = async () => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('user_id', user.id)
+        .eq('is_read', false);
+
+      if (error) {
+        console.error('Error marking all notifications as read:', error);
+        toast.error('Failed to mark all as read');
+        return;
+      }
+
+      setNotifications(prev => 
+        prev.map(notif => ({ ...notif, is_read: true }))
+      );
+      toast.success('All notifications marked as read');
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
+      toast.error('Failed to mark all as read');
+    }
   };
 
-  const deleteNotification = (id: string) => {
-    setNotifications(prev => prev.filter(notif => notif.id !== id));
+  const deleteNotification = async (id: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error deleting notification:', error);
+        toast.error('Failed to delete notification');
+        return;
+      }
+
+      setNotifications(prev => prev.filter(notif => notif.id !== id));
+      toast.success('Notification deleted');
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+      toast.error('Failed to delete notification');
+    }
   };
 
   const filteredNotifications = filter === 'unread' 
-    ? notifications.filter(n => !n.read)
+    ? notifications.filter(n => !n.is_read)
     : notifications;
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter(n => !n.is_read).length;
+
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+
+    if (diffInMinutes < 1) return 'Just now';
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
+    return `${Math.floor(diffInMinutes / 1440)}d ago`;
+  };
 
   if (!isOpen) return null;
 
@@ -208,7 +252,12 @@ export const NotificationCenter = ({ isOpen, onClose }: NotificationCenterProps)
 
         {/* Notifications List */}
         <div className="overflow-y-auto max-h-96">
-          {filteredNotifications.length === 0 ? (
+          {loading ? (
+            <div className="p-8 text-center text-gray-500">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-500 mx-auto mb-2"></div>
+              <p>Loading notifications...</p>
+            </div>
+          ) : filteredNotifications.length === 0 ? (
             <div className="p-8 text-center text-gray-500">
               <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
               <p>No notifications yet</p>
@@ -221,22 +270,13 @@ export const NotificationCenter = ({ isOpen, onClose }: NotificationCenterProps)
                   <div
                     key={notification.id}
                     className={`p-4 hover:bg-gray-50 transition-colors ${
-                      !notification.read ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+                      !notification.is_read ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
                     }`}
                   >
                     <div className="flex items-start gap-3">
-                      {notification.avatar ? (
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={notification.avatar} />
-                          <AvatarFallback>
-                            <IconComponent className={`h-4 w-4 ${getIconColor(notification.type)}`} />
-                          </AvatarFallback>
-                        </Avatar>
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                          <IconComponent className={`h-4 w-4 ${getIconColor(notification.type)}`} />
-                        </div>
-                      )}
+                      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                        <IconComponent className={`h-4 w-4 ${getIconColor(notification.type)}`} />
+                      </div>
                       
                       <div className="flex-1 min-w-0">
                         <h4 className="text-sm font-medium text-gray-900">
@@ -246,12 +286,12 @@ export const NotificationCenter = ({ isOpen, onClose }: NotificationCenterProps)
                           {notification.message}
                         </p>
                         <p className="text-xs text-gray-500 mt-1">
-                          {notification.timestamp}
+                          {formatTime(notification.created_at)}
                         </p>
                       </div>
                       
                       <div className="flex items-center gap-1">
-                        {!notification.read && (
+                        {!notification.is_read && (
                           <Button
                             variant="ghost"
                             size="sm"
