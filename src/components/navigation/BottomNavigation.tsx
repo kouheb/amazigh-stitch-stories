@@ -5,6 +5,7 @@ import {
   Users, 
   GraduationCap, 
   Calendar, 
+  MessageSquare,
   User 
 } from "lucide-react";
 
@@ -17,7 +18,7 @@ export const BottomNavigation = ({ activeTab, onTabChange }: BottomNavigationPro
   const tabs = [
     { id: "home", label: "Home", icon: Home },
     { id: "network", label: "Network", icon: Users },
-    { id: "learn", label: "Learn", icon: GraduationCap },
+    { id: "messages", label: "Messages", icon: MessageSquare },
     { id: "events", label: "Events", icon: Calendar },
     { id: "profile", label: "Profile", icon: User }
   ];
