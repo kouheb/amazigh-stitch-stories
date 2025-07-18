@@ -251,12 +251,17 @@ export const CallModal = ({
     // Calculate call duration if the call was connected
     const duration = callState === 'connected' ? callDuration : 0;
     
+    console.log('Ending call with duration:', duration, 'seconds');
+    
     // Stop ringtone
     stopRingtone();
     
     // Notify parent component about call completion
     if (onCallComplete && duration > 0) {
+      console.log('Calling onCallComplete with duration:', duration);
       onCallComplete(duration, callType);
+    } else {
+      console.log('No onCallComplete callback or zero duration:', { onCallComplete: !!onCallComplete, duration });
     }
     
     cleanupCall();

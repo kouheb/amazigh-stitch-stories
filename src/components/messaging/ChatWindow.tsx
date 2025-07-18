@@ -62,7 +62,7 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
     if (user && recipientId) {
       loadMessages();
       
-      // Set up real-time subscription
+      // Set up real-time subscription with improved filtering
       const channel = supabase
         .channel(`messages-${user.id}-${recipientId}`)
         .on(
@@ -74,6 +74,8 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
             filter: `or(and(sender_id.eq.${user.id},recipient_id.eq.${recipientId}),and(sender_id.eq.${recipientId},recipient_id.eq.${user.id}))`
           },
           (payload) => {
+            console.log('Real-time message received:', payload);
+            
             const newMessage: Message = {
               id: payload.new.id,
               senderId: payload.new.sender_id,
@@ -85,13 +87,21 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
               fileName: payload.new.file_name || undefined
             };
             
-            setMessageList(prev => [...prev, newMessage]);
+            console.log('Adding message to chat:', newMessage);
+            setMessageList(prev => {
+              const updated = [...prev, newMessage];
+              console.log('Updated message list:', updated);
+              return updated;
+            });
           }
         )
-        .subscribe();
+        .subscribe((status) => {
+          console.log('Real-time subscription status:', status);
+        });
 
       // Return cleanup function
       return () => {
+        console.log('Cleaning up real-time subscription');
         supabase.removeChannel(channel);
       };
     }
@@ -217,28 +227,46 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
   };
 
   const handleCallComplete = async (duration: number, callType: CallType) => {
-    if (!user) return;
+    if (!user) {
+      console.error('No user found for call completion');
+      return;
+    }
+    
+    console.log('Call completed:', { duration, callType, user: user.id, recipient: recipientId });
     
     try {
-      // Save call record to messages
-      const callMessage = `${callType === 'video' ? '📹' : '📞'} ${callType === 'video' ? 'Video' : 'Voice'} call - ${formatCallDuration(duration)}`;
+      // Create call history message
+      const callIcon = callType === 'video' ? '📹' : '📞';
+      const callTypeText = callType === 'video' ? 'Video call' : 'Voice call';
+      const durationText = formatCallDuration(duration);
+      const callMessage = `${callIcon} ${callTypeText} - ${durationText}`;
       
-      const { error } = await supabase
+      console.log('Saving call message:', callMessage);
+      
+      // Save call record to messages table
+      const { data: messageData, error: messageError } = await supabase
         .from('messages')
         .insert({
           sender_id: user.id,
           recipient_id: recipientId,
           content: callMessage,
           message_type: 'text'
-        });
+        })
+        .select()
+        .single();
 
-      if (error) {
-        console.error('Error saving call record:', error);
-      } else {
-        toast.success('Call completed');
+      if (messageError) {
+        console.error('Error saving call record:', messageError);
+        toast.error('Failed to save call history');
+        return;
       }
+
+      console.log('Call history saved successfully:', messageData);
+      toast.success('Call completed and saved to history');
+      
     } catch (error) {
-      console.error('Error saving call record:', error);
+      console.error('Error in handleCallComplete:', error);
+      toast.error('Failed to save call history');
     }
   };
 
