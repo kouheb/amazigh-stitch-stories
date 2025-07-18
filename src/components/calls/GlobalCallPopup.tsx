@@ -14,12 +14,26 @@ export const GlobalCallPopup = () => {
     endCall
   } = useCallSystem();
 
-  if (!showCallModal) return null;
+  if (!showCallModal) {
+    console.log('GlobalCallPopup: Modal not showing because showCallModal is false');
+    return null;
+  }
 
   const currentCall = incomingCall || activeCall;
   const currentParticipant = incomingCallParticipant || activeCallParticipant;
 
-  if (!currentCall || !currentParticipant) return null;
+  console.log('GlobalCallPopup render:', {
+    showCallModal,
+    currentCall: !!currentCall,
+    currentParticipant: !!currentParticipant,
+    isIncoming,
+    callStatus: currentCall?.status
+  });
+
+  if (!currentCall || !currentParticipant) {
+    console.log('GlobalCallPopup: No call or participant data');
+    return null;
+  }
 
   const handleCallComplete = (duration: number) => {
     console.log('Call completed in GlobalCallPopup:', duration);

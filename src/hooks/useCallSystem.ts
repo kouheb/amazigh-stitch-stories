@@ -37,7 +37,13 @@ export const useCallSystem = () => {
     console.log('Setting up call system for user:', user.id);
 
     const channel = supabase
-      .channel(`calls-${user.id}`)
+      .channel(`calls-${user.id}`, {
+        config: {
+          presence: {
+            key: user.id,
+          },
+        },
+      })
       .on(
         'postgres_changes',
         {
@@ -165,6 +171,8 @@ export const useCallSystem = () => {
         avatar: recipientProfile.avatar_url
       };
 
+      console.log('Setting up active call state...');
+      
       setActiveCall({
         ...callData,
         call_type: callData.call_type as 'voice' | 'video',
@@ -173,6 +181,13 @@ export const useCallSystem = () => {
       setActiveCallParticipant(participant);
       setIsIncoming(false);
       setShowCallModal(true);
+
+      console.log('Call modal state set:', {
+        activeCall: true,
+        participant: participant.name,
+        showCallModal: true,
+        isIncoming: false
+      });
 
       toast.success(`Calling ${participant.name}...`);
     } catch (error) {
