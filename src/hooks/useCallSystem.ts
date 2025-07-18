@@ -30,20 +30,15 @@ export const useCallSystem = () => {
   const [isIncoming, setIsIncoming] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout>();
 
-  // Listen for incoming calls
+  // Listen for incoming calls with improved real-time setup
   useEffect(() => {
     if (!user) return;
 
-    console.log('Setting up call system for user:', user.id);
+    console.log('🎯 Setting up call system for user:', user.id);
 
+    // Use a simpler channel name and configuration
     const channel = supabase
-      .channel(`calls-${user.id}`, {
-        config: {
-          presence: {
-            key: user.id,
-          },
-        },
-      })
+      .channel('calls')
       .on(
         'postgres_changes',
         {
@@ -53,7 +48,7 @@ export const useCallSystem = () => {
           filter: `recipient_id=eq.${user.id}`
         },
         async (payload) => {
-          console.log('Incoming call received:', payload);
+          console.log('🔥 INCOMING CALL DETECTED:', payload);
           
           const callData = {
             ...payload.new,
@@ -61,30 +56,43 @@ export const useCallSystem = () => {
             status: payload.new.status as 'ringing' | 'accepted' | 'rejected' | 'missed' | 'ended'
           } as CallData;
           
-          // Validate call type
-          const { data: callerProfile } = await supabase
-            .from('profiles')
-            .select('id, full_name, display_name, avatar_url')
-            .eq('id', callData.caller_id)
-            .single();
+          try {
+            // Get caller information
+            const { data: callerProfile } = await supabase
+              .from('profiles')
+              .select('id, full_name, display_name, avatar_url')
+              .eq('id', callData.caller_id)
+              .single();
 
-          const participant: CallParticipant = {
-            id: callData.caller_id,
-            name: callerProfile?.display_name || callerProfile?.full_name || 'Unknown User',
-            avatar: callerProfile?.avatar_url
-          };
+            const participant: CallParticipant = {
+              id: callData.caller_id,
+              name: callerProfile?.display_name || callerProfile?.full_name || 'Unknown User',
+              avatar: callerProfile?.avatar_url
+            };
 
-          setIncomingCall(callData);
-          setIncomingCallParticipant(participant);
-          setIsIncoming(true);
-          setShowCallModal(true);
+            console.log('🔥 SETTING UP INCOMING CALL UI:', {
+              callId: callData.id,
+              caller: participant.name,
+              type: callData.call_type
+            });
 
-          // Auto-reject after 30 seconds if no response
-          timeoutRef.current = setTimeout(() => {
-            handleMissedCall(callData.id);
-          }, 30000);
+            setIncomingCall(callData);
+            setIncomingCallParticipant(participant);
+            setIsIncoming(true);
+            setShowCallModal(true);
 
-          toast.info(`Incoming ${callData.call_type} call from ${participant.name}`);
+            // Auto-reject after 30 seconds if no response
+            timeoutRef.current = setTimeout(() => {
+              console.log('⏰ Call timeout - marking as missed');
+              handleMissedCall(callData.id);
+            }, 30000);
+
+            toast.info(`📞 Incoming ${callData.call_type} call from ${participant.name}`, {
+              duration: 30000,
+            });
+          } catch (error) {
+            console.error('❌ Error processing incoming call:', error);
+          }
         }
       )
       .on(
@@ -96,7 +104,7 @@ export const useCallSystem = () => {
           filter: `or(caller_id.eq.${user.id},recipient_id.eq.${user.id})`
         },
         (payload) => {
-          console.log('Call status updated:', payload);
+          console.log('📞 Call status updated:', payload.new.status);
           
           const callData = {
             ...payload.new,
@@ -105,20 +113,30 @@ export const useCallSystem = () => {
           } as CallData;
           
           // Handle call status changes
-          if (callData.status === 'ended' || callData.status === 'rejected') {
+          if (callData.status === 'ended' || callData.status === 'rejected' || callData.status === 'missed') {
+            console.log('📞 Call ended, cleaning up UI');
             setShowCallModal(false);
             setIncomingCall(null);
             setActiveCall(null);
+            setIncomingCallParticipant(null);
+            setActiveCallParticipant(null);
             clearTimeout(timeoutRef.current);
           }
         }
       )
       .subscribe((status) => {
-        console.log('Call system subscription status:', status);
+        console.log('📡 Call subscription status:', status);
+        if (status === 'SUBSCRIBED') {
+          console.log('✅ Successfully subscribed to call notifications');
+        } else if (status === 'TIMED_OUT') {
+          console.log('⚠️ Call subscription timed out');
+        } else if (status === 'CLOSED') {
+          console.log('❌ Call subscription closed');
+        }
       });
 
     return () => {
-      console.log('Cleaning up call system');
+      console.log('🧹 Cleaning up call system');
       supabase.removeChannel(channel);
       clearTimeout(timeoutRef.current);
     };
@@ -131,7 +149,7 @@ export const useCallSystem = () => {
     }
 
     try {
-      console.log('Initiating call:', { recipientId, callType });
+      console.log('📞 Initiating call:', { recipientId, callType });
 
       // Get recipient information
       const { data: recipientProfile } = await supabase
@@ -158,12 +176,12 @@ export const useCallSystem = () => {
         .single();
 
       if (error) {
-        console.error('Error creating call:', error);
+        console.error('❌ Error creating call:', error);
         toast.error('Failed to initiate call');
         return;
       }
 
-      console.log('Call created:', callData);
+      console.log('✅ Call record created:', callData.id);
 
       const participant: CallParticipant = {
         id: recipientId,
@@ -171,7 +189,7 @@ export const useCallSystem = () => {
         avatar: recipientProfile.avatar_url
       };
 
-      console.log('Setting up active call state...');
+      console.log('📞 Setting up outgoing call UI');
       
       setActiveCall({
         ...callData,
@@ -182,16 +200,9 @@ export const useCallSystem = () => {
       setIsIncoming(false);
       setShowCallModal(true);
 
-      console.log('Call modal state set:', {
-        activeCall: true,
-        participant: participant.name,
-        showCallModal: true,
-        isIncoming: false
-      });
-
-      toast.success(`Calling ${participant.name}...`);
+      toast.success(`📞 Calling ${participant.name}...`);
     } catch (error) {
-      console.error('Error initiating call:', error);
+      console.error('❌ Error initiating call:', error);
       toast.error('Failed to initiate call');
     }
   };
@@ -200,7 +211,7 @@ export const useCallSystem = () => {
     if (!incomingCall) return;
 
     try {
-      console.log('Accepting call:', incomingCall.id);
+      console.log('✅ Accepting call:', incomingCall.id);
 
       // Update call status to accepted
       const { error } = await supabase
@@ -209,7 +220,7 @@ export const useCallSystem = () => {
         .eq('id', incomingCall.id);
 
       if (error) {
-        console.error('Error accepting call:', error);
+        console.error('❌ Error accepting call:', error);
         toast.error('Failed to accept call');
         return;
       }
@@ -221,9 +232,9 @@ export const useCallSystem = () => {
       setIncomingCallParticipant(null);
       clearTimeout(timeoutRef.current);
 
-      toast.success('Call accepted');
+      toast.success('📞 Call accepted');
     } catch (error) {
-      console.error('Error accepting call:', error);
+      console.error('❌ Error accepting call:', error);
       toast.error('Failed to accept call');
     }
   };
@@ -232,7 +243,7 @@ export const useCallSystem = () => {
     if (!incomingCall) return;
 
     try {
-      console.log('Rejecting call:', incomingCall.id);
+      console.log('❌ Rejecting call:', incomingCall.id);
 
       // Update call status to rejected
       const { error } = await supabase
@@ -244,7 +255,7 @@ export const useCallSystem = () => {
         .eq('id', incomingCall.id);
 
       if (error) {
-        console.error('Error rejecting call:', error);
+        console.error('❌ Error rejecting call:', error);
         toast.error('Failed to reject call');
         return;
       }
@@ -254,9 +265,9 @@ export const useCallSystem = () => {
       setIncomingCallParticipant(null);
       clearTimeout(timeoutRef.current);
 
-      toast.info('Call rejected');
+      toast.info('📞 Call rejected');
     } catch (error) {
-      console.error('Error rejecting call:', error);
+      console.error('❌ Error rejecting call:', error);
       toast.error('Failed to reject call');
     }
   };
@@ -266,7 +277,7 @@ export const useCallSystem = () => {
     if (!currentCall) return;
 
     try {
-      console.log('Ending call:', currentCall.id, 'Duration:', duration);
+      console.log('📞 Ending call:', currentCall.id, 'Duration:', duration);
 
       // Update call status to ended
       const { error } = await supabase
@@ -279,7 +290,7 @@ export const useCallSystem = () => {
         .eq('id', currentCall.id);
 
       if (error) {
-        console.error('Error ending call:', error);
+        console.error('❌ Error ending call:', error);
         toast.error('Failed to end call');
         return;
       }
@@ -292,19 +303,21 @@ export const useCallSystem = () => {
       clearTimeout(timeoutRef.current);
 
       if (duration > 0) {
-        toast.success(`Call ended - Duration: ${Math.floor(duration / 60)}m ${duration % 60}s`);
+        const mins = Math.floor(duration / 60);
+        const secs = duration % 60;
+        toast.success(`📞 Call ended - Duration: ${mins}m ${secs}s`);
       } else {
-        toast.info('Call ended');
+        toast.info('📞 Call ended');
       }
     } catch (error) {
-      console.error('Error ending call:', error);
+      console.error('❌ Error ending call:', error);
       toast.error('Failed to end call');
     }
   };
 
   const handleMissedCall = async (callId: string) => {
     try {
-      console.log('Handling missed call:', callId);
+      console.log('📞 Handling missed call:', callId);
 
       // Update call status to missed
       const { error } = await supabase
@@ -316,7 +329,7 @@ export const useCallSystem = () => {
         .eq('id', callId);
 
       if (error) {
-        console.error('Error updating missed call:', error);
+        console.error('❌ Error updating missed call:', error);
         return;
       }
 
@@ -325,9 +338,9 @@ export const useCallSystem = () => {
       setIncomingCallParticipant(null);
       clearTimeout(timeoutRef.current);
 
-      toast.info('Missed call');
+      toast.info('📞 Missed call');
     } catch (error) {
-      console.error('Error handling missed call:', error);
+      console.error('❌ Error handling missed call:', error);
     }
   };
 
