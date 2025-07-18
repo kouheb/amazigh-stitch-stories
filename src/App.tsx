@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
+import { CallProvider } from "@/contexts/CallContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Membership from "./pages/Membership";
@@ -31,11 +32,12 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <NotificationProvider>
-        <LanguageProvider>
-          <TooltipProvider>
-          <Toaster />
-          <Sonner />
+      <CallProvider>
+        <NotificationProvider>
+          <LanguageProvider>
+            <TooltipProvider>
+            <Toaster />
+            <Sonner />
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
@@ -69,10 +71,11 @@ const App = () => (
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </BrowserRouter>
+           </BrowserRouter>
         </TooltipProvider>
       </LanguageProvider>
       </NotificationProvider>
+      </CallProvider>
     </AuthProvider>
   </QueryClientProvider>
 );

@@ -11,6 +11,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { GlobalCallPopup } from "@/components/calls/GlobalCallPopup";
 
 interface Conversation {
   id: string;
@@ -269,6 +270,9 @@ export const MessagingPage = () => {
           </div>
         )}
       </div>
+      
+      {/* Global Call Popup */}
+      <GlobalCallPopup />
     </div>
   );
 };
