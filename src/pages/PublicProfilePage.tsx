@@ -117,6 +117,22 @@ export const PublicProfilePage = () => {
     return date.getFullYear().toString();
   };
 
+  const handleMessage = () => {
+    navigate(`/messaging?user=${profile?.id}`);
+  };
+
+  const handleFollow = async () => {
+    if (!profile) return;
+    
+    try {
+      // TODO: Implement follow functionality
+      toast.success("Follow functionality coming soon!");
+    } catch (error) {
+      console.error('Error following user:', error);
+      toast.error('Failed to follow user');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -215,11 +231,11 @@ export const PublicProfilePage = () => {
                 </div>
                 
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={handleMessage}>
                     <MessageSquare className="h-4 w-4 mr-2" />
                     Message
                   </Button>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={handleFollow}>
                     <UserPlus className="h-4 w-4 mr-2" />
                     Follow
                   </Button>
