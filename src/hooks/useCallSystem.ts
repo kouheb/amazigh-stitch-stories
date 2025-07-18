@@ -36,19 +36,26 @@ export const useCallSystem = () => {
 
     console.log('🎯 Setting up call system for user:', user.id);
 
-    // Use a simpler channel name and configuration
+    // Use a simpler channel name and remove complex filters
     const channel = supabase
-      .channel('calls')
+      .channel(`user-calls-${user.id}`)
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
-          table: 'calls',
-          filter: `recipient_id=eq.${user.id}`
+          table: 'calls'
         },
         async (payload) => {
-          console.log('🔥 INCOMING CALL DETECTED:', payload);
+          console.log('📨 New call detected, checking if for me:', payload);
+          
+          // Check if this call is for the current user
+          if (payload.new.recipient_id !== user.id) {
+            console.log('❌ Call not for me, ignoring');
+            return;
+          }
+          
+          console.log('🔥 INCOMING CALL DETECTED FOR ME:', payload);
           
           const callData = {
             ...payload.new,
