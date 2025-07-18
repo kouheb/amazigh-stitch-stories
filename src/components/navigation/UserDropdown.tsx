@@ -40,15 +40,15 @@ export const UserDropdown = ({ onCreateClick, onTabChange }: UserDropdownProps) 
 
       try {
         const { data, error } = await supabase
-          .from('user_stats')
-          .select('notifications_count')
+          .from('notifications')
+          .select('id', { count: 'exact' })
           .eq('user_id', user.id)
-          .maybeSingle();
+          .eq('is_read', false);
 
         if (error) {
           console.error("Error loading notification count:", error);
-        } else if (data) {
-          setNotificationCount(data.notifications_count || 0);
+        } else {
+          setNotificationCount(data?.length || 0);
         }
       } catch (error) {
         console.error("Error loading notification count:", error);
