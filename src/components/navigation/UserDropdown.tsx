@@ -1,8 +1,6 @@
-
 import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -11,12 +9,12 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { 
-  Bell, 
   Settings, 
   User, 
   LogOut,
   Plus
 } from "lucide-react";
+import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -59,6 +57,10 @@ export const UserDropdown = ({ onCreateClick, onTabChange }: UserDropdownProps) 
     loadNotificationCount();
   }, [user]);
 
+  const handleNotificationCountChange = (newCount: number) => {
+    setNotificationCount(newCount);
+  };
+
   const handleSignOut = async () => {
     console.log("Sign out clicked");
     const { error } = await signOut();
@@ -96,11 +98,6 @@ export const UserDropdown = ({ onCreateClick, onTabChange }: UserDropdownProps) 
     }
   };
 
-  const handleNotificationsClick = () => {
-    console.log("Notifications clicked");
-    toast.info("Notifications feature coming soon");
-  };
-
   return (
     <div className="flex items-center gap-3">
       {/* Create button - hidden on mobile */}
@@ -114,19 +111,10 @@ export const UserDropdown = ({ onCreateClick, onTabChange }: UserDropdownProps) 
       </Button>
 
       {/* Notifications */}
-      <Button 
-        variant="ghost" 
-        size="sm" 
-        className="relative text-gray-700 hover:text-black hover:bg-gray-100"
-        onClick={handleNotificationsClick}
-      >
-        <Bell className="h-5 w-5" />
-        {notificationCount > 0 && (
-          <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-red-600 hover:bg-red-700 text-white text-xs">
-            {notificationCount > 99 ? '99+' : notificationCount}
-          </Badge>
-        )}
-      </Button>
+      <NotificationDropdown 
+        notificationCount={notificationCount}
+        onNotificationCountChange={handleNotificationCountChange}
+      />
 
       {/* Profile Dropdown */}
       <DropdownMenu>
