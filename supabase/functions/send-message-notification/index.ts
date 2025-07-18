@@ -29,7 +29,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     const { recipientId, senderName, messageContent }: MessageNotificationRequest = await req.json();
 
-    // Get recipient's email
+    // Get recipient's email and create in-app notification
     const { data: profile, error: profileError } = await supabaseClient
       .from('profiles')
       .select('email, display_name, full_name')
@@ -45,6 +45,24 @@ const handler = async (req: Request): Promise<Response> => {
           headers: { "Content-Type": "application/json", ...corsHeaders },
         }
       );
+    }
+
+    // Create in-app notification
+    const { error: notificationError } = await supabaseClient
+      .from('notifications')
+      .insert({
+        user_id: recipientId,
+        title: `New message from ${senderName}`,
+        message: messageContent.length > 100 
+          ? messageContent.substring(0, 100) + '...'
+          : messageContent,
+        type: 'info',
+        action_url: '/messaging'
+      });
+
+    if (notificationError) {
+      console.error('Error creating notification:', notificationError);
+      // Don't fail the whole request if notification creation fails
     }
 
     const recipientName = profile.display_name || profile.full_name || 'there';
