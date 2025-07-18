@@ -53,6 +53,99 @@ export const CallModal = ({
   const webrtcCallRef = useRef<WebRTCCall | null>(null);
   const callStartTimeRef = useRef<number>(0);
 
+  // Generate a Facebook-like ringtone
+  const generateFacebookLikeRingtone = () => {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const duration = 2.5; // Duration of one ring cycle
+    const sampleRate = audioContext.sampleRate;
+    const numSamples = duration * sampleRate;
+    
+    const audioBuffer = audioContext.createBuffer(1, numSamples, sampleRate);
+    const channelData = audioBuffer.getChannelData(0);
+    
+    // Create a pleasant dual-tone ringtone (similar to Facebook)
+    for (let i = 0; i < numSamples; i++) {
+      const time = i / sampleRate;
+      const fadeIn = Math.min(time * 10, 1);
+      const fadeOut = Math.max(1 - (time - 2) * 10, 0);
+      const envelope = fadeIn * fadeOut;
+      
+      // Two pleasant frequencies mixed together
+      const freq1 = 800; // Main tone
+      const freq2 = 1000; // Harmony tone
+      
+      const wave1 = Math.sin(2 * Math.PI * freq1 * time);
+      const wave2 = Math.sin(2 * Math.PI * freq2 * time) * 0.5;
+      
+      // Add some vibrato for richness
+      const vibrato = 1 + 0.1 * Math.sin(2 * Math.PI * 5 * time);
+      
+      channelData[i] = (wave1 + wave2) * envelope * vibrato * 0.3;
+    }
+    
+    // Convert to data URL
+    const offlineContext = new OfflineAudioContext(1, numSamples, sampleRate);
+    const source = offlineContext.createBufferSource();
+    source.buffer = audioBuffer;
+    source.connect(offlineContext.destination);
+    source.start();
+    
+    offlineContext.startRendering().then(renderedBuffer => {
+      // Create audio element
+      const ringtone = document.createElement('audio');
+      ringtone.loop = true;
+      ringtone.volume = 0.6;
+      
+      // Convert audio buffer to blob and create URL
+      const wavBlob = audioBufferToWav(renderedBuffer);
+      ringtone.src = URL.createObjectURL(wavBlob);
+      
+      document.body.appendChild(ringtone);
+      ringtonRef.current = ringtone;
+    });
+  };
+
+  // Helper function to convert AudioBuffer to WAV blob
+  const audioBufferToWav = (buffer: AudioBuffer): Blob => {
+    const length = buffer.length;
+    const arrayBuffer = new ArrayBuffer(44 + length * 2);
+    const view = new DataView(arrayBuffer);
+    const channels = buffer.numberOfChannels;
+    const sampleRate = buffer.sampleRate;
+    
+    // WAV header
+    const writeString = (offset: number, string: string) => {
+      for (let i = 0; i < string.length; i++) {
+        view.setUint8(offset + i, string.charCodeAt(i));
+      }
+    };
+    
+    writeString(0, 'RIFF');
+    view.setUint32(4, 36 + length * 2, true);
+    writeString(8, 'WAVE');
+    writeString(12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, channels, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 2, true);
+    view.setUint16(32, 2, true);
+    view.setUint16(34, 16, true);
+    writeString(36, 'data');
+    view.setUint32(40, length * 2, true);
+    
+    // Convert samples
+    const channelData = buffer.getChannelData(0);
+    let offset = 44;
+    for (let i = 0; i < length; i++) {
+      const sample = Math.max(-1, Math.min(1, channelData[i]));
+      view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+      offset += 2;
+    }
+    
+    return new Blob([arrayBuffer], { type: 'audio/wav' });
+  };
+
   useEffect(() => {
     let interval: NodeJS.Timeout;
     
@@ -79,15 +172,10 @@ export const CallModal = ({
         remoteAudioRef.current = remoteAudio;
       }
 
-      // Create ringtone
+      // Create ringtone with a Facebook-like sound
       if (!ringtonRef.current) {
-        const ringtone = document.createElement('audio');
-        ringtone.loop = true;
-        ringtone.volume = 0.5;
-        // Using a simple beep tone data URL
-        ringtone.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+D2u2AZBzyA0fDZdSEEL4bU8NiINAcZa7zj451KEQ1QqN/xt2EcBj6a3PfKdikGLIXQ6tuaQAkUcLzu58xGFBV9s+nyq1kXCUaj6faXOhEHMo7Y7+CFQR8I+3w='
-        document.body.appendChild(ringtone);
-        ringtonRef.current = ringtone;
+        // Generate a Facebook-like ringtone using Web Audio API
+        generateFacebookLikeRingtone();
       }
 
       if (!isIncoming) {
