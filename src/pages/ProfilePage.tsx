@@ -348,7 +348,7 @@ export const ProfilePage = () => {
               </TabsContent>
 
               <TabsContent value="portfolio">
-                <PortfolioGallery isOwnProfile={isOwnProfile} />
+                <PortfolioGallery isOwnProfile={isOwnProfile} userId={user?.id} />
               </TabsContent>
 
               <TabsContent value="skills">
@@ -360,7 +360,7 @@ export const ProfilePage = () => {
               </TabsContent>
 
               <TabsContent value="showcase">
-                <WorkShowcase isOwnProfile={isOwnProfile} />
+                <WorkShowcase isOwnProfile={isOwnProfile} userId={user?.id} />
               </TabsContent>
             </div>
           </Tabs>

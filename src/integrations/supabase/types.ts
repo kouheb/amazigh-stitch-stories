@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      portfolio_items: {
+        Row: {
+          category: string
+          comments: number
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          likes: number
+          tags: string[] | null
+          title: string
+          updated_at: string
+          user_id: string
+          views: number
+        }
+        Insert: {
+          category: string
+          comments?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          likes?: number
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          user_id: string
+          views?: number
+        }
+        Update: {
+          category?: string
+          comments?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          likes?: number
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          views?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -59,6 +104,57 @@ export type Database = {
         }
         Relationships: []
       }
+      showcase_items: {
+        Row: {
+          client: string | null
+          created_at: string
+          description: string | null
+          duration: string | null
+          id: string
+          likes: number | null
+          organization: string | null
+          status: string | null
+          thumbnail_url: string | null
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+          views: number | null
+        }
+        Insert: {
+          client?: string | null
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          id?: string
+          likes?: number | null
+          organization?: string | null
+          status?: string | null
+          thumbnail_url?: string | null
+          title: string
+          type: string
+          updated_at?: string
+          user_id: string
+          views?: number | null
+        }
+        Update: {
+          client?: string | null
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          id?: string
+          likes?: number | null
+          organization?: string | null
+          status?: string | null
+          thumbnail_url?: string | null
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+          views?: number | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -76,6 +172,33 @@ export type Database = {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_skills: {
+        Row: {
+          created_at: string
+          id: string
+          proficiency_level: string | null
+          skill_name: string
+          skill_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          proficiency_level?: string | null
+          skill_name: string
+          skill_type?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          proficiency_level?: string | null
+          skill_name?: string
+          skill_type?: string
           user_id?: string
         }
         Relationships: []
