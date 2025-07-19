@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,7 +45,9 @@ const experienceLevels = [
 
 const ProfileCreationScreen = ({ onProfileComplete }: ProfileCreationScreenProps) => {
   const { user, updateProfile } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [profileData, setProfileData] = useState<ProfileData>({
     fullName: "",
     displayName: "",
@@ -57,6 +59,66 @@ const ProfileCreationScreen = ({ onProfileComplete }: ProfileCreationScreenProps
     avatarUrl: ""
   });
   const [agreeToTerms, setAgreeToTerms] = useState(false);
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size should be less than 5MB');
+      return;
+    }
+
+    setUploadingImage(true);
+    try {
+      // Create unique filename
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (error) {
+        console.error('Upload error:', error);
+        toast.error('Failed to upload image');
+        return;
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+
+      // Update profile data
+      setProfileData(prev => ({
+        ...prev,
+        avatarUrl: publicUrl
+      }));
+
+      toast.success('Image uploaded successfully!');
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast.error('Failed to upload image');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
 
   const handleInputChange = (field: keyof ProfileData, value: string) => {
     setProfileData(prev => ({
@@ -141,18 +203,33 @@ const ProfileCreationScreen = ({ onProfileComplete }: ProfileCreationScreenProps
 
         <Card className="p-8 bg-white shadow-lg border border-gray-200">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Hidden file input */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImageUpload}
+              accept="image/*"
+              className="hidden"
+            />
+            
             {/* Profile Image */}
             <div className="text-center">
-              <div className="w-24 h-24 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
+              <div className="w-24 h-24 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4 overflow-hidden">
                 {profileData.avatarUrl ? (
                   <img src={profileData.avatarUrl} alt="Profile" className="w-24 h-24 rounded-full object-cover" />
                 ) : (
                   <User className="w-8 h-8 text-gray-400" />
                 )}
               </div>
-              <Button type="button" variant="outline" size="sm">
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="sm"
+                onClick={handleUploadClick}
+                disabled={uploadingImage}
+              >
                 <Upload className="w-4 h-4 mr-2" />
-                Upload Photo
+                {uploadingImage ? "Uploading..." : "Upload Photo"}
               </Button>
             </div>
 
