@@ -174,20 +174,22 @@ export const PublicProfilePage = () => {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-6">
-        {/* Cover Image */}
-        <div className="relative h-48 md:h-64 bg-gradient-to-r from-orange-400 to-red-500 rounded-lg overflow-hidden mb-6">
-          <div className="absolute inset-0 bg-black bg-opacity-20"></div>
-        </div>
+        {/* Cover Image & Profile Section */}
+        <div className="relative">
+          <div className="h-48 md:h-64 bg-gradient-to-r from-orange-400 to-red-500 rounded-lg overflow-hidden">
+            <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+          </div>
 
-        {/* Profile Header */}
-        <Card className="p-6 -mt-20 relative z-10 mb-6">
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-            <Avatar className="h-32 w-32 border-4 border-white shadow-lg">
-              <AvatarImage src={profile.avatar_url} alt={displayName} />
-              <AvatarFallback className="bg-orange-100 text-orange-600 text-2xl">
-                {displayName.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
+          {/* Profile Header */}
+          <div className="absolute -bottom-16 left-0 right-0">
+            <Card className="p-6 mx-4">
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+                <Avatar className="h-32 w-32 border-4 border-white shadow-lg">
+                  <AvatarImage src={profile.avatar_url} alt={displayName} />
+                  <AvatarFallback className="bg-orange-100 text-orange-600 text-2xl">
+                    {displayName.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
             
             <div className="flex-1">
               <div className="flex flex-col md:flex-row md:items-start md:justify-between">
@@ -243,8 +245,12 @@ export const PublicProfilePage = () => {
               </div>
             </div>
           </div>
-        </Card>
+          </Card>
+        </div>
+      </div>
 
+      {/* Content Section */}
+      <div className="max-w-4xl mx-auto px-4 mt-20">
         {/* Stats */}
         {stats && (
           <ProfileStats 

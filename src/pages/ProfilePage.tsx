@@ -225,7 +225,7 @@ export const ProfilePage = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-orange-400/20 via-red-400/20 to-pink-400/20"></div>
         </div>
         
-        <div className="absolute bottom-0 left-0 right-0 transform translate-y-1/2">
+        <div className="absolute -bottom-16 left-0 right-0">
           <div className="max-w-6xl mx-auto px-6 py-0">
             <div className="flex flex-col md:flex-row items-start md:items-end gap-6">
               <Avatar className="h-32 w-32 border-4 border-white shadow-lg">
