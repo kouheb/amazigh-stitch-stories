@@ -304,7 +304,7 @@ export const ProfilePage = () => {
       </div>
 
       {/* Profile Content */}
-      <div className="max-w-6xl mx-auto px-6 mt-20 py-[5px]">
+      <div className="max-w-6xl mx-auto px-6 mt-20 py-0">
         {/* Profile Stats */}
         <ProfileStats followers={userStats.followers} following={userStats.following} likes={userStats.likes} experience={profileData.experience} />
 
