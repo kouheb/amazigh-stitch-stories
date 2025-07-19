@@ -4,7 +4,7 @@ import { MainNavbar } from "@/components/navigation/MainNavbar";
 import { Sidebar } from "@/components/navigation/Sidebar";
 import { BottomNavigation } from "@/components/navigation/BottomNavigation";
 import { Footer } from "@/components/layout/Footer";
-import { GlobalCallPopup } from "@/components/calls/GlobalCallPopup";
+
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -59,8 +59,6 @@ export const AppLayout = ({ children, activeTab, onTabChange }: AppLayoutProps) 
         />
       </div>
 
-      {/* Global Call Popup */}
-      <GlobalCallPopup />
     </div>
   );
 };

@@ -2,12 +2,12 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Phone, Video, MoreVertical, Info } from "lucide-react";
+import { MoreVertical, Info } from "lucide-react";
 import { MessageInput } from "./MessageInput";
 import { MessageBubble } from "./MessageBubble";
 import { TypingIndicator } from "./TypingIndicator";
 import { ChatOptionsMenu } from "./ChatOptionsMenu";
-import { useCall } from "@/contexts/CallContext";
+
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -49,7 +49,7 @@ interface ChatWindowProps {
 export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { initiateCall } = useCall();
+  
   const [messageList, setMessageList] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -195,15 +195,6 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
     }
   };
 
-  const handleVoiceCall = async () => {
-    console.log(`Starting voice call with ${conversation.participant.name}`);
-    await initiateCall(recipientId, 'voice');
-  };
-
-  const handleVideoCall = async () => {
-    console.log(`Starting video call with ${conversation.participant.name}`);
-    await initiateCall(recipientId, 'video');
-  };
 
   const handleShowInfo = () => {
     console.log(`Showing info for ${conversation.participant.name}`);
@@ -212,16 +203,6 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
     toast.info(`Opening ${conversation.participant.name}'s profile`);
   };
 
-  const formatCallDuration = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    
-    if (mins === 0) {
-      return `${secs}s`;
-    } else {
-      return `${mins}m ${secs}s`;
-    }
-  };
 
   // Chat options handlers
   const handleToggleNotifications = () => {
@@ -272,22 +253,6 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
           </div>
           
           <div className="flex items-center gap-2">
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={handleVoiceCall}
-              className="hover:bg-green-50 hover:text-green-600"
-            >
-              <Phone className="h-4 w-4" />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={handleVideoCall}
-              className="hover:bg-blue-50 hover:text-blue-600"
-            >
-              <Video className="h-4 w-4" />
-            </Button>
             <Button 
               variant="ghost" 
               size="sm"

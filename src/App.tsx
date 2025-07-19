@@ -7,7 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
-import { CallProvider } from "@/contexts/CallContext";
+
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Membership from "./pages/Membership";
@@ -32,8 +32,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <CallProvider>
-        <NotificationProvider>
+      <NotificationProvider>
           <LanguageProvider>
             <TooltipProvider>
             <Toaster />
@@ -75,7 +74,6 @@ const App = () => (
         </TooltipProvider>
       </LanguageProvider>
       </NotificationProvider>
-      </CallProvider>
     </AuthProvider>
   </QueryClientProvider>
 );
