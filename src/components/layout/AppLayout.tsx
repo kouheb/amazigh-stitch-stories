@@ -30,6 +30,17 @@ export const AppLayout = ({ children, activeTab, onTabChange }: AppLayoutProps) 
     setSidebarOpen(false); // Close sidebar on mobile when navigating
   };
 
+  // Hide navigation during profile creation
+  const isProfileCreation = activeTab === "create-profile";
+  
+  if (isProfileCreation) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {children}
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <MainNavbar 
