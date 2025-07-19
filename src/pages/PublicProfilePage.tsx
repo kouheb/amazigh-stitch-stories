@@ -173,16 +173,15 @@ export const PublicProfilePage = () => {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        {/* Cover Image & Profile Section */}
-        <div className="relative">
-          <div className="h-48 md:h-64 bg-gradient-to-r from-orange-400 to-red-500 rounded-lg overflow-hidden">
-            <div className="absolute inset-0 bg-black bg-opacity-20"></div>
-          </div>
-
-          {/* Profile Header */}
-          <div className="absolute -bottom-16 left-0 right-0">
-            <Card className="p-6 mx-4">
+      {/* Cover & Profile Section */}
+      <div className="relative">
+        <div className="h-48 md:h-64 bg-gradient-to-r from-orange-400 to-red-500">
+          <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+        </div>
+        
+        <div className="absolute -bottom-16 left-0 right-0">
+          <div className="max-w-4xl mx-auto px-4">
+            <Card className="p-6">
               <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
                 <Avatar className="h-32 w-32 border-4 border-white shadow-lg">
                   <AvatarImage src={profile.avatar_url} alt={displayName} />
@@ -190,62 +189,63 @@ export const PublicProfilePage = () => {
                     {displayName.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-            
-            <div className="flex-1">
-              <div className="flex flex-col md:flex-row md:items-start md:justify-between">
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900 mb-1">
-                    {displayName}
-                  </h1>
-                  <p className="text-lg text-gray-600 mb-2">
-                    {profile.experience_level ? `${profile.experience_level} Experience` : 'Artisan'}
-                  </p>
-                  <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
-                    {profile.region && (
-                      <div className="flex items-center gap-1">
-                        <MapPin className="h-4 w-4" />
-                        <span>{profile.region}</span>
-                      </div>
-                    )}
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      <span>Member since {formatMemberSince(profile.created_at)}</span>
-                    </div>
-                    {profile.website && (
-                      <div className="flex items-center gap-1">
-                        <Globe className="h-4 w-4" />
-                        <a 
-                          href={profile.website} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800"
-                        >
-                          Website
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Bio */}
-                  <p className="text-gray-700 mb-4 max-w-2xl">
-                    {profile.bio || 'Welcome to my profile! I am passionate about creative work and looking forward to connecting with fellow artists and designers.'}
-                  </p>
-                </div>
                 
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={handleMessage}>
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                    Message
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={handleFollow}>
-                    <UserPlus className="h-4 w-4 mr-2" />
-                    Follow
-                  </Button>
+                <div className="flex-1">
+                  <div className="flex flex-col md:flex-row md:items-start md:justify-between">
+                    <div>
+                      <h1 className="text-2xl font-bold text-gray-900 mb-1">
+                        {displayName}
+                      </h1>
+                      <p className="text-lg text-gray-600 mb-2">
+                        {profile.experience_level ? `${profile.experience_level} Experience` : 'Artisan'}
+                      </p>
+                      <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+                        {profile.region && (
+                          <div className="flex items-center gap-1">
+                            <MapPin className="h-4 w-4" />
+                            <span>{profile.region}</span>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-4 w-4" />
+                          <span>Member since {formatMemberSince(profile.created_at)}</span>
+                        </div>
+                        {profile.website && (
+                          <div className="flex items-center gap-1">
+                            <Globe className="h-4 w-4" />
+                            <a 
+                              href={profile.website} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:text-blue-800"
+                            >
+                              Website
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Bio */}
+                      <p className="text-gray-700 mb-4 max-w-2xl">
+                        {profile.bio || 'Welcome to my profile! I am passionate about creative work and looking forward to connecting with fellow artists and designers.'}
+                      </p>
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" onClick={handleMessage}>
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        Message
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={handleFollow}>
+                        <UserPlus className="h-4 w-4 mr-2" />
+                        Follow
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            </Card>
           </div>
-          </Card>
         </div>
       </div>
 
