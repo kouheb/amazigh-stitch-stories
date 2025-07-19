@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Upload, X } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface WorkItem {
   id: number;
@@ -31,6 +33,11 @@ interface AddWorkModalProps {
 }
 
 export const AddWorkModal = ({ isOpen, onClose, onWorkAdded }: AddWorkModalProps) => {
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  
   const [formData, setFormData] = useState({
     title: "",
     category: "",
@@ -74,6 +81,72 @@ export const AddWorkModal = ({ isOpen, onClose, onWorkAdded }: AddWorkModalProps
     });
   };
 
+  const handleFileUpload = async (files: FileList) => {
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+    const uploadPromises = Array.from(files).map(async (file) => {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `portfolio/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        toast({
+          title: "Upload failed",
+          description: `Failed to upload ${file.name}`,
+          variant: "destructive"
+        });
+        return null;
+      }
+
+      const { data } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      return data.publicUrl;
+    });
+
+    try {
+      const results = await Promise.all(uploadPromises);
+      const successfulUploads = results.filter(url => url !== null) as string[];
+      setUploadedImages(prev => [...prev, ...successfulUploads]);
+      
+      if (successfulUploads.length > 0) {
+        toast({
+          title: "Upload successful",
+          description: `Uploaded ${successfulUploads.length} image(s)`
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Upload failed",
+        description: "Some images failed to upload",
+        variant: "destructive"
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      handleFileUpload(e.target.files);
+    }
+  };
+
+  const handleChooseFiles = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleRemoveImage = (imageUrl: string) => {
+    setUploadedImages(prev => prev.filter(url => url !== imageUrl));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -109,6 +182,7 @@ export const AddWorkModal = ({ isOpen, onClose, onWorkAdded }: AddWorkModalProps
       newTag: "",
       type: "project"
     });
+    setUploadedImages([]);
   };
 
   return (
@@ -176,14 +250,52 @@ export const AddWorkModal = ({ isOpen, onClose, onWorkAdded }: AddWorkModalProps
 
           <div className="space-y-2">
             <Label>Upload Images</Label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handleFileInputChange}
+              className="hidden"
+            />
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
               <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
               <p className="text-gray-600">Click to upload images or drag and drop</p>
               <p className="text-sm text-gray-500 mt-1">PNG, JPG up to 10MB each</p>
-              <Button type="button" variant="outline" className="mt-2">
-                Choose Files
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="mt-2" 
+                onClick={handleChooseFiles}
+                disabled={uploading}
+              >
+                {uploading ? 'Uploading...' : 'Choose Files'}
               </Button>
             </div>
+            
+            {/* Display uploaded images */}
+            {uploadedImages.length > 0 && (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                {uploadedImages.map((imageUrl, index) => (
+                  <div key={index} className="relative">
+                    <img 
+                      src={imageUrl} 
+                      alt={`Uploaded ${index + 1}`}
+                      className="w-full h-24 object-cover rounded-lg"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="absolute top-1 right-1 h-6 w-6 p-0"
+                      onClick={() => handleRemoveImage(imageUrl)}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">
