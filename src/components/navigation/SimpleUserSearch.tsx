@@ -19,10 +19,15 @@ export const SimpleUserSearch = () => {
   const searchUsers = async () => {
     setSearching(true);
     try {
+      console.log('Current user:', user?.email, user?.id);
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .limit(20);
+        .limit(50);
+
+      console.log('All profiles from DB:', data);
+      console.log('Search error:', error);
 
       if (error) {
         console.error('Search error:', error);
@@ -30,24 +35,34 @@ export const SimpleUserSearch = () => {
         return;
       }
 
+      if (!data || data.length === 0) {
+        toast.info('No users found in database');
+        setUsers([]);
+        return;
+      }
+
       // Filter by search query if provided
-      let filteredUsers = data || [];
+      let filteredUsers = data;
       if (searchQuery.trim()) {
-        filteredUsers = data?.filter(profile => {
-          const searchTerm = searchQuery.toLowerCase();
-          return (
-            profile.display_name?.toLowerCase().includes(searchTerm) ||
-            profile.full_name?.toLowerCase().includes(searchTerm) ||
-            profile.email?.toLowerCase().includes(searchTerm)
-          );
-        }) || [];
+        const searchTerm = searchQuery.toLowerCase();
+        filteredUsers = data.filter(profile => {
+          const displayName = (profile.display_name || '').toLowerCase();
+          const fullName = (profile.full_name || '').toLowerCase();
+          const email = (profile.email || '').toLowerCase();
+          
+          return displayName.includes(searchTerm) || 
+                 fullName.includes(searchTerm) || 
+                 email.includes(searchTerm);
+        });
+        console.log('Filtered by search term:', filteredUsers);
       }
 
       // Remove current user
-      filteredUsers = filteredUsers.filter(profile => profile.id !== user?.id);
+      const finalUsers = filteredUsers.filter(profile => profile.id !== user?.id);
+      console.log('Final users after removing current user:', finalUsers);
       
-      setUsers(filteredUsers);
-      toast.success(`Found ${filteredUsers.length} users`);
+      setUsers(finalUsers);
+      toast.success(`Found ${finalUsers.length} users`);
     } catch (error) {
       console.error('Search error:', error);
       toast.error('Search failed');

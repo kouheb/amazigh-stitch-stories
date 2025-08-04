@@ -22,21 +22,31 @@ export const SimpleQuickSearch = () => {
 
     setSearching(true);
     try {
+      console.log('Quick search - Current user:', user?.email, user?.id);
+      console.log('Quick search - Query:', query);
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .limit(5);
+        .limit(10);
+
+      console.log('Quick search - All profiles:', data);
 
       if (!error && data) {
+        const searchTerm = query.toLowerCase();
         const filtered = data.filter(profile => {
-          const searchTerm = query.toLowerCase();
-          return (
-            profile.id !== user?.id &&
-            (profile.display_name?.toLowerCase().includes(searchTerm) ||
-             profile.full_name?.toLowerCase().includes(searchTerm) ||
-             profile.email?.toLowerCase().includes(searchTerm))
+          const isNotCurrentUser = profile.id !== user?.id;
+          const matchesSearch = (
+            (profile.display_name || '').toLowerCase().includes(searchTerm) ||
+            (profile.full_name || '').toLowerCase().includes(searchTerm) ||
+            (profile.email || '').toLowerCase().includes(searchTerm)
           );
+          
+          console.log(`Profile ${profile.email}: isNotCurrentUser=${isNotCurrentUser}, matchesSearch=${matchesSearch}`);
+          return isNotCurrentUser && matchesSearch;
         });
+        
+        console.log('Quick search - Filtered results:', filtered);
         setResults(filtered);
       }
     } catch (error) {
