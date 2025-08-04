@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { SimpleChatTest } from "@/components/messaging/SimpleChatTest";
 import { RealtimeMessageTest } from "@/components/messaging/RealtimeMessageTest";
+import { PeopleSearchTest } from "@/components/navigation/PeopleSearchTest";
 
 
 interface Conversation {
@@ -280,8 +281,9 @@ export const MessagingPage = () => {
                 <p className="text-gray-500">Choose a conversation to start messaging</p>
               </div>
               
-              {/* Test messaging components */}
+              {/* Test components */}
               <div className="mt-8 space-y-4">
+                <PeopleSearchTest />
                 <SimpleChatTest />
                 <RealtimeMessageTest />
               </div>

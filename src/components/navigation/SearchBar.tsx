@@ -49,72 +49,85 @@ export const SearchBar = ({ className = "", isMobile = false }: SearchBarProps) 
     try {
       const searchResults: SearchResult[] = [];
 
-      // Search profiles by name, email, and bio
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, display_name, full_name, bio, avatar_url, email')
-        .or(`display_name.ilike.%${searchQuery}%,full_name.ilike.%${searchQuery}%,bio.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`)
-        .limit(10);
+      // Search profiles with better error handling
+      try {
+        const { data: profiles, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, display_name, full_name, bio, avatar_url, email')
+          .or(`display_name.ilike.%${searchQuery}%,full_name.ilike.%${searchQuery}%,bio.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`)
+          .limit(10);
 
-      if (!profilesError && profiles) {
-        profiles.forEach(profile => {
-          searchResults.push({
-            id: profile.id,
-            type: 'profile',
-            title: profile.display_name || profile.full_name || profile.email || 'Unknown User',
-            subtitle: `Profile • ${profile.email || ''}`,
-            avatar: profile.avatar_url,
-            description: profile.bio || 'Artisan profile'
+        if (!profilesError && profiles) {
+          profiles.forEach(profile => {
+            searchResults.push({
+              id: profile.id,
+              type: 'profile',
+              title: profile.display_name || profile.full_name || profile.email || 'Unknown User',
+              subtitle: `Profile • ${profile.email || ''}`,
+              avatar: profile.avatar_url,
+              description: profile.bio || 'Artisan profile'
+            });
           });
-        });
-      } else if (profilesError) {
-        console.error('Profile search error:', profilesError);
+        }
+      } catch (profileError) {
+        console.warn('Profile search temporarily unavailable');
       }
 
-      // Search portfolio items
-      const { data: portfolio, error: portfolioError } = await supabase
-        .from('portfolio_items')
-        .select('id, title, description, image_url, user_id')
-        .or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,category.ilike.%${searchQuery}%`)
-        .limit(5);
+      // Search portfolio items with error handling
+      try {
+        const { data: portfolio, error: portfolioError } = await supabase
+          .from('portfolio_items')
+          .select('id, title, description, image_url, user_id')
+          .or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,category.ilike.%${searchQuery}%`)
+          .limit(5);
 
-      if (!portfolioError && portfolio) {
-        portfolio.forEach(item => {
-          searchResults.push({
-            id: item.id,
-            type: 'portfolio',
-            title: item.title,
-            subtitle: 'Portfolio Item',
-            avatar: item.image_url,
-            description: item.description
+        if (!portfolioError && portfolio) {
+          portfolio.forEach(item => {
+            searchResults.push({
+              id: item.id,
+              type: 'portfolio',
+              title: item.title,
+              subtitle: 'Portfolio Item',
+              avatar: item.image_url,
+              description: item.description
+            });
           });
-        });
+        }
+      } catch (portfolioError) {
+        console.warn('Portfolio search temporarily unavailable');
       }
 
-      // Search showcase items
-      const { data: showcase, error: showcaseError } = await supabase
-        .from('showcase_items')
-        .select('id, title, description, thumbnail_url, user_id')
-        .or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,type.ilike.%${searchQuery}%`)
-        .limit(5);
+      // Search showcase items with error handling
+      try {
+        const { data: showcase, error: showcaseError } = await supabase
+          .from('showcase_items')
+          .select('id, title, description, thumbnail_url, user_id')
+          .or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,type.ilike.%${searchQuery}%`)
+          .limit(5);
 
-      if (!showcaseError && showcase) {
-        showcase.forEach(item => {
-          searchResults.push({
-            id: item.id,
-            type: 'showcase',
-            title: item.title,
-            subtitle: 'Showcase Item',
-            avatar: item.thumbnail_url,
-            description: item.description
+        if (!showcaseError && showcase) {
+          showcase.forEach(item => {
+            searchResults.push({
+              id: item.id,
+              type: 'showcase',
+              title: item.title,
+              subtitle: 'Showcase Item',
+              avatar: item.thumbnail_url,
+              description: item.description
+            });
           });
-        });
+        }
+      } catch (showcaseError) {
+        console.warn('Showcase search temporarily unavailable');
       }
 
       setResults(searchResults);
       setShowResults(true);
     } catch (error) {
-      console.error('Search error:', error);
+      console.warn('Search temporarily unavailable');
+      // Show a message indicating search is temporarily unavailable
+      setResults([]);
+      setShowResults(true);
     } finally {
       setIsSearching(false);
     }
@@ -212,7 +225,12 @@ export const SearchBar = ({ className = "", isMobile = false }: SearchBarProps) 
             <div className="p-4 text-center text-gray-500">
               <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
               <p className="text-sm">No results found for "{query}"</p>
-              <p className="text-xs text-gray-400 mt-1">Try different keywords</p>
+              <p className="text-xs text-gray-400 mt-1">
+                {results.length === 0 && !isSearching ? 
+                  "Search is temporarily unavailable. Try again later." : 
+                  "Try different keywords"
+                }
+              </p>
             </div>
           ) : null}
         </Card>
