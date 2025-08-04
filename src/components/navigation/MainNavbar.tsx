@@ -76,7 +76,7 @@ export const MainNavbar = ({ onMenuToggle, onCreateClick, onTabChange }: MainNav
       {/* Mobile search bar (only when authenticated) */}
       {isAuthenticated && (
         <div className="md:hidden mt-3">
-          <SearchBar isMobile={true} />
+          <WorkingQuickSearch />
         </div>
       )}
     </nav>
