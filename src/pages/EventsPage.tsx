@@ -460,6 +460,7 @@ export const EventsPage = () => {
             organizer: eventData.organizer || 'Community',
             tags: [eventData.category.charAt(0).toUpperCase() + eventData.category.slice(1)],
             created_by: user.id,
+            creator_email: user.email,
             approval_status: approvalStatus
           }
         ])
