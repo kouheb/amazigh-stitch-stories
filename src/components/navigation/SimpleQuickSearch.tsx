@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Search, MessageCircle } from "lucide-react";
+import { Search, MessageCircle, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -58,6 +58,12 @@ export const SimpleQuickSearch = () => {
     setResults([]);
   };
 
+  const viewProfile = (userId: string) => {
+    navigate(`/profile/${userId}`);
+    setSearchQuery("");
+    setResults([]);
+  };
+
   const getUserName = (profile: any) => {
     return profile.display_name || profile.full_name || profile.email || 'Unknown';
   };
@@ -82,23 +88,36 @@ export const SimpleQuickSearch = () => {
       {results.length > 0 && (
         <Card className="absolute top-full left-0 right-0 mt-1 p-2 z-50 max-h-60 overflow-y-auto">
           {results.map((profile) => (
-            <div
-              key={profile.id}
-              className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
-              onClick={() => startChat(profile.id)}
-            >
-              <Avatar className="h-8 w-8">
-                <AvatarFallback className="bg-blue-100 text-blue-600 text-xs">
-                  {getUserName(profile).charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">
-                  {getUserName(profile)}
-                </p>
-                <p className="text-xs text-gray-500 truncate">{profile.email}</p>
+            <div key={profile.id} className="p-2 hover:bg-gray-50 rounded">
+              <div className="flex items-center gap-2 mb-2">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback className="bg-blue-100 text-blue-600 text-xs">
+                    {getUserName(profile).charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">
+                    {getUserName(profile)}
+                  </p>
+                  <p className="text-xs text-gray-500 truncate">{profile.email}</p>
+                </div>
               </div>
-              <MessageCircle className="h-4 w-4 text-gray-400" />
+              <div className="flex gap-2">
+                <button
+                  onClick={() => viewProfile(profile.id)}
+                  className="flex-1 px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded flex items-center justify-center gap-1"
+                >
+                  <User className="h-3 w-3" />
+                  Profile
+                </button>
+                <button
+                  onClick={() => startChat(profile.id)}
+                  className="flex-1 px-2 py-1 text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 rounded flex items-center justify-center gap-1"
+                >
+                  <MessageCircle className="h-3 w-3" />
+                  Chat
+                </button>
+              </div>
             </div>
           ))}
         </Card>

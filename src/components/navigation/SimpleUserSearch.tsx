@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Search, MessageCircle, Users } from "lucide-react";
+import { Search, MessageCircle, Users, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -59,6 +59,10 @@ export const SimpleUserSearch = () => {
   const startChat = (userId: string, userName: string) => {
     navigate(`/messaging?user=${userId}`);
     toast.success(`Starting chat with ${userName}`);
+  };
+
+  const viewProfile = (userId: string) => {
+    navigate(`/profile/${userId}`);
   };
 
   const getUserName = (profile: any) => {
@@ -118,14 +122,25 @@ export const SimpleUserSearch = () => {
                     <p className="text-sm text-gray-500">{profile.email}</p>
                   </div>
                   
-                  <Button
-                    size="sm"
-                    onClick={() => startChat(profile.id, getUserName(profile))}
-                    className="flex items-center gap-1"
-                  >
-                    <MessageCircle className="h-3 w-3" />
-                    Chat
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => viewProfile(profile.id)}
+                      className="flex items-center gap-1"
+                    >
+                      <User className="h-3 w-3" />
+                      Profile
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={() => startChat(profile.id, getUserName(profile))}
+                      className="flex items-center gap-1"
+                    >
+                      <MessageCircle className="h-3 w-3" />
+                      Chat
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
