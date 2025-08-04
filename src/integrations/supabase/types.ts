@@ -133,6 +133,7 @@ export type Database = {
           category: string
           created_at: string
           created_by: string | null
+          creator_email: string | null
           current_attendees: number | null
           date_time: string
           description: string | null
@@ -143,6 +144,7 @@ export type Database = {
           organizer: string | null
           price: string | null
           status: string | null
+          submission_date: string | null
           tags: string[] | null
           title: string
           updated_at: string
@@ -152,6 +154,7 @@ export type Database = {
           category: string
           created_at?: string
           created_by?: string | null
+          creator_email?: string | null
           current_attendees?: number | null
           date_time: string
           description?: string | null
@@ -162,6 +165,7 @@ export type Database = {
           organizer?: string | null
           price?: string | null
           status?: string | null
+          submission_date?: string | null
           tags?: string[] | null
           title: string
           updated_at?: string
@@ -171,6 +175,7 @@ export type Database = {
           category?: string
           created_at?: string
           created_by?: string | null
+          creator_email?: string | null
           current_attendees?: number | null
           date_time?: string
           description?: string | null
@@ -181,6 +186,7 @@ export type Database = {
           organizer?: string | null
           price?: string | null
           status?: string | null
+          submission_date?: string | null
           tags?: string[] | null
           title?: string
           updated_at?: string
