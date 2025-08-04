@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EventRegistrationModal } from "@/components/modals/EventRegistrationModal";
 import { AddEventModal } from "@/components/modals/AddEventModal";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Search, 
   Filter, 
@@ -107,7 +109,10 @@ export const EventsPage = () => {
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [currentCalendarDate, setCurrentCalendarDate] = useState(new Date());
   const [isAddEventModalOpen, setIsAddEventModalOpen] = useState(false);
-  const [eventsList, setEventsList] = useState(initialEvents);
+  const [eventsList, setEventsList] = useState<any[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   const categories = [
     { id: "all", label: "All Events" },
@@ -287,9 +292,149 @@ export const EventsPage = () => {
     }
   };
 
+  // Check admin status and load events
+  useEffect(() => {
+    const checkAdminAndLoadEvents = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          // Check if user is admin
+          const { data: userRoles } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', user.id);
+          
+          setIsAdmin(userRoles?.some(role => role.role === 'admin') || false);
+        }
+
+        // Load events
+        await loadEvents();
+      } catch (error) {
+        console.error('Error loading data:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load events",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAdminAndLoadEvents();
+  }, []);
+
+  // Load events from database
+  const loadEvents = async () => {
+    try {
+      const { data: events, error } = await supabase
+        .from('events')
+        .select('*')
+        .eq('status', 'active')
+        .order('date_time', { ascending: true });
+
+      if (error) throw error;
+
+      // Transform database events to match component format
+      const transformedEvents = events?.map(event => ({
+        id: event.id,
+        title: event.title,
+        description: event.description,
+        date: new Date(event.date_time).toLocaleDateString('en-US', { 
+          month: 'long', 
+          day: 'numeric', 
+          year: 'numeric' 
+        }),
+        time: new Date(event.date_time).toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        }),
+        location: event.location,
+        category: event.category,
+        attendees: event.current_attendees || 0,
+        price: event.price || "Free",
+        organizer: event.organizer || "Community",
+        image: getCategoryEmoji(event.category),
+        tags: event.tags || [event.category.charAt(0).toUpperCase() + event.category.slice(1)]
+      })) || [];
+
+      setEventsList(transformedEvents);
+    } catch (error) {
+      console.error('Error loading events:', error);
+    }
+  };
+
+  const getCategoryEmoji = (category: string) => {
+    const emojis: { [key: string]: string } = {
+      workshop: "🛠️",
+      cultural: "🎭", 
+      exhibition: "🖼️",
+      market: "🛍️",
+      networking: "🤝"
+    };
+    return emojis[category] || "📅";
+  };
+
   // Handle adding new event
-  const handleAddEvent = (newEvent: any) => {
-    setEventsList(prev => [...prev, newEvent]);
+  const handleAddEvent = async (eventData: any) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Authentication required",
+          description: "Please log in to create events",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (!isAdmin) {
+        toast({
+          title: "Access denied",
+          description: "Only administrators can create events",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Combine date and time
+      const dateTime = new Date(`${eventData.date}T${eventData.time || '00:00'}`);
+
+      const { error } = await supabase
+        .from('events')
+        .insert([
+          {
+            title: eventData.title,
+            description: eventData.description,
+            date_time: dateTime.toISOString(),
+            location: eventData.location,
+            category: eventData.category,
+            price: eventData.price || 'Free',
+            organizer: eventData.organizer || 'Community',
+            tags: [eventData.category.charAt(0).toUpperCase() + eventData.category.slice(1)],
+            created_by: user.id
+          }
+        ]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Event created",
+        description: "Your event has been successfully created"
+      });
+
+      // Reload events
+      await loadEvents();
+    } catch (error) {
+      console.error('Error creating event:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create event",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -325,10 +470,15 @@ export const EventsPage = () => {
               <Filter className="h-4 w-4 mr-2" />
               Filters
             </Button>
-            <Button className="bg-black hover:bg-gray-800">
-              <Plus className="h-4 w-4 mr-2" />
-              Create Event
-            </Button>
+            {isAdmin && (
+              <Button 
+                className="bg-black hover:bg-gray-800"
+                onClick={() => setIsAddEventModalOpen(true)}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Create Event
+              </Button>
+            )}
           </div>
 
           {/* Categories */}

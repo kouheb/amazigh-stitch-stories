@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +20,7 @@ interface EventRegistrationModalProps {
   isOpen: boolean;
   onClose: () => void;
   event?: {
+    id?: string;
     title: string;
     date: string;
     location: string;
@@ -36,16 +38,61 @@ export const EventRegistrationModal = ({ isOpen, onClose, event }: EventRegistra
   });
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    toast({
-      title: "Registration Successful!",
-      description: `You've been registered for ${event?.title}. Check your email for confirmation.`,
-    });
-    
-    setFormData({ fullName: "", email: "", phone: "", specialRequests: "" });
-    onClose();
+    if (!formData.fullName || !formData.email) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      const { error } = await supabase
+        .from('event_registrations')
+        .insert([
+          {
+            event_id: event?.id,
+            user_id: user?.id,
+            full_name: formData.fullName,
+            email: formData.email,
+            phone: formData.phone || null,
+            special_requests: formData.specialRequests || null
+          }
+        ]);
+
+      if (error) {
+        if (error.code === '23505') { // Unique constraint violation
+          toast({
+            title: "Already Registered",
+            description: "You are already registered for this event.",
+            variant: "destructive"
+          });
+          return;
+        }
+        throw error;
+      }
+      
+      toast({
+        title: "Registration Successful!",
+        description: `You've been registered for ${event?.title}. Check your email for confirmation.`,
+      });
+      
+      setFormData({ fullName: "", email: "", phone: "", specialRequests: "" });
+      onClose();
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast({
+        title: "Registration Failed",
+        description: "There was an error processing your registration. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {

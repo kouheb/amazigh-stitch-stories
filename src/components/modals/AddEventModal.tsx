@@ -47,31 +47,8 @@ export const AddEventModal = ({ isOpen, onClose, onAddEvent, selectedDate }: Add
       return;
     }
 
-    const newEvent = {
-      id: Date.now(), // Simple ID generation
-      title: formData.title,
-      description: formData.description,
-      date: new Date(formData.date).toLocaleDateString('en-US', { 
-        month: 'long', 
-        day: 'numeric', 
-        year: 'numeric' 
-      }),
-      time: formData.time,
-      location: formData.location,
-      category: formData.category,
-      price: formData.price || "Free",
-      organizer: formData.organizer || "Community",
-      attendees: 0,
-      image: getCategoryEmoji(formData.category),
-      tags: [formData.category.charAt(0).toUpperCase() + formData.category.slice(1)]
-    };
-
-    onAddEvent(newEvent);
-    
-    toast({
-      title: "Event Created",
-      description: "Your event has been successfully added to the calendar."
-    });
+    // Pass form data to parent component for database handling
+    onAddEvent(formData);
 
     // Reset form
     setFormData({
