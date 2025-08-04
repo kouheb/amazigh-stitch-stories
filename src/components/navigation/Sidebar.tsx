@@ -34,6 +34,10 @@ export const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
 
   const handleNavigationClick = (itemId: string) => {
     console.log(`Sidebar nav clicked: ${itemId}`);
+    console.log('onTabChange function:', onTabChange);
+    if (itemId === 'events') {
+      console.log('Events navigation triggered');
+    }
     onTabChange(itemId);
   };
 
