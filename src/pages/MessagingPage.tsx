@@ -15,6 +15,7 @@ import { SimpleChatTest } from "@/components/messaging/SimpleChatTest";
 import { RealtimeMessageTest } from "@/components/messaging/RealtimeMessageTest";
 import { PeopleSearchTest } from "@/components/navigation/PeopleSearchTest";
 import { DirectChat } from "@/components/messaging/DirectChat";
+import { MessageTester } from "@/components/messaging/MessageTester";
 
 
 interface Conversation {
@@ -289,8 +290,8 @@ export const MessagingPage = () => {
               
               {/* Test components */}
               <div className="mt-8 space-y-4">
+                <MessageTester />
                 <PeopleSearchTest />
-                <SimpleChatTest />
                 <RealtimeMessageTest />
               </div>
             </div>

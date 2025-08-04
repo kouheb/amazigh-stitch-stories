@@ -13,10 +13,12 @@ import { ArtisanDashboard } from "@/components/dashboard/ArtisanDashboard";
 import ProfileCreationScreen from "@/components/wireframe/ProfileCreationScreen";
 import Membership from "./Membership";
 import { useAuth } from "@/contexts/AuthContext";
+import { useGlobalMessaging } from "@/hooks/useGlobalMessaging";
 import { supabase } from "@/integrations/supabase/client";
 
 export const MainApp = () => {
   const { user } = useAuth();
+  const { unreadCount } = useGlobalMessaging();
   const [activeTab, setActiveTab] = useState("home");
   const [isProfileComplete, setIsProfileComplete] = useState<boolean | null>(null);
   const [checkingProfile, setCheckingProfile] = useState(true);
