@@ -487,25 +487,37 @@ export const EventsPage = () => {
 
       if (error) throw error;
 
-      // Send notification to admins if event needs approval
+      console.log('Event created successfully:', newEvent);
+
+      // Send notification to admins if event needs approval AND if not admin
       if (!isAdmin && newEvent) {
         try {
+          console.log('Sending notifications for non-admin created event...');
+          
+          // Get the current user's profile for the notification
           const { data: profileData } = await supabase
             .from('profiles')
             .select('full_name')
             .eq('id', user.id)
             .single();
 
-          await supabase.functions.invoke('send-event-notification', {
+          // Call the edge function to send email notifications
+          const { error: notificationError } = await supabase.functions.invoke('send-event-notification', {
             body: {
               eventId: newEvent.id,
               eventTitle: newEvent.title,
               eventDescription: newEvent.description,
-              creatorName: profileData?.full_name || 'Unknown User',
+              creatorName: profileData?.full_name || user.email || 'Unknown User',
               eventDate: new Date(newEvent.date_time).toLocaleDateString(),
               eventLocation: newEvent.location || 'No location specified'
             }
           });
+
+          if (notificationError) {
+            console.error('Failed to send notification:', notificationError);
+          } else {
+            console.log('Notification sent successfully');
+          }
         } catch (notificationError) {
           console.error('Failed to send notification:', notificationError);
           // Don't fail the event creation if notification fails
