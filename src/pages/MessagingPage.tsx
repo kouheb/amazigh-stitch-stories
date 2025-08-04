@@ -16,6 +16,7 @@ import { RealtimeMessageTest } from "@/components/messaging/RealtimeMessageTest"
 import { PeopleSearchTest } from "@/components/navigation/PeopleSearchTest";
 import { DirectChat } from "@/components/messaging/DirectChat";
 import { MessageTester } from "@/components/messaging/MessageTester";
+import { UserFinder } from "@/components/navigation/UserFinder";
 
 
 interface Conversation {
@@ -288,11 +289,10 @@ export const MessagingPage = () => {
                 <p className="text-gray-500">Choose a conversation to start messaging</p>
               </div>
               
-              {/* Test components */}
-              <div className="mt-8 space-y-4">
+              {/* User search and messaging tools */}
+              <div className="mt-8 space-y-6">
+                <UserFinder />
                 <MessageTester />
-                <PeopleSearchTest />
-                <RealtimeMessageTest />
               </div>
             </div>
           </div>

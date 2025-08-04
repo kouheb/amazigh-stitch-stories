@@ -6,6 +6,7 @@ import { Logo } from "@/components/ui/Logo";
 import { LanguageSelector } from "./LanguageSelector";
 import { UserDropdown } from "./UserDropdown";
 import { SearchBar } from "./SearchBar";
+import { QuickUserSearch } from "./QuickUserSearch";
 import { AuthButtons } from "./AuthButtons";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -56,7 +57,7 @@ export const MainNavbar = ({ onMenuToggle, onCreateClick, onTabChange }: MainNav
         {/* Center - Search (only when authenticated) */}
         {isAuthenticated && (
           <div className="hidden md:flex flex-1 max-w-md mx-6">
-            <SearchBar />
+            <QuickUserSearch />
           </div>
         )}
 
