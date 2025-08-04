@@ -21,7 +21,12 @@ export const WorkingQuickSearch = () => {
   }, [user]);
 
   const loadAllUsers = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('No user authenticated for quick search');
+      return;
+    }
+    
+    console.log('Current user:', user.email, user.id);
     
     try {
       const { data, error } = await supabase
@@ -33,11 +38,14 @@ export const WorkingQuickSearch = () => {
         return;
       }
 
+      console.log('Raw profiles data:', data);
+      
       // Remove current user
       const otherUsers = (data || []).filter(profile => profile.id !== user.id);
       setAllUsers(otherUsers);
       
-      console.log('Quick search loaded users:', otherUsers);
+      console.log('Quick search loaded users (after filtering current user):', otherUsers);
+      console.log('Current user ID that was filtered out:', user.id);
     } catch (error) {
       console.error('Error loading users for quick search:', error);
     }
