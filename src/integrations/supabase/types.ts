@@ -129,6 +129,7 @@ export type Database = {
       }
       events: {
         Row: {
+          approval_status: string | null
           category: string
           created_at: string
           created_by: string | null
@@ -147,6 +148,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          approval_status?: string | null
           category: string
           created_at?: string
           created_by?: string | null
@@ -165,6 +167,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          approval_status?: string | null
           category?: string
           created_at?: string
           created_by?: string | null

@@ -24,7 +24,9 @@ import {
   Plus,
   ArrowRight,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Check,
+  X
 } from "lucide-react";
 
 const initialEvents = [
@@ -110,6 +112,7 @@ export const EventsPage = () => {
   const [currentCalendarDate, setCurrentCalendarDate] = useState(new Date());
   const [isAddEventModalOpen, setIsAddEventModalOpen] = useState(false);
   const [eventsList, setEventsList] = useState<any[]>([]);
+  const [pendingEvents, setPendingEvents] = useState<any[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -357,12 +360,60 @@ export const EventsPage = () => {
         price: event.price || "Free",
         organizer: event.organizer || "Community",
         image: getCategoryEmoji(event.category),
-        tags: event.tags || [event.category.charAt(0).toUpperCase() + event.category.slice(1)]
+        tags: event.tags || [event.category.charAt(0).toUpperCase() + event.category.slice(1)],
+        approval_status: event.approval_status
       })) || [];
 
       setEventsList(transformedEvents);
+      
+      // Load pending events for admins
+      if (isAdmin) {
+        await loadPendingEvents();
+      }
     } catch (error) {
       console.error('Error loading events:', error);
+    }
+  };
+
+  // Load pending events for admin approval
+  const loadPendingEvents = async () => {
+    try {
+      const { data: events, error } = await supabase
+        .from('events')
+        .select('*')
+        .eq('approval_status', 'pending')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const transformedEvents = events?.map(event => ({
+        id: event.id,
+        title: event.title,
+        description: event.description,
+        date: new Date(event.date_time).toLocaleDateString('en-US', { 
+          month: 'long', 
+          day: 'numeric', 
+          year: 'numeric' 
+        }),
+        time: new Date(event.date_time).toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        }),
+        location: event.location,
+        category: event.category,
+        attendees: event.current_attendees || 0,
+        price: event.price || "Free",
+        organizer: event.organizer || "Community",
+        image: getCategoryEmoji(event.category),
+        tags: event.tags || [event.category.charAt(0).toUpperCase() + event.category.slice(1)],
+        approval_status: event.approval_status,
+        created_by: event.created_by
+      })) || [];
+
+      setPendingEvents(transformedEvents);
+    } catch (error) {
+      console.error('Error loading pending events:', error);
     }
   };
 
@@ -390,17 +441,11 @@ export const EventsPage = () => {
         return;
       }
 
-      if (!isAdmin) {
-        toast({
-          title: "Access denied",
-          description: "Only administrators can create events",
-          variant: "destructive"
-        });
-        return;
-      }
-
       // Combine date and time
       const dateTime = new Date(`${eventData.date}T${eventData.time || '00:00'}`);
+
+      // Set approval status based on user role
+      const approvalStatus = isAdmin ? 'approved' : 'pending';
 
       const { error } = await supabase
         .from('events')
@@ -414,7 +459,8 @@ export const EventsPage = () => {
             price: eventData.price || 'Free',
             organizer: eventData.organizer || 'Community',
             tags: [eventData.category.charAt(0).toUpperCase() + eventData.category.slice(1)],
-            created_by: user.id
+            created_by: user.id,
+            approval_status: approvalStatus
           }
         ]);
 
@@ -422,16 +468,49 @@ export const EventsPage = () => {
 
       toast({
         title: "Event created",
-        description: "Your event has been successfully created"
+        description: isAdmin 
+          ? "Your event has been successfully created and is now live"
+          : "Your event has been submitted for admin approval"
       });
 
       // Reload events
       await loadEvents();
+      setIsAddEventModalOpen(false);
     } catch (error) {
       console.error('Error creating event:', error);
       toast({
         title: "Error",
         description: "Failed to create event",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Handle event approval/rejection
+  const handleEventApproval = async (eventId: string, action: 'approve' | 'reject') => {
+    try {
+      const { error } = await supabase
+        .from('events')
+        .update({ 
+          approval_status: action === 'approve' ? 'approved' : 'rejected'
+        })
+        .eq('id', eventId);
+
+      if (error) throw error;
+
+      toast({
+        title: `Event ${action}d`,
+        description: `The event has been successfully ${action}d`
+      });
+
+      // Reload events and pending events
+      await loadEvents();
+      await loadPendingEvents();
+    } catch (error) {
+      console.error(`Error ${action}ing event:`, error);
+      toast({
+        title: "Error",
+        description: `Failed to ${action} event`,
         variant: "destructive"
       });
     }
@@ -447,10 +526,17 @@ export const EventsPage = () => {
 
       {/* Tabs */}
       <Tabs defaultValue="events" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-4' : 'grid-cols-3'}`}>
           <TabsTrigger value="events">Events</TabsTrigger>
           <TabsTrigger value="community">Community</TabsTrigger>
           <TabsTrigger value="calendar">Calendar</TabsTrigger>
+          {isAdmin && (
+            <TabsTrigger value="admin">
+              Admin {pendingEvents.length > 0 && (
+                <Badge className="ml-2 bg-red-500">{pendingEvents.length}</Badge>
+              )}
+            </TabsTrigger>
+          )}
         </TabsList>
 
         {/* Events Tab */}
@@ -470,15 +556,13 @@ export const EventsPage = () => {
               <Filter className="h-4 w-4 mr-2" />
               Filters
             </Button>
-            {isAdmin && (
-              <Button 
-                className="bg-black hover:bg-gray-800"
-                onClick={() => setIsAddEventModalOpen(true)}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Create Event
-              </Button>
-            )}
+            <Button 
+              className="bg-black hover:bg-gray-800"
+              onClick={() => setIsAddEventModalOpen(true)}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Create Event
+            </Button>
           </div>
 
           {/* Categories */}
@@ -903,6 +987,118 @@ export const EventsPage = () => {
             </div>
           </Card>
         </TabsContent>
+
+        {/* Admin Tab - Event Approval */}
+        {isAdmin && (
+          <TabsContent value="admin" className="space-y-6">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">Event Management</h2>
+              <p className="text-gray-600">Review and approve pending events</p>
+            </div>
+
+            {/* Pending Events for Approval */}
+            <Card className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold">
+                  Pending Events ({pendingEvents.length})
+                </h3>
+                <Button variant="outline" size="sm" onClick={() => loadPendingEvents()}>
+                  Refresh
+                </Button>
+              </div>
+
+              {pendingEvents.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  No events pending approval
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {pendingEvents.map((event) => (
+                    <Card key={event.id} className="p-4 border-l-4 border-l-yellow-400">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="text-2xl">{event.image}</div>
+                            <div>
+                              <h4 className="text-lg font-semibold text-gray-800">{event.title}</h4>
+                              <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                                Pending Approval
+                              </Badge>
+                            </div>
+                          </div>
+                          
+                          <p className="text-gray-600 mb-3">{event.description}</p>
+                          
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm text-gray-600 mb-4">
+                            <div className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4" />
+                              {event.date}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Clock className="h-4 w-4" />
+                              {event.time}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <MapPin className="h-4 w-4" />
+                              {event.location}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Building className="h-4 w-4" />
+                              {event.organizer}
+                            </div>
+                          </div>
+
+                          <div className="flex flex-wrap gap-1 mb-4">
+                            {event.tags.map((tag, index) => (
+                              <Badge key={index} variant="secondary" className="text-xs">
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col gap-2 ml-4">
+                          <Button
+                            size="sm"
+                            className="bg-green-600 hover:bg-green-700"
+                            onClick={() => handleEventApproval(event.id, 'approve')}
+                          >
+                            <Check className="h-4 w-4 mr-2" />
+                            Approve
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleEventApproval(event.id, 'reject')}
+                          >
+                            <X className="h-4 w-4 mr-2" />
+                            Reject
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </Card>
+
+            {/* Admin Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card className="p-6 text-center">
+                <div className="text-2xl font-bold text-green-600">{eventsList.length}</div>
+                <div className="text-sm text-gray-600">Approved Events</div>
+              </Card>
+              <Card className="p-6 text-center">
+                <div className="text-2xl font-bold text-yellow-600">{pendingEvents.length}</div>
+                <div className="text-sm text-gray-600">Pending Approval</div>
+              </Card>
+              <Card className="p-6 text-center">
+                <div className="text-2xl font-bold text-gray-600">{eventsList.length + pendingEvents.length}</div>
+                <div className="text-sm text-gray-600">Total Events</div>
+              </Card>
+            </div>
+          </TabsContent>
+        )}
       </Tabs>
       
       <EventRegistrationModal
