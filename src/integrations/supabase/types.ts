@@ -83,6 +83,107 @@ export type Database = {
         }
         Relationships: []
       }
+      event_registrations: {
+        Row: {
+          email: string
+          event_id: string
+          full_name: string
+          id: string
+          phone: string | null
+          registration_date: string
+          special_requests: string | null
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          email: string
+          event_id: string
+          full_name: string
+          id?: string
+          phone?: string | null
+          registration_date?: string
+          special_requests?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          email?: string
+          event_id?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+          registration_date?: string
+          special_requests?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_registrations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          category: string
+          created_at: string
+          created_by: string | null
+          current_attendees: number | null
+          date_time: string
+          description: string | null
+          id: string
+          image_url: string | null
+          location: string
+          max_attendees: number | null
+          organizer: string | null
+          price: string | null
+          status: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          created_by?: string | null
+          current_attendees?: number | null
+          date_time: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          location: string
+          max_attendees?: number | null
+          organizer?: string | null
+          price?: string | null
+          status?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          current_attendees?: number | null
+          date_time?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          location?: string
+          max_attendees?: number | null
+          organizer?: string | null
+          price?: string | null
+          status?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string
