@@ -16,7 +16,7 @@ import { RealtimeMessageTest } from "@/components/messaging/RealtimeMessageTest"
 import { PeopleSearchTest } from "@/components/navigation/PeopleSearchTest";
 import { DirectChat } from "@/components/messaging/DirectChat";
 import { MessageTester } from "@/components/messaging/MessageTester";
-import { SimpleUserSearch } from "@/components/navigation/SimpleUserSearch";
+import { WorkingUserSearch } from "@/components/navigation/WorkingUserSearch";
 
 
 interface Conversation {
@@ -291,7 +291,7 @@ export const MessagingPage = () => {
               
               {/* User search and messaging tools */}
               <div className="mt-8 space-y-6">
-                <SimpleUserSearch />
+                <WorkingUserSearch />
                 <MessageTester />
               </div>
             </div>
