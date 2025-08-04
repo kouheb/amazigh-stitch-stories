@@ -25,19 +25,20 @@ export const UserFinder = () => {
     }
 
     setSearching(true);
+    setSearchResults([]);
+    
     try {
-      // Multiple search approaches for better reliability
-      const searchTerms = [
-        `display_name.ilike.%${searchQuery}%`,
-        `full_name.ilike.%${searchQuery}%`,
-        `email.ilike.%${searchQuery}%`
-      ];
-
+      console.log('Searching for:', searchQuery);
+      console.log('Current user ID:', user?.id);
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('id, display_name, full_name, email, avatar_url, bio')
-        .or(searchTerms.join(','))
+        .or(`display_name.ilike.%${searchQuery}%,full_name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`)
         .limit(15);
+
+      console.log('Search results:', data);
+      console.log('Search error:', error);
 
       if (error) {
         toast.error(`Search failed: ${error.message}`);
