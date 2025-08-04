@@ -14,6 +14,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { SimpleChatTest } from "@/components/messaging/SimpleChatTest";
 import { RealtimeMessageTest } from "@/components/messaging/RealtimeMessageTest";
 import { PeopleSearchTest } from "@/components/navigation/PeopleSearchTest";
+import { DirectChat } from "@/components/messaging/DirectChat";
 
 
 interface Conversation {
@@ -199,6 +200,11 @@ export const MessagingPage = () => {
 
 
   const selectedConversation = conversations.find(c => c.id === selectedConversationId);
+
+  // If we have a userId from URL params, show direct chat
+  if (userId) {
+    return <DirectChat recipientId={userId} />;
+  }
 
   return (
     <div className="h-screen flex bg-gray-50">
