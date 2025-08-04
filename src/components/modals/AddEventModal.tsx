@@ -76,8 +76,40 @@ export const AddEventModal = ({ isOpen, onClose, onAddEvent, selectedDate }: Add
     return emojis[category] || "📅";
   };
 
+  // Input validation and sanitization
+  const sanitizeInput = (input: string): string => {
+    return input.trim().replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+  };
+
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    // Sanitize input to prevent XSS
+    const sanitizedValue = sanitizeInput(value);
+    
+    // Additional validation based on field type
+    if (field === 'title' && sanitizedValue.length > 100) {
+      toast({
+        title: "Input too long",
+        description: "Event title must be less than 100 characters.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (field === 'description' && sanitizedValue.length > 1000) {
+      toast({
+        title: "Input too long",
+        description: "Description must be less than 1000 characters.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setFormData(prev => ({ ...prev, [field]: sanitizedValue }));
   };
 
   return (

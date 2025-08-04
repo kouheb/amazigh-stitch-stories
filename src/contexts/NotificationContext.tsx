@@ -60,7 +60,7 @@ export const NotificationProvider = ({ children }: NotificationProviderProps) =>
         .limit(50);
 
       if (error) {
-        console.error('Error loading notifications:', error);
+        console.warn('Failed to load notifications');
         // Silently fail - don't show error toast
         return;
       }

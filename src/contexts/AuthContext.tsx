@@ -36,7 +36,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
-          console.error('Error getting session:', error);
+          // Remove console.error for security - log without sensitive details
+          console.warn('Session retrieval failed');
         }
         
         if (isMounted) {
@@ -45,7 +46,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setLoading(false);
         }
       } catch (error) {
-        console.error('Error in getInitialSession:', error);
+        // Remove detailed error logging for security
+        console.warn('Session initialization failed');
         if (isMounted) {
           setLoading(false);
         }
@@ -54,14 +56,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     getInitialSession();
 
-    // Set up auth state listener
+    // Set up auth state listener with security improvements
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.email);
+        // Remove sensitive logging
         if (isMounted) {
           setSession(session);
           setUser(session?.user ?? null);
           setLoading(false);
+          
+          // Improve session security - clear old auth data on sign out
+          if (event === 'SIGNED_OUT') {
+            cleanupAuthState();
+          }
         }
       }
     );
