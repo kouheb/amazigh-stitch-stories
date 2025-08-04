@@ -28,21 +28,14 @@ export const UserFinder = () => {
     setSearchResults([]);
     
     try {
-      console.log('Searching for:', searchQuery);
-      console.log('Current user ID:', user?.id);
-      
       const { data, error } = await supabase
         .from('profiles')
         .select('id, display_name, full_name, email, avatar_url, bio')
         .or(`display_name.ilike.%${searchQuery}%,full_name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`)
         .limit(15);
 
-      console.log('Search results:', data);
-      console.log('Search error:', error);
-
       if (error) {
         toast.error(`Search failed: ${error.message}`);
-        console.error("Search error:", error);
         return;
       }
 
@@ -56,8 +49,8 @@ export const UserFinder = () => {
         toast.info("No users found with that search term");
       }
     } catch (error) {
-      console.error("Unexpected search error:", error);
-      toast.error("Search temporarily unavailable");
+      console.error("Search error:", error);
+      toast.error("Search failed");
       setSearchResults([]);
     } finally {
       setSearching(false);
@@ -66,11 +59,13 @@ export const UserFinder = () => {
 
   const loadAllUsers = async () => {
     setSearching(true);
+    setAllUsers([]);
+    
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('id, display_name, full_name, email, avatar_url, bio')
-        .neq('id', user?.id) // Exclude current user
+        .neq('id', user?.id)
         .limit(20)
         .order('created_at', { ascending: false });
 

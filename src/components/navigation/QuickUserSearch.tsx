@@ -23,9 +23,6 @@ export const QuickUserSearch = () => {
     setResults([]);
     
     try {
-      console.log('Quick searching for:', searchQuery);
-      console.log('Current user ID:', user?.id);
-      
       const { data, error } = await supabase
         .from('profiles')
         .select('id, display_name, full_name, email')
@@ -33,21 +30,11 @@ export const QuickUserSearch = () => {
         .neq('id', user?.id)
         .limit(5);
 
-      console.log('Quick search results:', data);
-      console.log('Quick search error:', error);
-
       if (!error && data) {
         setResults(data);
-        if (data.length === 0) {
-          console.log("No users found in quick search");
-        }
-      } else {
-        console.error("Quick search failed:", error);
-        toast.error("Search failed");
       }
     } catch (error) {
       console.error("Quick search error:", error);
-      toast.error("Search temporarily unavailable");
     } finally {
       setSearching(false);
     }
