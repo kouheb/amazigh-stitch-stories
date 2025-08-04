@@ -431,7 +431,9 @@ export const EventsPage = () => {
   // Handle adding new event
   const handleAddEvent = async (eventData: any) => {
     try {
+      console.log('Starting event creation...');
       const { data: { user } } = await supabase.auth.getUser();
+      console.log('Current user:', user);
       if (!user) {
         toast({
           title: "Authentication required",
@@ -446,6 +448,20 @@ export const EventsPage = () => {
 
       // Set approval status based on user role
       const approvalStatus = isAdmin ? 'approved' : 'pending';
+
+      console.log('Event data to insert:', {
+        title: eventData.title,
+        description: eventData.description,
+        date_time: dateTime.toISOString(),
+        location: eventData.location,
+        category: eventData.category,
+        price: eventData.price || 'Free',
+        organizer: eventData.organizer || 'Community',
+        tags: [eventData.category.charAt(0).toUpperCase() + eventData.category.slice(1)],
+        created_by: user.id,
+        creator_email: user.email,
+        approval_status: approvalStatus
+      });
 
       const { data: newEvent, error } = await supabase
         .from('events')
@@ -466,6 +482,8 @@ export const EventsPage = () => {
         ])
         .select()
         .single();
+      
+      console.log('Insert result:', { data: newEvent, error });
 
       if (error) throw error;
 
