@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { SimpleChatTest } from "@/components/messaging/SimpleChatTest";
+import { RealtimeMessageTest } from "@/components/messaging/RealtimeMessageTest";
 
 
 interface Conversation {
@@ -279,9 +280,10 @@ export const MessagingPage = () => {
                 <p className="text-gray-500">Choose a conversation to start messaging</p>
               </div>
               
-              {/* Test messaging component */}
-              <div className="mt-8">
+              {/* Test messaging components */}
+              <div className="mt-8 space-y-4">
                 <SimpleChatTest />
+                <RealtimeMessageTest />
               </div>
             </div>
           </div>

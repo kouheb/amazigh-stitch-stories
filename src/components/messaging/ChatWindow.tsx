@@ -59,46 +59,54 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
     if (user && recipientId) {
       loadMessages();
       
-      // Set up real-time subscription with improved filtering
+      // Set up simplified real-time subscription
       const channel = supabase
-        .channel(`messages-${user.id}-${recipientId}`)
+        .channel('messages')
         .on(
           'postgres_changes',
           {
             event: 'INSERT',
             schema: 'public',
-            table: 'messages',
-            filter: `or(and(sender_id.eq.${user.id},recipient_id.eq.${recipientId}),and(sender_id.eq.${recipientId},recipient_id.eq.${user.id}))`
+            table: 'messages'
           },
           (payload) => {
-            console.log('Real-time message received:', payload);
+            // Check if this message is relevant to the current conversation
+            const newMessageData = payload.new;
+            const isRelevant = (
+              (newMessageData.sender_id === user.id && newMessageData.recipient_id === recipientId) ||
+              (newMessageData.sender_id === recipientId && newMessageData.recipient_id === user.id)
+            );
             
-            const newMessage: Message = {
-              id: payload.new.id,
-              senderId: payload.new.sender_id,
-              text: payload.new.content,
-              timestamp: new Date(payload.new.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-              isRead: payload.new.is_read,
-              type: payload.new.message_type,
-              fileUrl: payload.new.file_url || undefined,
-              fileName: payload.new.file_name || undefined
-            };
-            
-            console.log('Adding message to chat:', newMessage);
-            setMessageList(prev => {
-              const updated = [...prev, newMessage];
-              console.log('Updated message list:', updated);
-              return updated;
-            });
+            if (isRelevant) {
+              const newMessage: Message = {
+                id: newMessageData.id,
+                senderId: newMessageData.sender_id,
+                text: newMessageData.content,
+                timestamp: new Date(newMessageData.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                isRead: newMessageData.is_read,
+                type: newMessageData.message_type,
+                fileUrl: newMessageData.file_url || undefined,
+                fileName: newMessageData.file_name || undefined
+              };
+              
+              setMessageList(prev => {
+                // Avoid duplicates
+                const exists = prev.some(msg => msg.id === newMessage.id);
+                if (exists) return prev;
+                return [...prev, newMessage];
+              });
+              
+              // Show notification if message is from someone else
+              if (newMessageData.sender_id !== user.id) {
+                toast.success(`New message received!`);
+              }
+            }
           }
         )
-        .subscribe((status) => {
-          console.log('Real-time subscription status:', status);
-        });
+        .subscribe();
 
       // Return cleanup function
       return () => {
-        console.log('Cleaning up real-time subscription');
         supabase.removeChannel(channel);
       };
     }
