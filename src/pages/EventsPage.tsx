@@ -447,7 +447,7 @@ export const EventsPage = () => {
       // Set approval status based on user role
       const approvalStatus = isAdmin ? 'approved' : 'pending';
 
-      const { error } = await supabase
+      const { data: newEvent, error } = await supabase
         .from('events')
         .insert([
           {
@@ -462,9 +462,36 @@ export const EventsPage = () => {
             created_by: user.id,
             approval_status: approvalStatus
           }
-        ]);
+        ])
+        .select()
+        .single();
 
       if (error) throw error;
+
+      // Send notification to admins if event needs approval
+      if (!isAdmin && newEvent) {
+        try {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('full_name')
+            .eq('id', user.id)
+            .single();
+
+          await supabase.functions.invoke('send-event-notification', {
+            body: {
+              eventId: newEvent.id,
+              eventTitle: newEvent.title,
+              eventDescription: newEvent.description,
+              creatorName: profileData?.full_name || 'Unknown User',
+              eventDate: new Date(newEvent.date_time).toLocaleDateString(),
+              eventLocation: newEvent.location || 'No location specified'
+            }
+          });
+        } catch (notificationError) {
+          console.error('Failed to send notification:', notificationError);
+          // Don't fail the event creation if notification fails
+        }
+      }
 
       toast({
         title: "Event created",
