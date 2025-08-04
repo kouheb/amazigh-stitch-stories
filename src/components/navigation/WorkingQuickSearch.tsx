@@ -27,25 +27,37 @@ export const WorkingQuickSearch = () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, email, display_name, full_name, avatar_url')
-        .not('email', 'is', null);
+        .select('id, email, display_name, full_name, avatar_url');
 
       if (error) {
         console.error('Error loading users for quick search:', error);
         return;
       }
 
-      console.log('Raw profiles data:', data);
+      console.log('Raw profiles data (ALL):', data);
+      console.log('Total profiles found:', data?.length || 0);
       
-      // Remove current user if authenticated
-      const otherUsers = user 
-        ? (data || []).filter(profile => profile.id !== user.id)
-        : (data || []);
+      // Log each profile for debugging
+      data?.forEach((profile, index) => {
+        console.log(`Profile ${index + 1}:`, {
+          id: profile.id,
+          email: profile.email,
+          display_name: profile.display_name,
+          full_name: profile.full_name,
+          hasEmail: !!profile.email
+        });
+      });
       
-      setAllUsers(otherUsers);
+      // Filter out profiles without email and current user
+      const filteredUsers = (data || [])
+        .filter(profile => profile.email) // Only include profiles with email
+        .filter(profile => user ? profile.id !== user.id : true); // Remove current user if authenticated
       
-      console.log('Quick search loaded users (after filtering):', otherUsers);
-      console.log('User count:', otherUsers.length);
+      setAllUsers(filteredUsers);
+      
+      console.log('Quick search loaded users (after filtering):', filteredUsers);
+      console.log('Filtered user count:', filteredUsers.length);
+      console.log('Users with emails:', filteredUsers.map(u => u.email));
     } catch (error) {
       console.error('Error loading users for quick search:', error);
     }
