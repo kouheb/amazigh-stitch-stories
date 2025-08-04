@@ -105,8 +105,12 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
   }, [user, recipientId]);
 
   const loadMessages = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('No user found, cannot load messages');
+      return;
+    }
     
+    console.log('Loading messages for user:', user.id, 'recipient:', recipientId);
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -115,9 +119,11 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
         .or(`and(sender_id.eq.${user.id},recipient_id.eq.${recipientId}),and(sender_id.eq.${recipientId},recipient_id.eq.${user.id})`)
         .order('created_at', { ascending: true });
 
+      console.log('Messages query result:', { data, error });
+
       if (error) {
         console.error('Error loading messages:', error);
-        toast.error('Failed to load messages');
+        toast.error(`Failed to load messages: ${error.message}`);
         return;
       }
 
