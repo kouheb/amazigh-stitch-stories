@@ -38,8 +38,14 @@ export const MainApp = () => {
 
         if (error) {
           console.error('Error checking profile:', error);
-          // If profile doesn't exist, consider it incomplete
-          setIsProfileComplete(false);
+          // If there's a network/connection error, allow navigation instead of blocking
+          if (error.message.includes('Failed to fetch') || error.message.includes('fetch')) {
+            console.log('Network error detected, allowing navigation');
+            setIsProfileComplete(true); // Allow navigation despite error
+          } else {
+            // If profile doesn't exist, consider it incomplete
+            setIsProfileComplete(false);
+          }
         } else {
           // Consider profile complete if at least full_name and display_name are filled
           const isComplete = !!(profile?.full_name && profile?.display_name);
@@ -52,7 +58,9 @@ export const MainApp = () => {
         }
       } catch (error) {
         console.error('Error checking profile completion:', error);
-        setIsProfileComplete(false);
+        // On catch errors (like network issues), allow navigation
+        console.log('Caught error, allowing navigation');
+        setIsProfileComplete(true);
       } finally {
         setCheckingProfile(false);
       }
@@ -62,7 +70,10 @@ export const MainApp = () => {
   }, [user]);
 
   const handleTabChange = (tab: string) => {
-    // Prevent navigation away from profile creation if profile is incomplete
+    console.log(`MainApp handleTabChange called with: ${tab}`);
+    console.log(`Current isProfileComplete: ${isProfileComplete}`);
+    
+    // Only prevent navigation if profile is explicitly incomplete (not null or true)
     if (isProfileComplete === false && tab !== "create-profile") {
       console.log("Profile must be completed before navigating");
       return;
