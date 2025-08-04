@@ -11,6 +11,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { SimpleChatTest } from "@/components/messaging/SimpleChatTest";
 
 
 interface Conversation {
@@ -58,15 +59,24 @@ export const MessagingPage = () => {
     
     setLoading(true);
     try {
-      // Get all conversations for the current user
+      // Simplified query with better error handling
       const { data: conversationsData, error: conversationsError } = await supabase
         .from('conversations')
-        .select('*')
+        .select(`
+          id,
+          participant_1_id,
+          participant_2_id,
+          last_message_at,
+          updated_at
+        `)
         .or(`participant_1_id.eq.${user.id},participant_2_id.eq.${user.id}`)
-        .order('updated_at', { ascending: false });
+        .order('updated_at', { ascending: false })
+        .limit(20);
 
       if (conversationsError) {
-        console.error('Error loading conversations:', conversationsError);
+        console.warn('Failed to load conversations');
+        // Set empty conversations to allow manual conversation creation
+        setConversations([]);
         return;
       }
 
@@ -80,15 +90,14 @@ export const MessagingPage = () => {
         [conv.participant_1_id, conv.participant_2_id].filter(id => id !== user.id)
       );
 
-      // Get participant profiles
+      // Get participant profiles with fallback for missing data
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, display_name, full_name, email, avatar_url')
         .in('id', participantIds);
 
       if (profilesError) {
-        console.error('Error loading participant profiles:', profilesError);
-        return;
+        console.warn('Failed to load participant profiles');
       }
 
       const formattedConversations: Conversation[] = conversationsData.map(conv => {
@@ -119,8 +128,9 @@ export const MessagingPage = () => {
         setSelectedConversationId(userId);
       }
     } catch (error) {
-      console.error('Error loading conversations:', error);
-      toast.error('Failed to load conversations');
+      console.warn('Failed to load conversations');
+      // Allow fallback to empty state
+      setConversations([]);
     } finally {
       setLoading(false);
     }
@@ -260,12 +270,19 @@ export const MessagingPage = () => {
           />
         ) : (
           <div className="flex-1 flex items-center justify-center bg-gray-50">
-            <div className="text-center">
+            <div className="text-center space-y-6">
               <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Search className="h-8 w-8 text-gray-400" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No conversation selected</h3>
-              <p className="text-gray-500">Choose a conversation to start messaging</p>
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No conversation selected</h3>
+                <p className="text-gray-500">Choose a conversation to start messaging</p>
+              </div>
+              
+              {/* Test messaging component */}
+              <div className="mt-8">
+                <SimpleChatTest />
+              </div>
             </div>
           </div>
         )}

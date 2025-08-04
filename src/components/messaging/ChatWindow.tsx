@@ -106,28 +106,34 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
 
   const loadMessages = async () => {
     if (!user) {
-      console.log('No user found, cannot load messages');
       return;
     }
     
-    console.log('Loading messages for user:', user.id, 'recipient:', recipientId);
     setLoading(true);
     try {
       const { data, error } = await supabase
         .from('messages')
-        .select('*')
+        .select(`
+          id,
+          sender_id,
+          content,
+          created_at,
+          is_read,
+          message_type,
+          file_url,
+          file_name
+        `)
         .or(`and(sender_id.eq.${user.id},recipient_id.eq.${recipientId}),and(sender_id.eq.${recipientId},recipient_id.eq.${user.id})`)
-        .order('created_at', { ascending: true });
-
-      console.log('Messages query result:', { data, error });
+        .order('created_at', { ascending: true })
+        .limit(100);
 
       if (error) {
-        console.error('Error loading messages:', error);
-        toast.error(`Failed to load messages: ${error.message}`);
+        console.warn('Failed to load messages');
+        setMessageList([]);
         return;
       }
 
-      const formattedMessages: Message[] = data.map(msg => ({
+      const formattedMessages: Message[] = (data || []).map(msg => ({
         id: msg.id,
         senderId: msg.sender_id,
         text: msg.content,
@@ -140,8 +146,8 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
 
       setMessageList(formattedMessages);
     } catch (error) {
-      console.error('Error loading messages:', error);
-      toast.error('Failed to load messages');
+      console.warn('Failed to load messages');
+      setMessageList([]);
     } finally {
       setLoading(false);
     }
@@ -167,12 +173,12 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
         .single();
 
       if (messageError) {
-        console.error('Error sending message:', messageError);
+        console.warn('Failed to send message');
         toast.error('Failed to send message');
         return;
       }
 
-      // Send email notification
+      // Optionally send email notification (don't let failures block the message)
       try {
         const { data: senderProfile } = await supabase
           .from('profiles')
@@ -190,13 +196,12 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
           }
         });
       } catch (emailError) {
-        console.error('Failed to send email notification:', emailError);
         // Don't show error to user as message was sent successfully
       }
 
       toast.success("Message sent!");
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.warn('Failed to send message');
       toast.error('Failed to send message');
     }
   };
