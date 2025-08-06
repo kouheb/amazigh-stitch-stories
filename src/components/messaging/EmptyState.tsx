@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { MessageCircle, Users } from "lucide-react";
-import { QuickUserSearch } from "@/components/navigation/QuickUserSearch";
+import { UserSearchSystem } from "@/components/navigation/UserSearchSystem";
 
 interface EmptyStateProps {
   onStartConversation?: (userId: string) => void;
@@ -18,10 +18,11 @@ export const EmptyState = ({ onStartConversation }: EmptyStateProps) => {
         Choose an existing conversation from the sidebar or start a new one by searching for a user.
       </p>
       
-      <div className="w-full max-w-sm mb-4">
-        <QuickUserSearch 
+      <div className="w-full max-w-md mb-4">
+        <UserSearchSystem 
           onSelectUser={onStartConversation}
           placeholder="Search users to start chatting..."
+          showProfileButton={false}
         />
       </div>
       
