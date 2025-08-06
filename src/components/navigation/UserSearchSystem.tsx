@@ -189,7 +189,7 @@ export const UserSearchSystem = ({
     } catch (error) {
       console.error('Error searching users:', error);
       
-      // Enhanced retry logic
+      // Only retry and show error for actual network errors, not normal empty results
       if ((error instanceof Error && (error.message?.includes('Failed to fetch') || error.message?.includes('NetworkError') || error.message?.includes('timeout'))) && retryCount < 3) {
         const delay = Math.pow(2, retryCount) * 1000;
         console.log(`Retrying search... (attempt ${retryCount + 1}) in ${delay}ms`);
@@ -197,7 +197,10 @@ export const UserSearchSystem = ({
         return;
       }
       
-      toast.error('Network connection problem. Please refresh the page and try again.');
+      // Only show network error for actual connection issues
+      if (error instanceof Error && (error.message?.includes('Failed to fetch') || error.message?.includes('NetworkError'))) {
+        toast.error('Network connection problem. Please check your internet and try again.');
+      }
       setResults([]);
     } finally {
       setSearching(false);
