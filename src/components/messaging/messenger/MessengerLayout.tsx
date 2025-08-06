@@ -38,14 +38,14 @@ export const MessengerLayout = ({
   const sendMessage = messagingHook?.sendMessage || (async () => false);
   const markAsRead = messagingHook?.markAsRead || (async () => {});
   
-  // Check if this is a mock conversation (offline mode)
+  // Check if this is a mock conversation (offline mode) - kept for backward compatibility
   const isMockConversation = selectedConversationId?.startsWith('mock-');
   const mockUserId = isMockConversation ? selectedConversationId?.replace('mock-', '') : null;
   
   const { conversation, loading: conversationLoading } = useConversation(isMockConversation ? null : selectedConversationId);
   const { user } = useAuth();
 
-  // Create mock conversation for offline mode with message tracking
+  // Create mock conversation for offline mode with message tracking (kept for fallback)
   const [mockMessages, setMockMessages] = useState<Message[]>([]);
   
   const mockConversation = isMockConversation && mockUserId ? {
@@ -66,7 +66,7 @@ export const MessengerLayout = ({
     messages: mockMessages
   } : null;
 
-  // Listen for mock message events and initialize with welcome message
+  // Listen for mock message events and initialize with welcome message (kept for fallback)
   useEffect(() => {
     const handleMockMessage = (event: CustomEvent) => {
       const { message, conversationId } = event.detail;
@@ -75,7 +75,7 @@ export const MessengerLayout = ({
       }
     };
 
-    // Initialize mock conversation with a welcome message
+    // Initialize mock conversation with a welcome message only if it's actually a mock conversation
     if (isMockConversation && mockMessages.length === 0) {
       const welcomeMessage = {
         id: `welcome-${Date.now()}`,
@@ -95,7 +95,7 @@ export const MessengerLayout = ({
     };
   }, [selectedConversationId, isMockConversation, mockUserId, mockMessages.length]);
 
-  // Use real conversation or mock conversation
+  // Use real conversation or mock conversation as fallback
   const activeConversation = conversation || mockConversation;
 
   const handleSelectConversation = (conversationId: string) => {

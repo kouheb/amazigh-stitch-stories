@@ -160,11 +160,13 @@ export const useMessaging = () => {
     }
   }, [user]);
 
-  // Create or get existing conversation with another user
-  const getOrCreateConversation = useCallback(async (otherUserId: string): Promise<string | null> => {
+  // Create or get existing conversation with better error handling
+  const getOrCreateConversation = useCallback(async (otherUserId: string, retryCount = 0): Promise<string | null> => {
     if (!user) return null;
 
     try {
+      console.log(`Attempting to get/create conversation with user ${otherUserId} (attempt ${retryCount + 1})`);
+      
       // Check if conversation already exists - use maybeSingle to avoid errors when no rows found
       const { data: existingConv, error: findError } = await supabase
         .from('conversations')
@@ -176,13 +178,22 @@ export const useMessaging = () => {
 
       if (findError) {
         console.error('Error finding conversation:', findError);
+        
+        // Retry on network errors
+        if ((findError.message?.includes('Failed to fetch') || findError.message?.includes('NetworkError')) && retryCount < 2) {
+          console.log(`Retrying conversation lookup... (attempt ${retryCount + 1})`);
+          await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+          return getOrCreateConversation(otherUserId, retryCount + 1);
+        }
         return null;
       }
 
       if (existingConv) {
+        console.log('Found existing conversation:', existingConv.id);
         return existingConv.id;
       }
 
+      console.log('Creating new conversation...');
       // Create new conversation
       const { data: newConv, error: createError } = await supabase
         .from('conversations')
@@ -194,8 +205,11 @@ export const useMessaging = () => {
         .single();
 
       if (createError) {
+        console.error('Error creating conversation:', createError);
+        
         // If it's a duplicate key error, try to find the conversation again
         if (createError.code === '23505') {
+          console.log('Duplicate conversation detected, searching again...');
           const { data: retryConv } = await supabase
             .from('conversations')
             .select('id')
@@ -207,17 +221,34 @@ export const useMessaging = () => {
           return retryConv?.id || null;
         }
         
-        console.error('Error creating conversation:', createError);
-        toast.error('Failed to create conversation');
+        // Retry on network errors
+        if ((createError.message?.includes('Failed to fetch') || createError.message?.includes('NetworkError')) && retryCount < 2) {
+          console.log(`Retrying conversation creation... (attempt ${retryCount + 1})`);
+          await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+          return getOrCreateConversation(otherUserId, retryCount + 1);
+        }
+        
         return null;
       }
 
+      console.log('Successfully created conversation:', newConv.id);
+      // Reload conversations to update the UI
+      setTimeout(() => loadConversations(), 500);
       return newConv.id;
+      
     } catch (error) {
       console.error('Error getting/creating conversation:', error);
+      
+      // Retry on network errors
+      if (error instanceof Error && (error.message?.includes('Failed to fetch') || error.message?.includes('NetworkError')) && retryCount < 2) {
+        console.log(`Retrying conversation operation... (attempt ${retryCount + 1})`);
+        await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+        return getOrCreateConversation(otherUserId, retryCount + 1);
+      }
+      
       return null;
     }
-  }, [user]);
+  }, [user, loadConversations]);
 
   // Send a message
   const sendMessage = useCallback(async (
@@ -256,6 +287,7 @@ export const useMessaging = () => {
     }
 
     try {
+      console.log('Sending real message to conversation:', conversationId);
       const { error } = await supabase
         .from('messages')
         .insert({
@@ -269,12 +301,15 @@ export const useMessaging = () => {
 
       if (error) {
         console.error('Error sending message:', error);
-        toast.error('Failed to send message due to connection issues');
+        toast.error('Failed to send message. Please try again.');
         return false;
       }
 
+      console.log('Message sent successfully');
+      toast.success('Message sent!');
+      
       // Reload conversations to update UI
-      loadConversations();
+      setTimeout(() => loadConversations(), 200);
       return true;
     } catch (error) {
       console.error('Error sending message:', error);
@@ -320,6 +355,7 @@ export const useMessaging = () => {
     if (!user) return;
 
     const channelName = `messaging-list-${user.id}`;
+    console.log('Setting up real-time messaging subscription for user:', user.id);
     
     // Remove any existing channels completely before creating new ones
     const cleanup = async () => {
@@ -356,9 +392,10 @@ export const useMessaging = () => {
             schema: 'public',
             table: 'messages'
           },
-          () => {
-            console.log('New message detected, reloading conversations');
-            loadConversations();
+          (payload) => {
+            console.log('New message detected:', payload);
+            // Reload conversations to show new message immediately
+            setTimeout(() => loadConversations(), 100);
           }
         )
         .on(
@@ -368,15 +405,31 @@ export const useMessaging = () => {
             schema: 'public',
             table: 'messages'
           },
-          () => {
-            console.log('Message updated, reloading conversations');
-            loadConversations();
+          (payload) => {
+            console.log('Message updated:', payload);
+            // Reload conversations to update message status
+            setTimeout(() => loadConversations(), 100);
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'conversations'
+          },
+          (payload) => {
+            console.log('New conversation detected:', payload);
+            // Reload conversations to show new conversation
+            setTimeout(() => loadConversations(), 100);
           }
         )
         .subscribe((status) => {
           console.log('Messaging subscription status:', status);
           if (status === 'CHANNEL_ERROR') {
             console.error('Real-time messaging subscription failed');
+          } else if (status === 'SUBSCRIBED') {
+            console.log('Real-time messaging successfully subscribed');
           }
         });
 
@@ -390,6 +443,7 @@ export const useMessaging = () => {
 
     return () => {
       if (channel) {
+        console.log('Cleaning up messaging subscription');
         channel.unsubscribe().then(() => {
           supabase.removeChannel(channel);
         });
@@ -397,8 +451,9 @@ export const useMessaging = () => {
     };
   }, [user?.id, loadConversations]);
 
-  // Load conversations on mount
+  // Load conversations on mount and refresh
   useEffect(() => {
+    console.log('Loading conversations on mount or user change');
     loadConversations();
   }, [loadConversations]);
 

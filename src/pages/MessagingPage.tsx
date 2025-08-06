@@ -27,21 +27,14 @@ export default function MessagingPage() {
         console.log('Conversation created/found:', conversationId);
         // Update URL to remove user parameter and add conversation
         navigate(`/messaging?conversation=${conversationId}`, { replace: true });
+        toast.success('Conversation started successfully!');
       } else {
         console.error('Failed to get conversation ID');
-        // Fallback: create a mock conversation ID for UI purposes
-        const fallbackConversationId = `mock-${targetUserId}`;
-        console.log('Using fallback conversation ID:', fallbackConversationId);
-        navigate(`/messaging?conversation=${fallbackConversationId}`, { replace: true });
-        toast.info('Starting conversation (limited functionality due to connection issues)');
+        toast.error('Failed to start conversation. Please try again.');
       }
     } catch (error) {
       console.error('Error starting conversation:', error);
-      // Fallback: create a mock conversation ID for UI purposes
-      const fallbackConversationId = `mock-${targetUserId}`;
-      console.log('Using fallback conversation ID due to error:', fallbackConversationId);
-      navigate(`/messaging?conversation=${fallbackConversationId}`, { replace: true });
-      toast.warning('Conversation started in offline mode. Some features may be limited.');
+      toast.error('Failed to start conversation. Please try again.');
     }
   };
 
