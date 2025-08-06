@@ -231,7 +231,7 @@ export const useMessaging = () => {
     if (!user) return;
 
     const channel = supabase
-      .channel('messaging-realtime')
+      .channel(`messaging-realtime-${user.id}`)
       .on(
         'postgres_changes',
         {
@@ -259,7 +259,7 @@ export const useMessaging = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, loadConversations]);
+  }, [user?.id]); // Only depend on user.id, not the entire loadConversations function
 
   // Load conversations on mount
   useEffect(() => {
