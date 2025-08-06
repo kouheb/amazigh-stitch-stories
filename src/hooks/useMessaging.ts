@@ -25,7 +25,7 @@ export const useMessaging = () => {
     }
 
     try {
-      // Get all conversations for the user (without requiring messages)
+      // Get all conversations for the user with better error handling
       const { data: conversationsData, error } = await supabase
         .from('conversations')
         .select('*')
@@ -42,58 +42,94 @@ export const useMessaging = () => {
           return;
         }
         
-        toast.error('Failed to load conversations. Please check your connection.');
+        // If we can't load conversations, show empty state instead of error
+        console.log('Using empty conversation list due to connection issues');
+        setConversations([]);
+        setUnreadCount(0);
         setLoading(false);
         return;
       }
 
-      // Process conversations to get other participant info
+      if (!conversationsData || conversationsData.length === 0) {
+        console.log('No conversations found');
+        setConversations([]);
+        setUnreadCount(0);
+        setLoading(false);
+        return;
+      }
+
+      // Process conversations with better error handling
       const processedConversations: Conversation[] = [];
       
-      for (const conv of conversationsData || []) {
-        const otherParticipantId = conv.participant_1_id === user.id 
-          ? conv.participant_2_id 
-          : conv.participant_1_id;
+      for (const conv of conversationsData) {
+        try {
+          const otherParticipantId = conv.participant_1_id === user.id 
+            ? conv.participant_2_id 
+            : conv.participant_1_id;
 
-        // Get other participant profile
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('id, display_name, full_name, email, avatar_url')
-          .eq('id', otherParticipantId)
-          .maybeSingle();
+          // Get other participant profile with timeout and error handling
+          const profilePromise = supabase
+            .from('profiles')
+            .select('id, display_name, full_name, email, avatar_url')
+            .eq('id', otherParticipantId)
+            .maybeSingle();
 
-        // Get last message for this conversation
-        const { data: lastMessage } = await supabase
-          .from('messages')
-          .select('*')
-          .eq('conversation_id', conv.id)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
-          
-        // Type assertion to ensure correct message_type
-        const typedLastMessage = lastMessage ? {
-          ...lastMessage,
-          message_type: lastMessage.message_type as 'text' | 'image' | 'file'
-        } : undefined;
+          // Get last message with timeout and error handling
+          const messagePromise = supabase
+            .from('messages')
+            .select('*')
+            .eq('conversation_id', conv.id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
 
-        // Count unread messages
-        const { count: unreadCount } = await supabase
-          .from('messages')
-          .select('id', { count: 'exact' })
-          .eq('conversation_id', conv.id)
-          .eq('is_read', false)
-          .neq('sender_id', user.id);
+          // Get unread count with error handling
+          const unreadPromise = supabase
+            .from('messages')
+            .select('id', { count: 'exact' })
+            .eq('conversation_id', conv.id)
+            .eq('is_read', false)
+            .neq('sender_id', user.id);
 
-        processedConversations.push({
-          ...conv,
-          other_participant: profile || {
-            id: otherParticipantId,
-            email: 'Unknown User'
-          },
-          last_message: typedLastMessage,
-          unread_count: unreadCount || 0
-        });
+          // Execute all queries with a timeout
+          const results = await Promise.allSettled([
+            Promise.race([profilePromise, new Promise((_, reject) => setTimeout(() => reject(new Error('Profile timeout')), 5000))]),
+            Promise.race([messagePromise, new Promise((_, reject) => setTimeout(() => reject(new Error('Message timeout')), 5000))]),
+            Promise.race([unreadPromise, new Promise((_, reject) => setTimeout(() => reject(new Error('Unread timeout')), 5000))])
+          ]);
+
+          // Extract results with fallbacks
+          const profileResult = results[0];
+          const messageResult = results[1];
+          const unreadResult = results[2];
+
+          const profile = profileResult.status === 'fulfilled' && (profileResult.value as any)?.data ? 
+            (profileResult.value as any).data : {
+              id: otherParticipantId,
+              email: 'Unknown User',
+              display_name: 'Unknown'
+            };
+
+          const lastMessage = messageResult.status === 'fulfilled' && (messageResult.value as any)?.data ? {
+            ...(messageResult.value as any).data,
+            message_type: (messageResult.value as any).data.message_type as 'text' | 'image' | 'file'
+          } : undefined;
+
+          const unreadCount = unreadResult.status === 'fulfilled' ? 
+            ((unreadResult.value as any)?.count || 0) : 0;
+
+          processedConversations.push({
+            ...conv,
+            other_participant: profile,
+            last_message: lastMessage,
+            unread_count: unreadCount
+          });
+
+        } catch (error) {
+          console.error('Error processing conversation:', conv.id, error);
+          // Continue with next conversation instead of failing entirely
+          continue;
+        }
       }
 
       setConversations(processedConversations);
@@ -115,7 +151,10 @@ export const useMessaging = () => {
         return;
       }
       
-      toast.error('Connection error. Please check your internet and try again.');
+      // Show empty state instead of error
+      console.log('Using empty conversation list due to connection error');
+      setConversations([]);
+      setUnreadCount(0);
     } finally {
       setLoading(false);
     }
