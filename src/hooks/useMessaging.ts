@@ -250,55 +250,87 @@ export const useMessaging = () => {
     }
   }, [user, conversations]);
 
-  // Set up real-time subscriptions - only once per user
+  // Set up real-time subscriptions - only once per user with proper cleanup
   useEffect(() => {
     if (!user) return;
 
     const channelName = `messaging-list-${user.id}`;
     
-    // Clean up any existing channels with similar names
-    const existingChannels = supabase.getChannels();
-    existingChannels.forEach(ch => {
-      if (ch.topic.startsWith(`messaging-list-${user.id}`)) {
+    // Remove any existing channels completely before creating new ones
+    const cleanup = async () => {
+      const existingChannels = supabase.getChannels();
+      const matchingChannels = existingChannels.filter(ch => 
+        ch.topic.includes(`messaging-list-${user.id}`)
+      );
+      
+      // Unsubscribe and remove existing channels
+      for (const ch of matchingChannels) {
+        await ch.unsubscribe();
         supabase.removeChannel(ch);
       }
+      
+      // Wait a bit to ensure cleanup is complete
+      await new Promise(resolve => setTimeout(resolve, 100));
+    };
+
+    const setupChannel = async () => {
+      await cleanup();
+      
+      const channel = supabase
+        .channel(channelName, {
+          config: {
+            presence: {
+              key: user.id,
+            },
+          },
+        })
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'messages'
+          },
+          () => {
+            console.log('New message detected, reloading conversations');
+            loadConversations();
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'messages'
+          },
+          () => {
+            console.log('Message updated, reloading conversations');
+            loadConversations();
+          }
+        )
+        .subscribe((status) => {
+          console.log('Messaging subscription status:', status);
+          if (status === 'CHANNEL_ERROR') {
+            console.error('Real-time messaging subscription failed');
+          }
+        });
+
+      return channel;
+    };
+
+    let channel: any;
+    setupChannel().then(ch => {
+      channel = ch;
     });
 
-    const channel = supabase
-      .channel(channelName)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages'
-        },
-        () => {
-          loadConversations();
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'messages'
-        },
-        () => {
-          loadConversations();
-        }
-      )
-      .subscribe((status) => {
-        console.log('Messaging subscription status:', status);
-        if (status === 'CHANNEL_ERROR') {
-          console.error('Real-time messaging subscription failed');
-        }
-      });
-
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) {
+        channel.unsubscribe().then(() => {
+          supabase.removeChannel(channel);
+        });
+      }
     };
-  }, [user?.id]); // Only depend on user.id
+  }, [user?.id, loadConversations]);
 
   // Load conversations on mount
   useEffect(() => {
@@ -406,53 +438,84 @@ export const useConversation = (conversationId: string | null) => {
     }
   }, [conversationId, user]);
 
-  // Set up real-time subscription for this conversation
+  // Set up real-time subscription for this conversation with proper cleanup
   useEffect(() => {
     if (!conversationId) return;
 
     const channelName = `conversation-detail-${conversationId}`;
     
-    // Clean up any existing channels for this conversation
-    const existingChannels = supabase.getChannels();
-    existingChannels.forEach(ch => {
-      if (ch.topic.startsWith(`conversation-detail-${conversationId}`)) {
+    // Remove any existing channels completely before creating new ones
+    const cleanup = async () => {
+      const existingChannels = supabase.getChannels();
+      const matchingChannels = existingChannels.filter(ch => 
+        ch.topic.includes(`conversation-detail-${conversationId}`)
+      );
+      
+      // Unsubscribe and remove existing channels
+      for (const ch of matchingChannels) {
+        await ch.unsubscribe();
         supabase.removeChannel(ch);
       }
+      
+      // Wait a bit to ensure cleanup is complete
+      await new Promise(resolve => setTimeout(resolve, 100));
+    };
+
+    const setupChannel = async () => {
+      await cleanup();
+      
+      const channel = supabase
+        .channel(channelName, {
+          config: {
+            presence: {
+              key: conversationId,
+            },
+          },
+        })
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'messages',
+            filter: `conversation_id=eq.${conversationId}`
+          },
+          (payload) => {
+            console.log('New message in conversation:', payload);
+            setConversation(prev => {
+              if (!prev) return prev;
+              const newMessage = {
+                ...payload.new,
+                message_type: payload.new.message_type as 'text' | 'image' | 'file'
+              } as Message;
+              return {
+                ...prev,
+                messages: [...prev.messages, newMessage]
+              };
+            });
+          }
+        )
+        .subscribe((status) => {
+          console.log('Conversation subscription status:', status);
+          if (status === 'CHANNEL_ERROR') {
+            console.error('Real-time conversation subscription failed');
+          }
+        });
+
+      return channel;
+    };
+
+    let channel: any;
+    setupChannel().then(ch => {
+      channel = ch;
     });
 
-    const channel = supabase
-      .channel(channelName)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-          filter: `conversation_id=eq.${conversationId}`
-        },
-        (payload) => {
-          setConversation(prev => {
-            if (!prev) return prev;
-            const newMessage = {
-              ...payload.new,
-              message_type: payload.new.message_type as 'text' | 'image' | 'file'
-            } as Message;
-            return {
-              ...prev,
-              messages: [...prev.messages, newMessage]
-            };
-          });
-        }
-      )
-      .subscribe((status) => {
-        console.log('Conversation subscription status:', status);
-        if (status === 'CHANNEL_ERROR') {
-          console.error('Real-time conversation subscription failed');
-        }
-      });
-
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) {
+        channel.unsubscribe().then(() => {
+          supabase.removeChannel(channel);
+        });
+      }
     };
   }, [conversationId]);
 
