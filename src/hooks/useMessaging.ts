@@ -190,6 +190,13 @@ export const useMessaging = () => {
   ): Promise<boolean> => {
     if (!user) return false;
 
+    // Handle mock conversations (offline mode)
+    if (conversationId.startsWith('mock-')) {
+      console.log('Attempting to send message in mock conversation:', conversationId);
+      toast.info('Message sending is unavailable due to connection issues. Please try again when online.');
+      return false;
+    }
+
     try {
       const { error } = await supabase
         .from('messages')
@@ -204,7 +211,7 @@ export const useMessaging = () => {
 
       if (error) {
         console.error('Error sending message:', error);
-        toast.error('Failed to send message');
+        toast.error('Failed to send message due to connection issues');
         return false;
       }
 
@@ -213,7 +220,7 @@ export const useMessaging = () => {
       return true;
     } catch (error) {
       console.error('Error sending message:', error);
-      toast.error('Failed to send message');
+      toast.error('Failed to send message. Please check your connection and try again.');
       return false;
     }
   }, [user, loadConversations]);
