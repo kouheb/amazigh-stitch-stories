@@ -37,7 +37,31 @@ export const MessengerLayout = ({
   const sendMessage = messagingHook?.sendMessage || (async () => false);
   const markAsRead = messagingHook?.markAsRead || (async () => {});
   
-  const { conversation, loading: conversationLoading } = useConversation(selectedConversationId);
+  // Check if this is a mock conversation (offline mode)
+  const isMockConversation = selectedConversationId?.startsWith('mock-');
+  const mockUserId = isMockConversation ? selectedConversationId?.replace('mock-', '') : null;
+  
+  const { conversation, loading: conversationLoading } = useConversation(isMockConversation ? null : selectedConversationId);
+
+  // Create mock conversation for offline mode
+  const mockConversation = isMockConversation && mockUserId ? {
+    id: selectedConversationId,
+    participant_1_id: 'current-user',
+    participant_2_id: mockUserId,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    last_message_at: null,
+    last_message_id: null,
+    other_participant: {
+      id: mockUserId,
+      display_name: mockUserId === 'a990b02c-5913-4bdf-9609-68dee14cdd2d' ? 'BRILYSM' : 'User',
+      email: mockUserId === 'a990b02c-5913-4bdf-9609-68dee14cdd2d' ? 'nabilguellil0@gmail.com' : 'user@email.com'
+    },
+    messages: []
+  } : null;
+
+  // Use real conversation or mock conversation
+  const activeConversation = conversation || mockConversation;
 
   const handleSelectConversation = (conversationId: string) => {
     onSelectConversation(conversationId);
@@ -57,11 +81,11 @@ export const MessengerLayout = ({
 
   // Mobile layout: show either list or chat
   if (isMobile) {
-    if (selectedConversationId && conversation) {
+    if (selectedConversationId && activeConversation) {
       return (
         <div className="h-full">
           <MessengerChat
-            conversation={conversation}
+            conversation={activeConversation}
             onSendMessage={handleSendMessage}
             onBack={handleBackToList}
             showBackButton={true}
@@ -97,9 +121,9 @@ export const MessengerLayout = ({
 
       {/* Chat area */}
       <div className="flex-1">
-        {selectedConversationId && conversation ? (
+        {selectedConversationId && activeConversation ? (
           <MessengerChat
-            conversation={conversation}
+            conversation={activeConversation}
             onSendMessage={handleSendMessage}
           />
         ) : (
