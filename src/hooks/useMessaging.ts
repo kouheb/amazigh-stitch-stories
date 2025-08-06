@@ -18,17 +18,12 @@ export const useMessaging = () => {
     }
 
     try {
-      // Get conversations with participant info and last message
+      // Get all conversations for the user (without requiring messages)
       const { data: conversationsData, error } = await supabase
         .from('conversations')
-        .select(`
-          *,
-          messages!inner(
-            id, content, sender_id, created_at, is_read, message_type
-          )
-        `)
+        .select('*')
         .or(`participant_1_id.eq.${user.id},participant_2_id.eq.${user.id}`)
-        .order('last_message_at', { ascending: false });
+        .order('last_message_at', { ascending: false, nullsFirst: false });
 
       if (error) {
         console.error('Error loading conversations:', error);
@@ -49,7 +44,7 @@ export const useMessaging = () => {
           .from('profiles')
           .select('id, display_name, full_name, email, avatar_url')
           .eq('id', otherParticipantId)
-          .single();
+          .maybeSingle();
 
         // Get last message for this conversation
         const { data: lastMessage } = await supabase
@@ -58,7 +53,7 @@ export const useMessaging = () => {
           .eq('conversation_id', conv.id)
           .order('created_at', { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle();
           
         // Type assertion to ensure correct message_type
         const typedLastMessage = lastMessage ? {
@@ -317,7 +312,7 @@ export const useConversation = (conversationId: string | null) => {
         .from('profiles')
         .select('id, display_name, full_name, email, avatar_url')
         .eq('id', otherParticipantId)
-        .single();
+        .maybeSingle();
 
       // Get messages
       const { data: messages, error: messagesError } = await supabase
