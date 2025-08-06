@@ -17,6 +17,13 @@ export const useMessaging = () => {
       return;
     }
 
+    // Check connection status
+    if (!navigator.onLine) {
+      toast.error('You are offline. Please check your internet connection.');
+      setLoading(false);
+      return;
+    }
+
     try {
       // Get all conversations for the user (without requiring messages)
       const { data: conversationsData, error } = await supabase
@@ -29,13 +36,14 @@ export const useMessaging = () => {
         console.error('Error loading conversations:', error);
         
         // Retry on network errors
-        if (error.message?.includes('Failed to fetch') && retryCount < 2) {
+        if ((error.message?.includes('Failed to fetch') || error.message?.includes('NetworkError')) && retryCount < 2) {
           console.log(`Retrying conversation load... (attempt ${retryCount + 1})`);
-          setTimeout(() => loadConversations(retryCount + 1), 1000 * (retryCount + 1));
+          setTimeout(() => loadConversations(retryCount + 1), 2000 * (retryCount + 1));
           return;
         }
         
         toast.error('Failed to load conversations. Please check your connection.');
+        setLoading(false);
         return;
       }
 
@@ -101,13 +109,13 @@ export const useMessaging = () => {
       console.error('Error loading conversations:', error);
       
       // Retry on network errors
-      if (error instanceof Error && error.message?.includes('Failed to fetch') && retryCount < 2) {
+      if (error instanceof Error && (error.message?.includes('Failed to fetch') || error.message?.includes('NetworkError')) && retryCount < 2) {
         console.log(`Retrying conversation load... (attempt ${retryCount + 1})`);
-        setTimeout(() => loadConversations(retryCount + 1), 1000 * (retryCount + 1));
+        setTimeout(() => loadConversations(retryCount + 1), 2000 * (retryCount + 1));
         return;
       }
       
-      toast.error('Network error loading conversations. Please try again.');
+      toast.error('Connection error. Please check your internet and try again.');
     } finally {
       setLoading(false);
     }
@@ -327,9 +335,9 @@ export const useConversation = (conversationId: string | null) => {
         console.error('Error loading conversation:', convError);
         
         // Retry on network errors
-        if (convError.message?.includes('Failed to fetch') && retryCount < 2) {
+        if ((convError.message?.includes('Failed to fetch') || convError.message?.includes('NetworkError')) && retryCount < 2) {
           console.log(`Retrying conversation detail load... (attempt ${retryCount + 1})`);
-          setTimeout(() => loadConversation(retryCount + 1), 1000 * (retryCount + 1));
+          setTimeout(() => loadConversation(retryCount + 1), 2000 * (retryCount + 1));
           return;
         }
         
@@ -381,13 +389,13 @@ export const useConversation = (conversationId: string | null) => {
       console.error('Error loading conversation:', error);
       
       // Retry on network errors
-      if (error instanceof Error && error.message?.includes('Failed to fetch') && retryCount < 2) {
+      if (error instanceof Error && (error.message?.includes('Failed to fetch') || error.message?.includes('NetworkError')) && retryCount < 2) {
         console.log(`Retrying conversation detail load... (attempt ${retryCount + 1})`);
-        setTimeout(() => loadConversation(retryCount + 1), 1000 * (retryCount + 1));
+        setTimeout(() => loadConversation(retryCount + 1), 2000 * (retryCount + 1));
         return;
       }
       
-      toast.error('Network error loading conversation. Please try again.');
+      toast.error('Connection error. Please check your internet and try again.');
     } finally {
       setLoading(false);
     }
