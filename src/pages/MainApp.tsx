@@ -6,7 +6,7 @@ import { NetworkPage } from "./NetworkPage";
 import { LearningPage } from "./LearningPage";
 import { EventsPage } from "./EventsPage";
 import { ProfilePage } from "./ProfilePage";
-import { MessagingPage } from "./MessagingPage";
+import MessagingPage from "./MessagingPage";
 import { MarketplacePage } from "./MarketplacePage";
 import { TestingPage } from "./TestingPage";
 import { ArtisanDashboard } from "@/components/dashboard/ArtisanDashboard";

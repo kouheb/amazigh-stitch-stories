@@ -10,7 +10,7 @@ export const useGlobalMessaging = () => {
   useEffect(() => {
     if (!user) return;
 
-    // Set up global real-time listener for messages
+    // Set up global real-time listener for new messages
     const channel = supabase
       .channel('global-messages')
       .on(
@@ -20,52 +20,51 @@ export const useGlobalMessaging = () => {
           schema: 'public',
           table: 'messages'
         },
-        (payload) => {
+        async (payload) => {
           const newMessage = payload.new;
           
+          // Get the conversation to check if current user is a participant
+          const { data: conversation } = await supabase
+            .from('conversations')
+            .select('participant_1_id, participant_2_id')
+            .eq('id', newMessage.conversation_id)
+            .single();
+
+          if (!conversation) return;
+
           // Only show notifications for messages received by current user
-          if (newMessage.recipient_id === user.id && newMessage.sender_id !== user.id) {
+          const isRecipient = (conversation.participant_1_id === user.id && newMessage.sender_id !== user.id) ||
+                             (conversation.participant_2_id === user.id && newMessage.sender_id !== user.id);
+
+          if (isRecipient) {
             // Get sender info for notification
-            supabase
+            const { data: senderProfile } = await supabase
               .from('profiles')
               .select('display_name, full_name, email')
               .eq('id', newMessage.sender_id)
-              .single()
-              .then(({ data: senderProfile }) => {
-                const senderName = senderProfile?.display_name || 
-                                 senderProfile?.full_name || 
-                                 senderProfile?.email || 
-                                 'Someone';
-                
-                toast.success(`New message from ${senderName}`, {
-                  description: newMessage.content.substring(0, 50) + (newMessage.content.length > 50 ? '...' : ''),
-                  action: {
-                    label: 'View',
-                    onClick: () => {
-                      window.location.href = `/messaging?user=${newMessage.sender_id}`;
-                    }
-                  }
-                });
-              }, () => {
-                toast.success('New message received!', {
-                  description: newMessage.content.substring(0, 50) + (newMessage.content.length > 50 ? '...' : ''),
-                  action: {
-                    label: 'View',
-                    onClick: () => {
-                      window.location.href = `/messaging?user=${newMessage.sender_id}`;
-                    }
-                  }
-                });
-              });
+              .single();
+
+            const senderName = senderProfile?.display_name || 
+                             senderProfile?.full_name || 
+                             senderProfile?.email || 
+                             'Someone';
+            
+            toast.success(`New message from ${senderName}`, {
+              description: newMessage.content.substring(0, 50) + (newMessage.content.length > 50 ? '...' : ''),
+              action: {
+                label: 'View',
+                onClick: () => {
+                  window.location.href = `/messaging?conversation=${newMessage.conversation_id}`;
+                }
+              }
+            });
 
             // Update unread count
             setUnreadCount(prev => prev + 1);
           }
         }
       )
-      .subscribe((status) => {
-        console.log('Global messaging status:', status);
-      });
+      .subscribe();
 
     // Load initial unread count
     loadUnreadCount();
@@ -79,29 +78,43 @@ export const useGlobalMessaging = () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
-        .from('messages')
+      // Get all conversations for this user
+      const { data: conversations } = await supabase
+        .from('conversations')
         .select('id')
-        .eq('recipient_id', user.id)
-        .eq('is_read', false);
+        .or(`participant_1_id.eq.${user.id},participant_2_id.eq.${user.id}`);
 
-      if (!error && data) {
-        setUnreadCount(data.length);
+      if (!conversations) return;
+
+      // Count unread messages across all conversations
+      let totalUnread = 0;
+      for (const conv of conversations) {
+        const { count } = await supabase
+          .from('messages')
+          .select('id', { count: 'exact' })
+          .eq('conversation_id', conv.id)
+          .eq('is_read', false)
+          .neq('sender_id', user.id);
+
+        totalUnread += count || 0;
       }
+
+      setUnreadCount(totalUnread);
     } catch (error) {
       console.warn('Could not load unread count');
     }
   };
 
-  const markAsRead = async (senderId: string) => {
+  const markAsRead = async (conversationId: string) => {
     if (!user) return;
 
     try {
       await supabase
         .from('messages')
         .update({ is_read: true })
-        .eq('recipient_id', user.id)
-        .eq('sender_id', senderId);
+        .eq('conversation_id', conversationId)
+        .neq('sender_id', user.id)
+        .eq('is_read', false);
 
       // Reload unread count
       loadUnreadCount();

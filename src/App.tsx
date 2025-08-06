@@ -20,7 +20,7 @@ import { AppBannerPage } from "./pages/AppBannerPage";
 import { IconBannerPage } from "./pages/IconBannerPage";
 import { DeveloperIconPage } from "./pages/DeveloperIconPage";
 import { DeveloperHeaderPage } from "./pages/DeveloperHeaderPage";
-import { MessagingPage } from "./pages/MessagingPage";
+import MessagingPage from "./pages/MessagingPage";
 import { PrivacyPolicy } from "./pages/PrivacyPolicy";
 import { DeleteAccountPage } from "./pages/DeleteAccountPage";
 import { PlayStoreGraphicsPage } from "./pages/PlayStoreGraphicsPage";

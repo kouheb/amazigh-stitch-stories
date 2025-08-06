@@ -6,18 +6,20 @@ import { Send, Paperclip, Smile, Image, File } from "lucide-react";
 import { toast } from "sonner";
 
 interface MessageInputProps {
-  onSend: (message: string, type?: "text" | "image" | "file", fileUrl?: string, fileName?: string) => void;
+  onSendMessage: (content: string) => Promise<boolean>;
 }
 
-export const MessageInput = ({ onSend }: MessageInputProps) => {
+export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
   const [message, setMessage] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (message.trim()) {
-      onSend(message);
-      setMessage("");
+      const success = await onSendMessage(message);
+      if (success) {
+        setMessage("");
+      }
     }
   };
 
@@ -28,35 +30,37 @@ export const MessageInput = ({ onSend }: MessageInputProps) => {
     }
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // In a real app, you'd upload to a server here
-      const mockUrl = URL.createObjectURL(file);
-      onSend(`Shared a file: ${file.name}`, "file", mockUrl, file.name);
-      toast.success("File shared successfully!");
+      // For now, just send a text message about the file
+      const success = await onSendMessage(`📎 ${file.name}`);
+      if (success) {
+        toast.success("File reference sent!");
+      }
     }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // In a real app, you'd upload to a server here
-      const mockUrl = URL.createObjectURL(file);
-      onSend("Shared an image", "image", mockUrl, file.name);
-      toast.success("Image shared successfully!");
+      // For now, just send a text message about the image
+      const success = await onSendMessage(`📷 ${file.name}`);
+      if (success) {
+        toast.success("Image reference sent!");
+      }
     }
   };
 
   return (
-    <div className="bg-white border-t border-gray-200 p-4">
+    <div className="bg-background p-4">
       <div className="flex items-end gap-3">
         <div className="flex gap-2">
           <Button 
             variant="ghost" 
             size="sm"
             onClick={() => fileInputRef.current?.click()}
-            className="hover:bg-gray-100"
+            className="hover:bg-accent"
           >
             <Paperclip className="h-4 w-4" />
           </Button>
@@ -64,11 +68,11 @@ export const MessageInput = ({ onSend }: MessageInputProps) => {
             variant="ghost" 
             size="sm"
             onClick={() => imageInputRef.current?.click()}
-            className="hover:bg-blue-50 hover:text-blue-600"
+            className="hover:bg-accent"
           >
             <Image className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="sm" className="hover:bg-yellow-50 hover:text-yellow-600">
+          <Button variant="ghost" size="sm" className="hover:bg-accent">
             <Smile className="h-4 w-4" />
           </Button>
         </div>
@@ -84,7 +88,7 @@ export const MessageInput = ({ onSend }: MessageInputProps) => {
           <Button 
             onClick={handleSend}
             disabled={!message.trim()}
-            className="bg-orange-600 hover:bg-orange-700"
+            variant="default"
           >
             <Send className="h-4 w-4" />
           </Button>

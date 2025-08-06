@@ -58,7 +58,6 @@ export type Database = {
           created_at: string
           id: string
           last_message_at: string | null
-          last_message_id: string | null
           participant_1_id: string
           participant_2_id: string
           updated_at: string
@@ -67,7 +66,6 @@ export type Database = {
           created_at?: string
           id?: string
           last_message_at?: string | null
-          last_message_id?: string | null
           participant_1_id: string
           participant_2_id: string
           updated_at?: string
@@ -76,7 +74,6 @@ export type Database = {
           created_at?: string
           id?: string
           last_message_at?: string | null
-          last_message_id?: string | null
           participant_1_id?: string
           participant_2_id?: string
           updated_at?: string
@@ -196,41 +193,46 @@ export type Database = {
       messages: {
         Row: {
           content: string
+          conversation_id: string
           created_at: string
           file_name: string | null
           file_url: string | null
           id: string
           is_read: boolean
           message_type: string
-          recipient_id: string
           sender_id: string
-          updated_at: string
         }
         Insert: {
           content: string
+          conversation_id: string
           created_at?: string
           file_name?: string | null
           file_url?: string | null
           id?: string
           is_read?: boolean
           message_type?: string
-          recipient_id: string
           sender_id: string
-          updated_at?: string
         }
         Update: {
           content?: string
+          conversation_id?: string
           created_at?: string
           file_name?: string | null
           file_url?: string | null
           id?: string
           is_read?: boolean
           message_type?: string
-          recipient_id?: string
           sender_id?: string
-          updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notifications: {
         Row: {

@@ -1,102 +1,101 @@
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Download, File, Check, CheckCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-interface Message {
-  id: string;
-  senderId: string;
-  text: string;
-  timestamp: string;
-  isRead: boolean;
-  status?: "sending" | "sent" | "delivered" | "read";
-  type?: "text" | "image" | "file";
-  fileUrl?: string;
-  fileName?: string;
-}
+import { format } from "date-fns";
+import type { Message } from "@/types/messaging";
 
 interface MessageBubbleProps {
   message: Message;
   isOwn: boolean;
+  showAvatar?: boolean;
+  senderName?: string;
+  senderAvatar?: string;
 }
 
-export const MessageBubble = ({ message, isOwn }: MessageBubbleProps) => {
-  const getStatusIcon = () => {
-    if (!isOwn) return null;
-    
-    switch (message.status) {
-      case "sending":
-        return <div className="w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin" />;
-      case "sent":
-        return <Check className="w-3 h-3 text-gray-400" />;
-      case "delivered":
-        return <CheckCheck className="w-3 h-3 text-gray-400" />;
-      case "read":
-        return <CheckCheck className="w-3 h-3 text-orange-600" />;
-      default:
-        return null;
-    }
-  };
-
-  const renderMessageContent = () => {
-    switch (message.type) {
-      case "image":
-        return (
-          <div className="space-y-2">
-            {message.fileUrl && (
-              <img 
-                src={message.fileUrl} 
-                alt="Shared image" 
-                className="max-w-xs rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-                onClick={() => window.open(message.fileUrl, '_blank')}
-              />
-            )}
-            <p className="text-sm">{message.text}</p>
-          </div>
-        );
-      case "file":
-        return (
-          <div className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
-            <File className="h-8 w-8 text-gray-600" />
-            <div className="flex-1">
-              <p className="text-sm font-medium">{message.fileName}</p>
-              <p className="text-xs text-gray-500">{message.text}</p>
-            </div>
-            <Button size="sm" variant="ghost" className="p-1">
-              <Download className="h-4 w-4" />
-            </Button>
-          </div>
-        );
-      default:
-        return <p className="text-sm leading-relaxed">{message.text}</p>;
-    }
+export const MessageBubble = ({ 
+  message, 
+  isOwn, 
+  showAvatar = true,
+  senderName = "User",
+  senderAvatar 
+}: MessageBubbleProps) => {
+  const formatTime = (dateString: string) => {
+    return format(new Date(dateString), 'HH:mm');
   };
 
   return (
-    <div className={cn("flex gap-3 max-w-4xl", isOwn && "flex-row-reverse ml-auto")}>
-      {!isOwn && (
+    <div className={cn("flex gap-3 mb-4", isOwn && "flex-row-reverse")}>
+      {!isOwn && showAvatar && (
         <Avatar className="h-8 w-8 flex-shrink-0">
-          <AvatarImage src="https://images.unsplash.com/photo-1494790108755-2616c163f505?w=32&h=32&fit=crop&crop=face" />
-          <AvatarFallback>FM</AvatarFallback>
+          <AvatarImage src={senderAvatar} />
+          <AvatarFallback className="text-xs">
+            {senderName.charAt(0).toUpperCase()}
+          </AvatarFallback>
         </Avatar>
       )}
       
-      <div className={cn("flex flex-col", isOwn && "items-end")}>
+      <div className={cn("max-w-xs lg:max-w-md", isOwn && "items-end")}>
         <div
           className={cn(
-            "px-4 py-3 rounded-2xl max-w-xs lg:max-w-md word-wrap break-word",
+            "px-4 py-2 rounded-2xl break-words",
             isOwn
-              ? "bg-orange-600 text-white rounded-br-md"
-              : "bg-white text-gray-800 border border-gray-200 rounded-bl-md"
+              ? "bg-primary text-primary-foreground"
+              : "bg-muted text-muted-foreground"
           )}
         >
-          {renderMessageContent()}
+          {message.message_type === 'text' && (
+            <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+          )}
+          
+          {message.message_type === 'image' && (
+            <div>
+              {message.content && (
+                <p className="text-sm mb-2">{message.content}</p>
+              )}
+              {message.file_url && (
+                <img 
+                  src={message.file_url} 
+                  alt="Shared image" 
+                  className="max-w-full h-auto rounded-lg"
+                />
+              )}
+            </div>
+          )}
+          
+          {message.message_type === 'file' && (
+            <div>
+              {message.content && (
+                <p className="text-sm mb-2">{message.content}</p>
+              )}
+              {message.file_url && (
+                <a 
+                  href={message.file_url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-sm underline"
+                >
+                  📎 {message.file_name || 'Download file'}
+                </a>
+              )}
+            </div>
+          )}
         </div>
         
-        <div className={cn("mt-1 flex items-center gap-2 px-1", isOwn && "flex-row-reverse")}>
-          <span className="text-xs text-gray-500">{message.timestamp}</span>
-          {getStatusIcon()}
+        <div className={cn("mt-1 flex items-center gap-1", isOwn && "justify-end")}>
+          <span className="text-xs text-muted-foreground">
+            {formatTime(message.created_at)}
+          </span>
+          {isOwn && (
+            <div className="flex">
+              <div className={cn(
+                "w-1 h-1 rounded-full",
+                message.is_read ? "bg-primary" : "bg-muted-foreground"
+              )}></div>
+              <div className={cn(
+                "w-1 h-1 rounded-full ml-0.5",
+                message.is_read ? "bg-primary" : "bg-muted-foreground"
+              )}></div>
+            </div>
+          )}
         </div>
       </div>
     </div>

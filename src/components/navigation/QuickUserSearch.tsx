@@ -9,7 +9,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
-export const QuickUserSearch = () => {
+interface QuickUserSearchProps {
+  onSelectUser?: (userId: string) => void;
+  placeholder?: string;
+}
+
+export const QuickUserSearch = ({ onSelectUser, placeholder = "Quick search users..." }: QuickUserSearchProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
@@ -47,7 +52,7 @@ export const QuickUserSearch = () => {
         <Input
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Quick search users..."
+          placeholder={placeholder}
           className="pl-9 pr-4"
           onKeyPress={(e) => e.key === 'Enter' && quickSearch()}
         />
@@ -64,7 +69,13 @@ export const QuickUserSearch = () => {
             <div
               key={person.id}
               className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
-              onClick={() => navigate(`/messaging?user=${person.id}`)}
+          onClick={() => {
+            if (onSelectUser) {
+              onSelectUser(person.id);
+            } else {
+              navigate(`/messaging?user=${person.id}`);
+            }
+          }}
             >
               <Avatar className="h-8 w-8">
                 <AvatarFallback className="bg-orange-100 text-orange-600 text-xs">
