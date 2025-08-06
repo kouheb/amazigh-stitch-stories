@@ -2,20 +2,27 @@ import React, { useState, useEffect } from 'react';
 import { MessengerConversationList } from './MessengerConversationList';
 import { MessengerChat } from './MessengerChat';
 import { EmptyState } from '../EmptyState';
-import { useMessaging } from '@/hooks/useMessaging';
 import { useConversation } from '@/hooks/useMessaging';
 import { useIsMobile } from '@/hooks/use-mobile';
+import type { Conversation } from '@/types/messaging';
 
 interface MessengerLayoutProps {
   selectedConversationId?: string | null;
   onSelectConversation?: (conversationId: string) => void;
   onStartConversation?: (userId: string) => void;
+  messagingHook?: {
+    conversations: Conversation[];
+    loading: boolean;
+    sendMessage: (conversationId: string, content: string, messageType?: 'text' | 'image' | 'file', fileUrl?: string, fileName?: string) => Promise<boolean>;
+    markAsRead: (conversationId: string) => Promise<void>;
+  };
 }
 
 export const MessengerLayout = ({ 
   selectedConversationId: propSelectedConversationId,
   onSelectConversation: propOnSelectConversation,
-  onStartConversation 
+  onStartConversation,
+  messagingHook
 }: MessengerLayoutProps) => {
   const isMobile = useIsMobile();
   const [internalSelectedConversationId, setInternalSelectedConversationId] = useState<string | null>(null);
@@ -24,7 +31,12 @@ export const MessengerLayout = ({
   const selectedConversationId = propSelectedConversationId ?? internalSelectedConversationId;
   const onSelectConversation = propOnSelectConversation ?? setInternalSelectedConversationId;
 
-  const { conversations, loading, sendMessage, markAsRead } = useMessaging();
+  // Use provided messaging hook or default empty state
+  const conversations = messagingHook?.conversations || [];
+  const loading = messagingHook?.loading || false;
+  const sendMessage = messagingHook?.sendMessage || (async () => false);
+  const markAsRead = messagingHook?.markAsRead || (async () => {});
+  
   const { conversation, loading: conversationLoading } = useConversation(selectedConversationId);
 
   const handleSelectConversation = (conversationId: string) => {

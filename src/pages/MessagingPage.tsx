@@ -8,7 +8,7 @@ export default function MessagingPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { getOrCreateConversation } = useMessaging();
+  const messagingHook = useMessaging();
 
   // Handle direct message URL parameter
   useEffect(() => {
@@ -20,7 +20,7 @@ export default function MessagingPage() {
 
   const startConversationWithUser = async (targetUserId: string) => {
     try {
-      const conversationId = await getOrCreateConversation(targetUserId);
+      const conversationId = await messagingHook.getOrCreateConversation(targetUserId);
       if (conversationId) {
         // Update URL to remove user parameter and add conversation
         navigate(`/messaging?conversation=${conversationId}`, { replace: true });
@@ -58,6 +58,7 @@ export default function MessagingPage() {
         selectedConversationId={selectedConversationId}
         onSelectConversation={handleSelectConversation}
         onStartConversation={handleStartConversation}
+        messagingHook={messagingHook}
       />
     </div>
   );
