@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Search, User, MessageCircle, UserPlus, X } from "lucide-react";
+import { Search, User, MessageCircle, UserPlus, X, Wifi, WifiOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -41,8 +41,23 @@ export const UserSearchSystem = ({
   const [results, setResults] = useState<UserResult[]>([]);
   const [searching, setSearching] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Monitor online/offline status
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -56,11 +71,17 @@ export const UserSearchSystem = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Search for users
-  const searchUsers = async (query: string) => {
+  // Search for users with retry logic
+  const searchUsers = async (query: string, retryCount = 0) => {
     if (!query.trim() || query.length < 2) {
       setResults([]);
       setIsOpen(false);
+      return;
+    }
+
+    // Check if online
+    if (!isOnline) {
+      toast.error('You are offline. Please check your internet connection.');
       return;
     }
 
@@ -76,7 +97,15 @@ export const UserSearchSystem = ({
 
       if (error) {
         console.error('Error searching users:', error);
-        toast.error('Failed to search users');
+        
+        // Retry on network errors
+        if (error.message.includes('Failed to fetch') && retryCount < 2) {
+          console.log(`Retrying search... (attempt ${retryCount + 1})`);
+          setTimeout(() => searchUsers(query, retryCount + 1), 1000);
+          return;
+        }
+        
+        toast.error('Failed to search users. Please try again.');
         return;
       }
 
@@ -84,7 +113,15 @@ export const UserSearchSystem = ({
       setIsOpen(true);
     } catch (error) {
       console.error('Error searching users:', error);
-      toast.error('Failed to search users');
+      
+      // Retry on network errors
+      if (error instanceof Error && error.message.includes('Failed to fetch') && retryCount < 2) {
+        console.log(`Retrying search... (attempt ${retryCount + 1})`);
+        setTimeout(() => searchUsers(query, retryCount + 1), 1000);
+        return;
+      }
+      
+      toast.error('Network error. Please check your connection and try again.');
     } finally {
       setSearching(false);
     }
@@ -146,13 +183,19 @@ export const UserSearchSystem = ({
     <div ref={searchRef} className={`relative w-full ${className}`}>
       {/* Search Input */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        {!isOnline && (
+          <div className="absolute left-2 top-1/2 transform -translate-y-1/2 z-10">
+            <WifiOff className="h-4 w-4 text-red-500" />
+          </div>
+        )}
+        <Search className={`absolute ${!isOnline ? 'left-7' : 'left-3'} top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground`} />
         <Input
           ref={inputRef}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder={placeholder}
-          className="pl-10 pr-10"
+          className={`${!isOnline ? 'pl-12' : 'pl-10'} pr-10`}
+          disabled={!isOnline}
           onFocus={() => searchQuery.length >= 2 && setIsOpen(true)}
         />
         {searchQuery && (
