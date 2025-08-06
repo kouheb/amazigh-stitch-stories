@@ -107,21 +107,26 @@ export const useMessaging = () => {
     if (!user) return null;
 
     try {
-      // Check if conversation already exists
-      const { data: existingConv } = await supabase
+      // Check if conversation already exists - use maybeSingle to avoid errors when no rows found
+      const { data: existingConv, error: findError } = await supabase
         .from('conversations')
         .select('id')
         .or(
           `and(participant_1_id.eq.${user.id},participant_2_id.eq.${otherUserId}),and(participant_1_id.eq.${otherUserId},participant_2_id.eq.${user.id})`
         )
-        .single();
+        .maybeSingle();
+
+      if (findError) {
+        console.error('Error finding conversation:', findError);
+        return null;
+      }
 
       if (existingConv) {
         return existingConv.id;
       }
 
       // Create new conversation
-      const { data: newConv, error } = await supabase
+      const { data: newConv, error: createError } = await supabase
         .from('conversations')
         .insert({
           participant_1_id: user.id,
@@ -130,8 +135,21 @@ export const useMessaging = () => {
         .select('id')
         .single();
 
-      if (error) {
-        console.error('Error creating conversation:', error);
+      if (createError) {
+        // If it's a duplicate key error, try to find the conversation again
+        if (createError.code === '23505') {
+          const { data: retryConv } = await supabase
+            .from('conversations')
+            .select('id')
+            .or(
+              `and(participant_1_id.eq.${user.id},participant_2_id.eq.${otherUserId}),and(participant_1_id.eq.${otherUserId},participant_2_id.eq.${user.id})`
+            )
+            .maybeSingle();
+          
+          return retryConv?.id || null;
+        }
+        
+        console.error('Error creating conversation:', createError);
         toast.error('Failed to create conversation');
         return null;
       }
