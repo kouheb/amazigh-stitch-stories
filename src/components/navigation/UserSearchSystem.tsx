@@ -90,12 +90,13 @@ export const UserSearchSystem = ({
       // Clean the query to prevent issues
       const cleanQuery = query.trim().replace(/[%_]/g, '');
       
-      // Search in profiles table for users by name and email
+      // Search in profiles table for users by name and email with better query
       const { data: profiles, error } = await supabase
         .from('profiles')
         .select('id, display_name, full_name, email, avatar_url, bio, region, experience_level')
-        .or(`display_name.ilike.%${cleanQuery}%,full_name.ilike.%${cleanQuery}%,email.ilike.%${cleanQuery}%`)
+        .or(`display_name.ilike.%${cleanQuery}%,full_name.ilike.%${cleanQuery}%,email.ilike.%${cleanQuery}%,bio.ilike.%${cleanQuery}%`)
         .not('id', 'eq', user?.id || '') // Exclude current user
+        .order('display_name', { ascending: true })
         .limit(15);
 
       if (error) {
