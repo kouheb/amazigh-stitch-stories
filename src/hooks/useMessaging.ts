@@ -288,7 +288,12 @@ export const useMessaging = () => {
           loadConversations();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Messaging subscription status:', status);
+        if (status === 'CHANNEL_ERROR') {
+          console.error('Real-time messaging subscription failed');
+        }
+      });
 
     return () => {
       supabase.removeChannel(channel);
@@ -439,7 +444,12 @@ export const useConversation = (conversationId: string | null) => {
           });
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Conversation subscription status:', status);
+        if (status === 'CHANNEL_ERROR') {
+          console.error('Real-time conversation subscription failed');
+        }
+      });
 
     return () => {
       supabase.removeChannel(channel);
