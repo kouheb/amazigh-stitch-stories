@@ -227,11 +227,21 @@ export const useMessaging = () => {
   }, [user, conversations]);
 
   // Set up real-time subscriptions
+  // Set up real-time subscriptions - only once per user
   useEffect(() => {
     if (!user) return;
 
+    const channelName = `messaging-${user.id}`;
+    
+    // Remove any existing channel with this name first
+    const existingChannels = supabase.getChannels();
+    const existingChannel = existingChannels.find(ch => ch.topic === channelName);
+    if (existingChannel) {
+      supabase.removeChannel(existingChannel);
+    }
+
     const channel = supabase
-      .channel(`messaging-realtime-${user.id}`)
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
@@ -259,7 +269,7 @@ export const useMessaging = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user?.id]); // Only depend on user.id, not the entire loadConversations function
+  }, [user?.id]); // Only depend on user.id
 
   // Load conversations on mount
   useEffect(() => {
@@ -353,8 +363,17 @@ export const useConversation = (conversationId: string | null) => {
   useEffect(() => {
     if (!conversationId) return;
 
+    const channelName = `conversation-${conversationId}`;
+    
+    // Remove any existing channel with this name first
+    const existingChannels = supabase.getChannels();
+    const existingChannel = existingChannels.find(ch => ch.topic === channelName);
+    if (existingChannel) {
+      supabase.removeChannel(existingChannel);
+    }
+
     const channel = supabase
-      .channel(`conversation-${conversationId}`)
+      .channel(channelName)
       .on(
         'postgres_changes',
         {

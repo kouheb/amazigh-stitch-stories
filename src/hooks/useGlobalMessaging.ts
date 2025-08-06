@@ -10,9 +10,18 @@ export const useGlobalMessaging = () => {
   useEffect(() => {
     if (!user) return;
 
+    const channelName = `global-${user.id}`;
+    
+    // Remove any existing channel with this name first
+    const existingChannels = supabase.getChannels();
+    const existingChannel = existingChannels.find(ch => ch.topic === channelName);
+    if (existingChannel) {
+      supabase.removeChannel(existingChannel);
+    }
+
     // Set up global real-time listener for new messages
     const channel = supabase
-      .channel('global-messages')
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
@@ -28,7 +37,7 @@ export const useGlobalMessaging = () => {
             .from('conversations')
             .select('participant_1_id, participant_2_id')
             .eq('id', newMessage.conversation_id)
-            .single();
+            .maybeSingle();
 
           if (!conversation) return;
 
@@ -42,7 +51,7 @@ export const useGlobalMessaging = () => {
               .from('profiles')
               .select('display_name, full_name, email')
               .eq('id', newMessage.sender_id)
-              .single();
+              .maybeSingle();
 
             const senderName = senderProfile?.display_name || 
                              senderProfile?.full_name || 
@@ -72,7 +81,7 @@ export const useGlobalMessaging = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user?.id]);
 
   const loadUnreadCount = async () => {
     if (!user) return;
