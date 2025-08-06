@@ -31,6 +31,7 @@ export const useGlobalMessaging = () => {
           table: 'messages'
         },
         async (payload) => {
+          console.log('Global real-time: New message received', payload.new);
           const newMessage = payload.new;
           
           // Get the conversation to check if current user is a participant

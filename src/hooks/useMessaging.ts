@@ -250,6 +250,7 @@ export const useMessaging = () => {
           table: 'messages'
         },
         () => {
+          console.log('Real-time: New message received, reloading conversations');
           loadConversations();
         }
       )
@@ -261,6 +262,7 @@ export const useMessaging = () => {
           table: 'messages'
         },
         () => {
+          console.log('Real-time: Message updated, reloading conversations');
           loadConversations();
         }
       )
@@ -384,6 +386,7 @@ export const useConversation = (conversationId: string | null) => {
           filter: `conversation_id=eq.${conversationId}`
         },
         (payload) => {
+          console.log('Real-time: New message in conversation', payload.new);
           setConversation(prev => {
             if (!prev) return prev;
             const newMessage = {
