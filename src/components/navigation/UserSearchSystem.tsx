@@ -87,41 +87,54 @@ export const UserSearchSystem = ({
 
     setSearching(true);
     try {
+      // Clean the query to prevent issues
+      const cleanQuery = query.trim().replace(/[%_]/g, '');
+      
       // Search in profiles table for users by name and email
       const { data: profiles, error } = await supabase
         .from('profiles')
         .select('id, display_name, full_name, email, avatar_url, bio, region, experience_level')
-        .or(`display_name.ilike.%${query}%,full_name.ilike.%${query}%,email.ilike.%${query}%`)
-        .neq('id', user?.id) // Exclude current user
+        .or(`display_name.ilike.%${cleanQuery}%,full_name.ilike.%${cleanQuery}%,email.ilike.%${cleanQuery}%`)
+        .not('id', 'eq', user?.id || '') // Exclude current user
         .limit(15);
 
       if (error) {
         console.error('Error searching users:', error);
         
         // Retry on network errors
-        if (error.message.includes('Failed to fetch') && retryCount < 2) {
+        if (error.message?.includes('Failed to fetch') && retryCount < 2) {
           console.log(`Retrying search... (attempt ${retryCount + 1})`);
-          setTimeout(() => searchUsers(query, retryCount + 1), 1000);
+          setTimeout(() => searchUsers(query, retryCount + 1), 1000 * (retryCount + 1));
           return;
         }
         
         toast.error('Failed to search users. Please try again.');
+        setResults([]);
         return;
       }
 
-      setResults(profiles || []);
-      setIsOpen(true);
+      // Filter out null/undefined results and the current user
+      const filteredProfiles = (profiles || []).filter(profile => 
+        profile && 
+        profile.id && 
+        profile.id !== user?.id &&
+        (profile.display_name || profile.full_name || profile.email)
+      );
+
+      setResults(filteredProfiles);
+      setIsOpen(filteredProfiles.length > 0 || searchQuery.length >= 2);
     } catch (error) {
       console.error('Error searching users:', error);
       
       // Retry on network errors
-      if (error instanceof Error && error.message.includes('Failed to fetch') && retryCount < 2) {
+      if (error instanceof Error && error.message?.includes('Failed to fetch') && retryCount < 2) {
         console.log(`Retrying search... (attempt ${retryCount + 1})`);
-        setTimeout(() => searchUsers(query, retryCount + 1), 1000);
+        setTimeout(() => searchUsers(query, retryCount + 1), 1000 * (retryCount + 1));
         return;
       }
       
       toast.error('Network error. Please check your connection and try again.');
+      setResults([]);
     } finally {
       setSearching(false);
     }
