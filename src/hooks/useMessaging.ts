@@ -226,19 +226,19 @@ export const useMessaging = () => {
     }
   }, [user, conversations]);
 
-  // Set up real-time subscriptions
   // Set up real-time subscriptions - only once per user
   useEffect(() => {
     if (!user) return;
 
-    const channelName = `messaging-${user.id}`;
+    const channelName = `messaging-list-${user.id}`;
     
-    // Remove any existing channel with this name first
+    // Clean up any existing channels with similar names
     const existingChannels = supabase.getChannels();
-    const existingChannel = existingChannels.find(ch => ch.topic === channelName);
-    if (existingChannel) {
-      supabase.removeChannel(existingChannel);
-    }
+    existingChannels.forEach(ch => {
+      if (ch.topic.startsWith(`messaging-list-${user.id}`)) {
+        supabase.removeChannel(ch);
+      }
+    });
 
     const channel = supabase
       .channel(channelName)
@@ -363,14 +363,15 @@ export const useConversation = (conversationId: string | null) => {
   useEffect(() => {
     if (!conversationId) return;
 
-    const channelName = `conversation-${conversationId}`;
+    const channelName = `conversation-detail-${conversationId}`;
     
-    // Remove any existing channel with this name first
+    // Clean up any existing channels for this conversation
     const existingChannels = supabase.getChannels();
-    const existingChannel = existingChannels.find(ch => ch.topic === channelName);
-    if (existingChannel) {
-      supabase.removeChannel(existingChannel);
-    }
+    existingChannels.forEach(ch => {
+      if (ch.topic.startsWith(`conversation-detail-${conversationId}`)) {
+        supabase.removeChannel(ch);
+      }
+    });
 
     const channel = supabase
       .channel(channelName)

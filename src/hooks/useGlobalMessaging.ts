@@ -10,14 +10,15 @@ export const useGlobalMessaging = () => {
   useEffect(() => {
     if (!user) return;
 
-    const channelName = `global-${user.id}`;
+    const channelName = `global-notifications-${user.id}`;
     
-    // Remove any existing channel with this name first
+    // Clean up any existing global notification channels
     const existingChannels = supabase.getChannels();
-    const existingChannel = existingChannels.find(ch => ch.topic === channelName);
-    if (existingChannel) {
-      supabase.removeChannel(existingChannel);
-    }
+    existingChannels.forEach(ch => {
+      if (ch.topic.startsWith(`global-notifications-${user.id}`)) {
+        supabase.removeChannel(ch);
+      }
+    });
 
     // Set up global real-time listener for new messages
     const channel = supabase
