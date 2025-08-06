@@ -11,7 +11,7 @@ export const useMessaging = () => {
   const [unreadCount, setUnreadCount] = useState(0);
 
   // Load all conversations for the current user
-  const loadConversations = useCallback(async () => {
+  const loadConversations = useCallback(async (retryCount = 0) => {
     if (!user) {
       setLoading(false);
       return;
@@ -27,7 +27,15 @@ export const useMessaging = () => {
 
       if (error) {
         console.error('Error loading conversations:', error);
-        toast.error('Failed to load conversations');
+        
+        // Retry on network errors
+        if (error.message?.includes('Failed to fetch') && retryCount < 2) {
+          console.log(`Retrying conversation load... (attempt ${retryCount + 1})`);
+          setTimeout(() => loadConversations(retryCount + 1), 1000 * (retryCount + 1));
+          return;
+        }
+        
+        toast.error('Failed to load conversations. Please check your connection.');
         return;
       }
 
@@ -91,7 +99,15 @@ export const useMessaging = () => {
 
     } catch (error) {
       console.error('Error loading conversations:', error);
-      toast.error('Failed to load conversations');
+      
+      // Retry on network errors
+      if (error instanceof Error && error.message?.includes('Failed to fetch') && retryCount < 2) {
+        console.log(`Retrying conversation load... (attempt ${retryCount + 1})`);
+        setTimeout(() => loadConversations(retryCount + 1), 1000 * (retryCount + 1));
+        return;
+      }
+      
+      toast.error('Network error loading conversations. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -293,7 +309,7 @@ export const useConversation = (conversationId: string | null) => {
   const [conversation, setConversation] = useState<ConversationWithMessages | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const loadConversation = useCallback(async () => {
+  const loadConversation = useCallback(async (retryCount = 0) => {
     if (!conversationId || !user) {
       setLoading(false);
       return;
@@ -309,6 +325,15 @@ export const useConversation = (conversationId: string | null) => {
 
       if (convError) {
         console.error('Error loading conversation:', convError);
+        
+        // Retry on network errors
+        if (convError.message?.includes('Failed to fetch') && retryCount < 2) {
+          console.log(`Retrying conversation detail load... (attempt ${retryCount + 1})`);
+          setTimeout(() => loadConversation(retryCount + 1), 1000 * (retryCount + 1));
+          return;
+        }
+        
+        toast.error('Failed to load conversation. Please check your connection.');
         setLoading(false);
         return;
       }
@@ -354,6 +379,15 @@ export const useConversation = (conversationId: string | null) => {
 
     } catch (error) {
       console.error('Error loading conversation:', error);
+      
+      // Retry on network errors
+      if (error instanceof Error && error.message?.includes('Failed to fetch') && retryCount < 2) {
+        console.log(`Retrying conversation detail load... (attempt ${retryCount + 1})`);
+        setTimeout(() => loadConversation(retryCount + 1), 1000 * (retryCount + 1));
+        return;
+      }
+      
+      toast.error('Network error loading conversation. Please try again.');
     } finally {
       setLoading(false);
     }
