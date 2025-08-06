@@ -6,25 +6,25 @@ import { MessageBubble } from "./MessageBubble";
 import { MessageInput } from "./MessageInput";
 import { useConversation } from "@/hooks/useMessaging";
 import { useAuth } from "@/contexts/AuthContext";
-import { useMessaging } from "@/hooks/useMessaging";
 import { useEffect } from "react";
 
 interface ChatAreaProps {
   conversationId: string;
   onBack?: () => void;
+  onSendMessage: (conversationId: string, content: string) => Promise<boolean>;
+  onMarkAsRead: (conversationId: string) => void;
 }
 
-export const ChatArea = ({ conversationId, onBack }: ChatAreaProps) => {
+export const ChatArea = ({ conversationId, onBack, onSendMessage, onMarkAsRead }: ChatAreaProps) => {
   const { user } = useAuth();
   const { conversation, loading } = useConversation(conversationId);
-  const { sendMessage, markAsRead } = useMessaging();
 
   // Mark messages as read when opening conversation
   useEffect(() => {
     if (conversationId) {
-      markAsRead(conversationId);
+      onMarkAsRead(conversationId);
     }
-  }, [conversationId, markAsRead]);
+  }, [conversationId, onMarkAsRead]);
 
   const getDisplayName = () => {
     const participant = conversation?.other_participant;
@@ -37,7 +37,7 @@ export const ChatArea = ({ conversationId, onBack }: ChatAreaProps) => {
   const handleSendMessage = async (content: string) => {
     if (!content.trim()) return;
     
-    const success = await sendMessage(conversationId, content);
+    const success = await onSendMessage(conversationId, content);
     return success;
   };
 

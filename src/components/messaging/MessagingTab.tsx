@@ -8,7 +8,7 @@ import { toast } from "sonner";
 
 export const MessagingTab = () => {
   const { user } = useAuth();
-  const { conversations, loading, getOrCreateConversation } = useMessaging();
+  const { conversations, loading, getOrCreateConversation, sendMessage, markAsRead } = useMessaging();
   
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [isMobileView, setIsMobileView] = useState(false);
@@ -54,6 +54,8 @@ export const MessagingTab = () => {
           <ChatArea 
             conversationId={selectedConversationId} 
             onBack={handleBackToList}
+            onSendMessage={sendMessage}
+            onMarkAsRead={markAsRead}
           />
         </div>
       );
@@ -95,7 +97,11 @@ export const MessagingTab = () => {
       {/* Chat Area */}
       <div className="flex-1 flex flex-col">
         {selectedConversationId ? (
-          <ChatArea conversationId={selectedConversationId} />
+          <ChatArea 
+            conversationId={selectedConversationId}
+            onSendMessage={sendMessage}
+            onMarkAsRead={markAsRead}
+          />
         ) : (
           <EmptyState onStartConversation={handleStartConversation} />
         )}

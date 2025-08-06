@@ -13,7 +13,7 @@ export default function MessagingPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { conversations, loading, getOrCreateConversation } = useMessaging();
+  const { conversations, loading, getOrCreateConversation, sendMessage, markAsRead } = useMessaging();
   
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [isMobileView, setIsMobileView] = useState(false);
@@ -73,6 +73,8 @@ export default function MessagingPage() {
           <ChatArea 
             conversationId={selectedConversationId} 
             onBack={handleBackToList}
+            onSendMessage={sendMessage}
+            onMarkAsRead={markAsRead}
           />
         </div>
       );
@@ -120,7 +122,11 @@ export default function MessagingPage() {
       {/* Chat Area */}
       <div className="flex-1 flex flex-col">
         {selectedConversationId ? (
-          <ChatArea conversationId={selectedConversationId} />
+          <ChatArea 
+            conversationId={selectedConversationId}
+            onSendMessage={sendMessage}
+            onMarkAsRead={markAsRead}
+          />
         ) : (
           <EmptyState onStartConversation={handleStartConversation} />
         )}
