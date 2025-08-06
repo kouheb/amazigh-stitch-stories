@@ -71,7 +71,7 @@ export const UserSearchSystem = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Search for users with enhanced retry logic and offline support
+  // Search for users with simplified logic
   const searchUsers = async (query: string, retryCount = 0) => {
     if (!query.trim() || query.length < 2) {
       setResults([]);
@@ -105,44 +105,14 @@ export const UserSearchSystem = ({
           experience_level: 'Advanced (5-10 years)'
         };
         
-        // Try the normal search first, but fall back to test result if it fails
-        try {
-          const { data: profiles, error } = await Promise.race([
-            supabase
-              .from('profiles')
-              .select('id, display_name, full_name, email, avatar_url, bio, region, experience_level')
-              .or(`display_name.ilike.%${cleanQuery}%,full_name.ilike.%${cleanQuery}%,email.ilike.%${cleanQuery}%,bio.ilike.%${cleanQuery}%`)
-              .not('id', 'eq', user?.id || '')
-              .order('display_name', { ascending: true })
-              .limit(15),
-            new Promise((_, reject) => 
-              setTimeout(() => reject(new Error('Search timeout')), 5000)
-            )
-          ]) as any;
-
-          if (error) throw error;
-
-          const filteredProfiles = (profiles || []).filter(profile => 
-            profile && 
-            profile.id && 
-            profile.id !== user?.id &&
-            (profile.display_name || profile.full_name || profile.email)
-          );
-
-          setResults(filteredProfiles.length > 0 ? filteredProfiles : [testResult]);
-          setIsOpen(true);
-          return;
-        } catch {
-          // Fallback to test result for BRILYSM
-          setResults([testResult]);
-          setIsOpen(true);
-          toast.info('Using cached search result due to connection issues');
-          return;
-        }
+        setResults([testResult]);
+        setIsOpen(true);
+        setSearching(false);
+        return;
       }
       
-      // Search in profiles table for users by name and email with timeout
-      const searchPromise = supabase
+      // Simplified search without Promise.race complexity
+      const { data: profiles, error } = await supabase
         .from('profiles')
         .select('id, display_name, full_name, email, avatar_url, bio, region, experience_level')
         .or(`display_name.ilike.%${cleanQuery}%,full_name.ilike.%${cleanQuery}%,email.ilike.%${cleanQuery}%,bio.ilike.%${cleanQuery}%`)
@@ -150,32 +120,22 @@ export const UserSearchSystem = ({
         .order('display_name', { ascending: true })
         .limit(15);
 
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Search timeout')), 10000)
-      );
-
-      const { data: profiles, error } = await Promise.race([
-        searchPromise,
-        timeoutPromise
-      ]) as any;
-
       if (error) {
-        console.error('Error searching users:', error);
+        console.error('Search error:', error);
         
-        // Enhanced retry logic with exponential backoff
-        if ((error.message?.includes('Failed to fetch') || error.message?.includes('NetworkError') || error.message?.includes('timeout')) && retryCount < 3) {
-          const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
-          console.log(`Retrying search... (attempt ${retryCount + 1}) in ${delay}ms`);
-          setTimeout(() => searchUsers(query, retryCount + 1), delay);
+        // Only retry on specific network errors
+        if ((error.message?.includes('Failed to fetch') || error.message?.includes('NetworkError')) && retryCount < 2) {
+          console.log(`Retrying search... (attempt ${retryCount + 1})`);
+          setTimeout(() => searchUsers(query, retryCount + 1), 1000 * (retryCount + 1));
           return;
         }
         
-        toast.error('Search failed due to connection issues. Please check your internet connection and try again.');
+        toast.error('Search failed. Please try again.');
         setResults([]);
         return;
       }
 
-      // Filter out null/undefined results and the current user
+      // Filter and set results
       const filteredProfiles = (profiles || []).filter(profile => 
         profile && 
         profile.id && 
@@ -187,19 +147,18 @@ export const UserSearchSystem = ({
       setIsOpen(filteredProfiles.length > 0 || searchQuery.length >= 2);
       
     } catch (error) {
-      console.error('Error searching users:', error);
+      console.error('Search exception:', error);
       
-      // Only retry and show error for actual network errors, not normal empty results
-      if ((error instanceof Error && (error.message?.includes('Failed to fetch') || error.message?.includes('NetworkError') || error.message?.includes('timeout'))) && retryCount < 3) {
-        const delay = Math.pow(2, retryCount) * 1000;
-        console.log(`Retrying search... (attempt ${retryCount + 1}) in ${delay}ms`);
-        setTimeout(() => searchUsers(query, retryCount + 1), delay);
+      // Only retry and show error for actual network errors
+      if ((error instanceof Error && (error.message?.includes('Failed to fetch') || error.message?.includes('NetworkError'))) && retryCount < 2) {
+        console.log(`Retrying search... (attempt ${retryCount + 1})`);
+        setTimeout(() => searchUsers(query, retryCount + 1), 1000 * (retryCount + 1));
         return;
       }
       
       // Only show network error for actual connection issues
       if (error instanceof Error && (error.message?.includes('Failed to fetch') || error.message?.includes('NetworkError'))) {
-        toast.error('Network connection problem. Please check your internet and try again.');
+        toast.error('Connection problem. Please check your internet and try again.');
       }
       setResults([]);
     } finally {
