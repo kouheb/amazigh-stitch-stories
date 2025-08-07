@@ -1,5 +1,5 @@
 import React from 'react';
-import { MessengerLayout } from './messenger/MessengerLayout';
+import { MessagingInterface } from './MessagingInterface';
 
 interface MessagingTabProps {
   onStartConversation?: (userId: string) => void;
@@ -8,7 +8,7 @@ interface MessagingTabProps {
 export const MessagingTab = ({ onStartConversation }: MessagingTabProps) => {
   return (
     <div className="h-full">
-      <MessengerLayout onStartConversation={onStartConversation} />
+      <MessagingInterface onStartConversation={onStartConversation} />
     </div>
   );
 };
