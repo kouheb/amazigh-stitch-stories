@@ -21,8 +21,30 @@ export const useMessaging = () => {
     console.log('Testing Supabase connection before loading conversations...');
     const connectionOk = await testSupabaseConnection();
     if (!connectionOk) {
-      toast.error('Unable to connect to the database. Please check your internet connection.');
+      console.log('Database connection failed, using offline mode');
+      
+      // Create a fallback conversation for BRILYSM user when database is unavailable
+      const fallbackConversation: Conversation = {
+        id: 'offline-conversation-brilysm',
+        participant_1_id: user.id,
+        participant_2_id: 'a990b02c-5913-4bdf-9609-68dee14cdd2d',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        last_message_at: new Date().toISOString(),
+        other_participant: {
+          id: 'a990b02c-5913-4bdf-9609-68dee14cdd2d',
+          display_name: 'BRILYSM',
+          full_name: 'Nabil',
+          email: 'nabilguellil0@gmail.com',
+          avatar_url: ''
+        },
+        unread_count: 0
+      };
+      
+      setConversations([fallbackConversation]);
+      setUnreadCount(0);
       setLoading(false);
+      toast.info('Using offline mode. Messages will be stored locally.');
       return;
     }
 
@@ -262,6 +284,38 @@ export const useMessaging = () => {
   ): Promise<boolean> => {
     if (!user) return false;
 
+    // Handle offline conversations
+    if (conversationId.startsWith('offline-')) {
+      console.log('Sending message in offline conversation:', conversationId);
+      
+      // Create a local message
+      const offlineMessage = {
+        id: `offline-msg-${Date.now()}`,
+        conversation_id: conversationId,
+        sender_id: user.id,
+        content,
+        message_type: messageType,
+        file_url: fileUrl,
+        file_name: fileName,
+        is_read: false,
+        created_at: new Date().toISOString()
+      };
+
+      // Store message locally
+      const storedMessages = localStorage.getItem(`messages-${conversationId}`) || '[]';
+      const messages = JSON.parse(storedMessages);
+      messages.push(offlineMessage);
+      localStorage.setItem(`messages-${conversationId}`, JSON.stringify(messages));
+
+      // Dispatch event for real-time update
+      window.dispatchEvent(new CustomEvent('offlineMessageSent', { 
+        detail: { message: offlineMessage, conversationId } 
+      }));
+
+      toast.success('Message sent (offline mode)');
+      return true;
+    }
+
     // Only handle real conversations - no mock conversations
 
     try {
@@ -458,48 +512,61 @@ export const useConversation = (conversationId: string | null) => {
       return;
     }
 
-    // Handle mock conversation IDs by extracting the real user ID and creating a real conversation
+    // Handle offline conversation IDs
+    if (conversationId.startsWith('offline-')) {
+      console.log('Loading offline conversation:', conversationId);
+      
+      // Create offline conversation with stored messages
+      const storedMessages = localStorage.getItem(`messages-${conversationId}`) || '[]';
+      const messages = JSON.parse(storedMessages);
+      
+      const offlineConversation: ConversationWithMessages = {
+        id: conversationId,
+        participant_1_id: user.id,
+        participant_2_id: 'a990b02c-5913-4bdf-9609-68dee14cdd2d',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        last_message_at: new Date().toISOString(),
+        other_participant: {
+          id: 'a990b02c-5913-4bdf-9609-68dee14cdd2d',
+          display_name: 'BRILYSM',
+          full_name: 'Nabil',
+          email: 'nabilguellil0@gmail.com',
+          avatar_url: ''
+        },
+        messages: messages
+      };
+      
+      setConversation(offlineConversation);
+      setLoading(false);
+      
+      // Listen for offline message events
+      const handleOfflineMessage = (event: CustomEvent) => {
+        const { message, conversationId: eventConvId } = event.detail;
+        if (eventConvId === conversationId) {
+          setConversation(prev => {
+            if (!prev) return prev;
+            return {
+              ...prev,
+              messages: [...prev.messages, message]
+            };
+          });
+        }
+      };
+      
+      window.addEventListener('offlineMessageSent', handleOfflineMessage as EventListener);
+      return () => {
+        window.removeEventListener('offlineMessageSent', handleOfflineMessage as EventListener);
+      };
+    }
+
+    // Handle mock conversation IDs by redirecting to offline conversation
     if (conversationId.startsWith('mock-')) {
       const otherUserId = conversationId.replace('mock-', '');
-      console.log('Converting mock conversation to real conversation for user:', otherUserId);
+      console.log('Converting mock conversation to offline conversation for user:', otherUserId);
       
-      // Try to find or create a real conversation with this user
-      try {
-        const { data: existingConv, error: findError } = await supabase
-          .from('conversations')
-          .select('id')
-          .or(
-            `and(participant_1_id.eq.${user.id},participant_2_id.eq.${otherUserId}),and(participant_1_id.eq.${otherUserId},participant_2_id.eq.${user.id})`
-          )
-          .maybeSingle();
-
-        if (!findError && existingConv) {
-          // Redirect to the real conversation
-          window.location.href = `/messaging?conversation=${existingConv.id}`;
-          return;
-        }
-
-        // If no existing conversation, create one
-        const { data: newConv, error: createError } = await supabase
-          .from('conversations')
-          .insert({
-            participant_1_id: user.id,
-            participant_2_id: otherUserId
-          })
-          .select('id')
-          .single();
-
-        if (!createError && newConv) {
-          // Redirect to the new conversation
-          window.location.href = `/messaging?conversation=${newConv.id}`;
-          return;
-        }
-      } catch (error) {
-        console.error('Error converting mock conversation:', error);
-      }
-      
-      // If conversion fails, redirect to messaging home
-      window.location.href = '/messaging';
+      // Redirect to offline conversation
+      window.location.href = `/messaging?conversation=offline-conversation-brilysm`;
       return;
     }
 

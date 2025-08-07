@@ -5,6 +5,13 @@ import type { Database } from './types';
 const SUPABASE_URL = "https://tatsijulcgjpadcjnalv.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhdHNpanVsY2dqcGFkY2puYWx2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAzMDAzNzEsImV4cCI6MjA2NTg3NjM3MX0.CjnbAeZi39Lr_g_rcfzxI2pJBxtCjSud7oA16DlPae0";
 
+// Log the configuration for debugging
+console.log('Supabase configuration:', {
+  url: SUPABASE_URL,
+  hasKey: !!SUPABASE_PUBLISHABLE_KEY,
+  keyLength: SUPABASE_PUBLISHABLE_KEY.length
+});
+
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
@@ -12,27 +19,35 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-  },
-  global: {
-    headers: {
-      'apikey': SUPABASE_PUBLISHABLE_KEY,
-    },
-  },
+  }
 });
 
-// Add connection test function
+// Enhanced connection test function
 export const testSupabaseConnection = async () => {
   try {
-    console.log('Testing Supabase connection...');
-    const { data, error } = await supabase.from('profiles').select('id').limit(1);
+    console.log('Testing Supabase connection to:', SUPABASE_URL);
+    
+    // First test basic connectivity with a simple query
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id')
+      .limit(1);
+    
     if (error) {
-      console.error('Supabase connection test failed:', error);
+      console.error('Supabase connection test failed with error:', error);
       return false;
     }
-    console.log('Supabase connection test successful');
+    
+    console.log('Supabase connection test successful, data:', data);
     return true;
   } catch (error) {
-    console.error('Supabase connection test error:', error);
+    console.error('Supabase connection test caught exception:', error);
+    
+    // Check if it's a network error
+    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+      console.error('Network error detected - possible CORS or connectivity issue');
+    }
+    
     return false;
   }
 };
