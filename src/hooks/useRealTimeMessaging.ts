@@ -15,6 +15,12 @@ export const useRealTimeMessaging = () => {
   // Load conversations with better error handling
   const loadConversations = useCallback(async () => {
     if (!user) return;
+    
+    // If already in test mode, don't retry database calls
+    if (testMode) {
+      loadTestData();
+      return;
+    }
 
     console.log('Loading conversations for user:', user.id);
     
@@ -81,18 +87,18 @@ export const useRealTimeMessaging = () => {
       );
 
       setConversations(conversationsWithParticipants);
-      setTestMode(false);
       setError(null);
       
     } catch (err) {
       console.error('Error loading conversations:', err);
       console.log('Switching to test mode due to database error');
       setTestMode(true);
+      setError('Database connection failed - using demo mode');
       loadTestData();
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, testMode]);
 
   // Load test data when database is unavailable
   const loadTestData = useCallback(() => {
@@ -517,9 +523,9 @@ export const useRealTimeMessaging = () => {
     };
   }, [user, testMode, conversations, loadConversations]);
 
-  // Load initial data
+  // Load initial data only once when user is available and not in test mode
   useEffect(() => {
-    if (user) {
+    if (user && !testMode) {
       loadConversations();
     }
   }, [user, loadConversations]);
