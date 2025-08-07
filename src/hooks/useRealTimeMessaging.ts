@@ -12,13 +12,13 @@ export const useRealTimeMessaging = () => {
   const [error, setError] = useState<string | null>(null);
   const [testMode, setTestMode] = useState(false);
 
-  // Load conversations
+  // Load conversations with better error handling
   const loadConversations = useCallback(async () => {
     if (!user) return;
 
+    console.log('Loading conversations for user:', user.id);
+    
     try {
-      console.log('Loading conversations for user:', user.id);
-      
       const { data, error } = await supabase
         .from('conversations')
         .select(`
@@ -33,37 +33,60 @@ export const useRealTimeMessaging = () => {
         .order('last_message_at', { ascending: false, nullsFirst: false });
 
       if (error) {
-        console.error('Error loading conversations:', error);
-        setTestMode(true);
-        loadTestData();
-        return;
+        throw error;
       }
 
-      // Get other participants info
+      // Get other participants info with error handling per profile
       const conversationsWithParticipants = await Promise.all(
         (data || []).map(async (conv) => {
-          const otherParticipantId = conv.participant_1_id === user.id 
-            ? conv.participant_2_id 
-            : conv.participant_1_id;
+          try {
+            const otherParticipantId = conv.participant_1_id === user.id 
+              ? conv.participant_2_id 
+              : conv.participant_1_id;
 
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('id, display_name, full_name, email, avatar_url')
-            .eq('id', otherParticipantId)
-            .single();
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('id, display_name, full_name, email, avatar_url')
+              .eq('id', otherParticipantId)
+              .maybeSingle();
 
-          return {
-            ...conv,
-            other_participant: profile
-          };
+            return {
+              ...conv,
+              other_participant: profile || {
+                id: otherParticipantId,
+                display_name: 'Unknown User',
+                full_name: 'Unknown User', 
+                email: 'unknown@example.com',
+                avatar_url: null
+              }
+            };
+          } catch (profileError) {
+            console.warn('Failed to load profile for conversation:', conv.id, profileError);
+            const otherParticipantId = conv.participant_1_id === user.id 
+              ? conv.participant_2_id 
+              : conv.participant_1_id;
+              
+            return {
+              ...conv,
+              other_participant: {
+                id: otherParticipantId,
+                display_name: 'Unknown User',
+                full_name: 'Unknown User',
+                email: 'unknown@example.com', 
+                avatar_url: null
+              }
+            };
+          }
         })
       );
 
       setConversations(conversationsWithParticipants);
+      setTestMode(false);
       setError(null);
+      
     } catch (err) {
-      console.error('Failed to load conversations:', err);
-      console.log('Switching to test mode');
+      console.error('Error loading conversations:', err);
+      console.log('Switching to test mode due to database error');
       setTestMode(true);
       loadTestData();
     } finally {

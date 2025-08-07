@@ -39,7 +39,7 @@ export const MessageBubble = ({
             "px-4 py-2 rounded-2xl break-words",
             isOwn
               ? "bg-primary text-primary-foreground"
-              : "bg-muted text-muted-foreground"
+              : "bg-muted text-foreground"
           )}
         >
           {message.message_type === 'text' && (
