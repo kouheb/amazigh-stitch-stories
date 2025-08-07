@@ -456,6 +456,51 @@ export const useConversation = (conversationId: string | null) => {
       return;
     }
 
+    // Handle mock conversation IDs by extracting the real user ID and creating a real conversation
+    if (conversationId.startsWith('mock-')) {
+      const otherUserId = conversationId.replace('mock-', '');
+      console.log('Converting mock conversation to real conversation for user:', otherUserId);
+      
+      // Try to find or create a real conversation with this user
+      try {
+        const { data: existingConv, error: findError } = await supabase
+          .from('conversations')
+          .select('id')
+          .or(
+            `and(participant_1_id.eq.${user.id},participant_2_id.eq.${otherUserId}),and(participant_1_id.eq.${otherUserId},participant_2_id.eq.${user.id})`
+          )
+          .maybeSingle();
+
+        if (!findError && existingConv) {
+          // Redirect to the real conversation
+          window.location.href = `/messaging?conversation=${existingConv.id}`;
+          return;
+        }
+
+        // If no existing conversation, create one
+        const { data: newConv, error: createError } = await supabase
+          .from('conversations')
+          .insert({
+            participant_1_id: user.id,
+            participant_2_id: otherUserId
+          })
+          .select('id')
+          .single();
+
+        if (!createError && newConv) {
+          // Redirect to the new conversation
+          window.location.href = `/messaging?conversation=${newConv.id}`;
+          return;
+        }
+      } catch (error) {
+        console.error('Error converting mock conversation:', error);
+      }
+      
+      // If conversion fails, redirect to messaging home
+      window.location.href = '/messaging';
+      return;
+    }
+
     try {
       // Get conversation details
       const { data: convData, error: convError } = await supabase
