@@ -46,12 +46,8 @@ export default function MessagingPage() {
 
   const selectedConversationId = searchParams.get('conversation');
 
-  // Clean up test conversations
-  useEffect(() => {
-    if (selectedConversationId && selectedConversationId.startsWith('test-')) {
-      navigate('/messaging', { replace: true });
-    }
-  }, [selectedConversationId, navigate]);
+// Removed cleanup of test conversations to allow test mode navigation
+
 
   const handleSelectConversation = (conversationId: string | null) => {
     if (conversationId && !conversationId.startsWith('test-')) {

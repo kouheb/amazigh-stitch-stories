@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ConversationList } from './ConversationList';
 import { ConversationView } from './ConversationView';
 import { useRealTimeMessaging } from '@/hooks/useRealTimeMessaging';
@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { MessageSquare, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TypingIndicator } from './TypingIndicator';
+import { useSearchParams } from 'react-router-dom';
 
 interface MessagingInterfaceProps {
   onStartConversation?: (userId: string) => void;
@@ -34,6 +35,17 @@ export const MessagingInterface = ({ onStartConversation }: MessagingInterfacePr
 
   const selectedConversation = conversations.find(c => c.id === selectedConversationId);
   const conversationMessages = selectedConversationId ? messages[selectedConversationId] || [] : [];
+
+  const [searchParams] = useSearchParams();
+  useEffect(() => {
+    const convId = searchParams.get('conversation');
+    if (convId && convId !== selectedConversationId) {
+      setSelectedConversationId(convId);
+      setShowConversationList(false);
+      loadMessages(convId);
+      updatePresence('online');
+    }
+  }, [searchParams, selectedConversationId]);
 
   const handleSelectConversation = async (conversationId: string) => {
     setSelectedConversationId(conversationId);
