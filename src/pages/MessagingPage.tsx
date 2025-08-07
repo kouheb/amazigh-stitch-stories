@@ -25,7 +25,7 @@ export default function MessagingPage() {
       const conversationId = await messagingHook.getOrCreateConversation(targetUserId);
       if (conversationId) {
         console.log('Conversation created/found:', conversationId);
-        // Update URL to remove user parameter and add conversation
+        // Update URL to show the real conversation
         navigate(`/messaging?conversation=${conversationId}`, { replace: true });
         toast.success('Conversation started successfully!');
       } else {
@@ -44,8 +44,15 @@ export default function MessagingPage() {
 
   const selectedConversationId = searchParams.get('conversation');
 
+  // Clean up test conversations
+  useEffect(() => {
+    if (selectedConversationId && selectedConversationId.startsWith('test-')) {
+      navigate('/messaging', { replace: true });
+    }
+  }, [selectedConversationId, navigate]);
+
   const handleSelectConversation = (conversationId: string | null) => {
-    if (conversationId) {
+    if (conversationId && !conversationId.startsWith('test-')) {
       navigate(`/messaging?conversation=${conversationId}`);
     } else {
       navigate('/messaging');
