@@ -21,6 +21,13 @@ export default function MessagingPage() {
     }
   }, [searchParams, user]);
 
+  // Auto-attempt live mode if currently in test mode
+  useEffect(() => {
+    if (messagingHook.testMode) {
+      messagingHook.retryLive();
+    }
+  }, [messagingHook.testMode]);
+
   const startConversationWithUser = async (targetUserId: string) => {
     try {
       console.log('Attempting to start conversation with user:', targetUserId);

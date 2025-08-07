@@ -91,10 +91,8 @@ export const useRealTimeMessaging = () => {
       
     } catch (err) {
       console.error('Error loading conversations:', err);
-      console.log('Switching to test mode due to database error');
-      setTestMode(true);
-      setError('Database connection failed - using demo mode');
-      loadTestData();
+      setError('Could not load conversations. Please try again.');
+      // Stay in live mode; do not switch to test mode automatically
     } finally {
       setLoading(false);
     }
@@ -310,14 +308,9 @@ export const useRealTimeMessaging = () => {
       
       return data.id;
     } catch (err) {
-      console.error('Failed to create conversation, switching to test mode:', err);
-      
-      // Switch to test mode on any error (network, auth, etc.)
-      setTestMode(true);
-      loadTestData();
-      
-      // Return test conversation ID
-      return 'test-conv-1';
+      console.error('Failed to create conversation:', err);
+      toast.error('Could not create conversation. Please try again.');
+      return null;
     }
   }, [user, loadConversations, testMode]);
 
