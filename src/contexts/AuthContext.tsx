@@ -31,13 +31,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     let isMounted = true;
 
-    // Get initial session
+    // Set up auth state listener FIRST to catch all auth events
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        console.log('Auth state change:', event, !!session);
+        if (isMounted) {
+          setSession(session);
+          setUser(session?.user ?? null);
+          setLoading(false);
+          
+          // Cleanup on sign out
+          if (event === 'SIGNED_OUT') {
+            cleanupAuthState();
+          }
+        }
+      }
+    );
+
+    // THEN check for existing session
     const getInitialSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
-          // Remove console.error for security - log without sensitive details
-          console.warn('Session retrieval failed');
+          console.warn('Session retrieval failed:', error.message);
         }
         
         if (isMounted) {
@@ -46,32 +62,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setLoading(false);
         }
       } catch (error) {
-        // Remove detailed error logging for security
-        console.warn('Session initialization failed');
+        console.warn('Session initialization failed:', error);
         if (isMounted) {
+          setSession(null);
+          setUser(null);
           setLoading(false);
         }
       }
     };
 
     getInitialSession();
-
-    // Set up auth state listener with security improvements
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        // Remove sensitive logging
-        if (isMounted) {
-          setSession(session);
-          setUser(session?.user ?? null);
-          setLoading(false);
-          
-          // Improve session security - clear old auth data on sign out
-          if (event === 'SIGNED_OUT') {
-            cleanupAuthState();
-          }
-        }
-      }
-    );
 
     return () => {
       isMounted = false;
