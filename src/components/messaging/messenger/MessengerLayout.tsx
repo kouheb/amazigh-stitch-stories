@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MessengerConversationList } from './MessengerConversationList';
 import { MessengerChat } from './MessengerChat';
 import { EmptyState } from '../EmptyState';
-import { useConversation } from '@/hooks/useMessaging';
+// Removed old useConversation hook - using new real-time system
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/AuthContext';
 import type { Conversation, Message } from '@/types/messaging';
@@ -38,7 +38,9 @@ export const MessengerLayout = ({
   const sendMessage = messagingHook?.sendMessage || (async () => false);
   const markAsRead = messagingHook?.markAsRead || (async () => {});
   
-  const { conversation, loading: conversationLoading } = useConversation(selectedConversationId);
+  // Note: This component is now unused in favor of the new MessagingInterface
+  const conversation = null;
+  const conversationLoading = false;
   const { user } = useAuth();
 
   // Only use real conversations

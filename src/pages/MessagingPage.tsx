@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { MessengerLayout } from '@/components/messaging/messenger/MessengerLayout';
-import { useMessaging } from '@/hooks/useMessaging';
+import { useRealTimeMessaging } from '@/hooks/useRealTimeMessaging';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
@@ -9,7 +9,7 @@ export default function MessagingPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const messagingHook = useMessaging();
+  const messagingHook = useRealTimeMessaging();
 
   // Handle direct message URL parameter
   useEffect(() => {
@@ -22,7 +22,7 @@ export default function MessagingPage() {
   const startConversationWithUser = async (targetUserId: string) => {
     try {
       console.log('Attempting to start conversation with user:', targetUserId);
-      const conversationId = await messagingHook.getOrCreateConversation(targetUserId);
+      const conversationId = await messagingHook.createConversation(targetUserId);
       if (conversationId) {
         console.log('Conversation created/found:', conversationId);
         // Update URL to show the real conversation

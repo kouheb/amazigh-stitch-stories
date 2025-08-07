@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, MoreVertical, Phone, Video } from "lucide-react";
 import { MessageBubble } from "./MessageBubble";
 import { MessageInput } from "./MessageInput";
-import { useConversation } from "@/hooks/useMessaging";
+// Removed old useConversation hook - using new real-time system
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 
@@ -17,7 +17,9 @@ interface ChatAreaProps {
 
 export const ChatArea = ({ conversationId, onBack, onSendMessage, onMarkAsRead }: ChatAreaProps) => {
   const { user } = useAuth();
-  const { conversation, loading } = useConversation(conversationId);
+  // Note: This component is now unused in favor of the new ConversationView
+  const conversation = null;
+  const loading = false;
 
   // Mark messages as read when opening conversation
   useEffect(() => {
