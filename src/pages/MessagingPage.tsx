@@ -80,6 +80,18 @@ export default function MessagingPage() {
         </Button>
         <h1 className="text-lg font-semibold">Messages</h1>
       </div>
+
+      {messagingHook.testMode && (
+        <div className="bg-muted/50 border-b px-4 py-2 flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">Database connection issue. Using test mode.</span>
+          <Button size="sm" onClick={async () => {
+            const ok = await messagingHook.retryLive();
+            if (ok) navigate('/messaging');
+          }}>
+            Start live mode
+          </Button>
+        </div>
+      )}
       
       {/* Messaging interface */}
       <div className="flex-1">

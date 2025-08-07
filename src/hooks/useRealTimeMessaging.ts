@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, testSupabaseConnection } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import type { Message, Conversation } from '@/types/messaging';
@@ -530,15 +530,44 @@ export const useRealTimeMessaging = () => {
     }
   }, [user, loadConversations]);
 
+  // Allow switching back to live mode
+  const retryLive = useCallback(async () => {
+    setLoading(true);
+    try {
+      const ok = await testSupabaseConnection();
+      if (ok) {
+        setTestMode(false);
+        await loadConversations();
+        toast.success('Live mode enabled');
+        return true;
+      } else {
+        toast.error('Still offline. Staying in test mode.');
+        setTestMode(true);
+        loadTestData();
+        return false;
+      }
+    } catch (err) {
+      console.error('Retry live mode failed:', err);
+      toast.error('Could not enable live mode');
+      setTestMode(true);
+      loadTestData();
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }, [loadConversations, loadTestData]);
+
   return {
     conversations,
     messages,
     loading,
     error,
+    testMode,
     loadMessages,
     sendMessage,
     createConversation,
     markAsRead,
+    retryLive,
     refetch: loadConversations
   };
 };
