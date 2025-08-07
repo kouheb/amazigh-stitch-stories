@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase, testSupabaseConnection } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -11,6 +11,13 @@ export const useRealTimeMessaging = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [testMode, setTestMode] = useState(false);
+
+  // Deduplication and state refs
+  const testToastShownRef = useRef(false);
+  const testModeRef = useRef(testMode);
+  useEffect(() => {
+    testModeRef.current = testMode;
+  }, [testMode]);
 
   // Load conversations with better error handling
   const loadConversations = useCallback(async () => {
@@ -175,10 +182,13 @@ export const useRealTimeMessaging = () => {
 
     setMessages(testMessages);
     setError(null);
-    
-    toast.info('Database connection issue. Using test mode.', {
-      description: 'Real messaging requires fixing the connection.'
-    });
+
+    if (!testToastShownRef.current) {
+      testToastShownRef.current = true;
+      toast.info('Database connection issue. Using test mode.', {
+        description: 'Real messaging requires fixing the connection.'
+      });
+    }
   }, [user]);
 
   // Load messages for a conversation
@@ -533,8 +543,15 @@ export const useRealTimeMessaging = () => {
       if (ok) {
         setTestMode(false);
         await loadConversations();
-        toast.success('Live mode enabled');
-        return true;
+        if (!testModeRef.current) {
+          toast.success('Live mode enabled');
+          return true;
+        }
+        // If we ended up back in test mode after loading, treat as failure
+        toast.error('Still offline. Staying in test mode.');
+        setTestMode(true);
+        loadTestData();
+        return false;
       } else {
         toast.error('Still offline. Staying in test mode.');
         setTestMode(true);

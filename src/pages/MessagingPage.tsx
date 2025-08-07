@@ -21,12 +21,7 @@ export default function MessagingPage() {
     }
   }, [searchParams, user]);
 
-  // Auto-attempt live mode if currently in test mode
-  useEffect(() => {
-    if (messagingHook.testMode) {
-      messagingHook.retryLive();
-    }
-  }, [messagingHook.testMode]);
+  // Removed auto-retry live mode to avoid toast flapping; manual retry only
 
   const startConversationWithUser = async (targetUserId: string) => {
     try {
