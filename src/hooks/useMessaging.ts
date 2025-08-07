@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase, testSupabaseConnection } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import type { Conversation, Message, ConversationWithMessages } from '@/types/messaging';
@@ -17,39 +17,10 @@ export const useMessaging = () => {
       return;
     }
 
-    // Test connection first
-    console.log('Testing Supabase connection before loading conversations...');
-    const connectionOk = await testSupabaseConnection();
-    if (!connectionOk) {
-      console.log('Database connection failed, using offline mode');
-      
-      // Create a fallback conversation for BRILYSM user when database is unavailable
-      const fallbackConversation: Conversation = {
-        id: 'offline-conversation-brilysm',
-        participant_1_id: user.id,
-        participant_2_id: 'a990b02c-5913-4bdf-9609-68dee14cdd2d',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        last_message_at: new Date().toISOString(),
-        other_participant: {
-          id: 'a990b02c-5913-4bdf-9609-68dee14cdd2d',
-          display_name: 'BRILYSM',
-          full_name: 'Nabil',
-          email: 'nabilguellil0@gmail.com',
-          avatar_url: ''
-        },
-        unread_count: 0
-      };
-      
-      setConversations([fallbackConversation]);
-      setUnreadCount(0);
-      setLoading(false);
-      toast.info('Using offline mode. Messages will be stored locally.');
-      return;
-    }
-
     try {
-      // Get all conversations for the user with better error handling
+      console.log('Loading conversations for user:', user.id);
+      
+      // Get all conversations for the user
       const { data: conversationsData, error } = await supabase
         .from('conversations')
         .select('*')
@@ -59,15 +30,35 @@ export const useMessaging = () => {
       if (error) {
         console.error('Error loading conversations:', error);
         
-        // Retry on network errors
-        if ((error.message?.includes('Failed to fetch') || error.message?.includes('NetworkError')) && retryCount < 2) {
-          console.log(`Retrying conversation load... (attempt ${retryCount + 1})`);
-          setTimeout(() => loadConversations(retryCount + 1), 2000 * (retryCount + 1));
+        // On connection error, create a fallback system
+        if (error.message?.includes('Failed to fetch') || error.message?.includes('NetworkError')) {
+          console.log('Database connection failed, creating test conversation');
+          
+          // Create a test conversation for BRILYSM user
+          const testConversation: Conversation = {
+            id: 'test-conversation-brilysm',
+            participant_1_id: user.id,
+            participant_2_id: 'a990b02c-5913-4bdf-9609-68dee14cdd2d',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            last_message_at: new Date().toISOString(),
+            other_participant: {
+              id: 'a990b02c-5913-4bdf-9609-68dee14cdd2d',
+              display_name: 'BRILYSM',
+              full_name: 'Nabil',
+              email: 'nabilguellil0@gmail.com',
+              avatar_url: ''
+            },
+            unread_count: 0
+          };
+          
+          setConversations([testConversation]);
+          setUnreadCount(0);
+          setLoading(false);
+          toast.error('Database connection issue. Using test mode. Real messaging requires fixing the connection.');
           return;
         }
         
-        // If we can't load conversations, show empty state instead of error
-        console.log('Using empty conversation list due to connection issues');
         setConversations([]);
         setUnreadCount(0);
         setLoading(false);
@@ -167,13 +158,6 @@ export const useMessaging = () => {
 
     } catch (error) {
       console.error('Error loading conversations:', error);
-      
-      // Retry on network errors
-      if (error instanceof Error && (error.message?.includes('Failed to fetch') || error.message?.includes('NetworkError')) && retryCount < 2) {
-        console.log(`Retrying conversation load... (attempt ${retryCount + 1})`);
-        setTimeout(() => loadConversations(retryCount + 1), 2000 * (retryCount + 1));
-        return;
-      }
       
       // Show empty state instead of error
       console.log('Using empty conversation list due to connection error');
@@ -283,40 +267,6 @@ export const useMessaging = () => {
     fileName?: string
   ): Promise<boolean> => {
     if (!user) return false;
-
-    // Handle offline conversations
-    if (conversationId.startsWith('offline-')) {
-      console.log('Sending message in offline conversation:', conversationId);
-      
-      // Create a local message
-      const offlineMessage = {
-        id: `offline-msg-${Date.now()}`,
-        conversation_id: conversationId,
-        sender_id: user.id,
-        content,
-        message_type: messageType,
-        file_url: fileUrl,
-        file_name: fileName,
-        is_read: false,
-        created_at: new Date().toISOString()
-      };
-
-      // Store message locally
-      const storedMessages = localStorage.getItem(`messages-${conversationId}`) || '[]';
-      const messages = JSON.parse(storedMessages);
-      messages.push(offlineMessage);
-      localStorage.setItem(`messages-${conversationId}`, JSON.stringify(messages));
-
-      // Dispatch event for real-time update
-      window.dispatchEvent(new CustomEvent('offlineMessageSent', { 
-        detail: { message: offlineMessage, conversationId } 
-      }));
-
-      toast.success('Message sent (offline mode)');
-      return true;
-    }
-
-    // Only handle real conversations - no mock conversations
 
     try {
       console.log('Sending real message to conversation:', conversationId);
@@ -509,64 +459,6 @@ export const useConversation = (conversationId: string | null) => {
   const loadConversation = useCallback(async (retryCount = 0) => {
     if (!conversationId || !user) {
       setLoading(false);
-      return;
-    }
-
-    // Handle offline conversation IDs
-    if (conversationId.startsWith('offline-')) {
-      console.log('Loading offline conversation:', conversationId);
-      
-      // Create offline conversation with stored messages
-      const storedMessages = localStorage.getItem(`messages-${conversationId}`) || '[]';
-      const messages = JSON.parse(storedMessages);
-      
-      const offlineConversation: ConversationWithMessages = {
-        id: conversationId,
-        participant_1_id: user.id,
-        participant_2_id: 'a990b02c-5913-4bdf-9609-68dee14cdd2d',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        last_message_at: new Date().toISOString(),
-        other_participant: {
-          id: 'a990b02c-5913-4bdf-9609-68dee14cdd2d',
-          display_name: 'BRILYSM',
-          full_name: 'Nabil',
-          email: 'nabilguellil0@gmail.com',
-          avatar_url: ''
-        },
-        messages: messages
-      };
-      
-      setConversation(offlineConversation);
-      setLoading(false);
-      
-      // Listen for offline message events
-      const handleOfflineMessage = (event: CustomEvent) => {
-        const { message, conversationId: eventConvId } = event.detail;
-        if (eventConvId === conversationId) {
-          setConversation(prev => {
-            if (!prev) return prev;
-            return {
-              ...prev,
-              messages: [...prev.messages, message]
-            };
-          });
-        }
-      };
-      
-      window.addEventListener('offlineMessageSent', handleOfflineMessage as EventListener);
-      return () => {
-        window.removeEventListener('offlineMessageSent', handleOfflineMessage as EventListener);
-      };
-    }
-
-    // Handle mock conversation IDs by redirecting to offline conversation
-    if (conversationId.startsWith('mock-')) {
-      const otherUserId = conversationId.replace('mock-', '');
-      console.log('Converting mock conversation to offline conversation for user:', otherUserId);
-      
-      // Redirect to offline conversation
-      window.location.href = `/messaging?conversation=offline-conversation-brilysm`;
       return;
     }
 

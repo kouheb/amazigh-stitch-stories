@@ -19,26 +19,33 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-  }
+  },
+  db: {
+    schema: 'public'
+  },
+  global: {
+    headers: {
+      'x-my-custom-header': 'my-app-name',
+    },
+  },
 });
 
-// Enhanced connection test function
+// Simple connection test without using profiles table that might not exist
 export const testSupabaseConnection = async () => {
   try {
     console.log('Testing Supabase connection to:', SUPABASE_URL);
     
-    // First test basic connectivity with a simple query
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('id')
-      .limit(1);
+    // Test basic connectivity with auth endpoint instead of profiles table
+    const { data, error } = await supabase.auth.getSession();
     
-    if (error) {
-      console.error('Supabase connection test failed with error:', error);
+    console.log('Supabase connection test result:', { hasData: !!data, error });
+    
+    if (error && error.message.includes('Failed to fetch')) {
+      console.error('Network connectivity issue detected');
       return false;
     }
     
-    console.log('Supabase connection test successful, data:', data);
+    console.log('Supabase connection test successful');
     return true;
   } catch (error) {
     console.error('Supabase connection test caught exception:', error);
