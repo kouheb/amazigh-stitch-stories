@@ -5,7 +5,7 @@ import { EmptyState } from '../EmptyState';
 // Removed old useConversation hook - using new real-time system
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/AuthContext';
-import type { Conversation, Message } from '@/types/messaging';
+import type { Conversation, ConversationWithMessages } from '@/types/messaging';
 
 interface MessengerLayoutProps {
   selectedConversationId?: string | null;
@@ -16,6 +16,7 @@ interface MessengerLayoutProps {
     loading: boolean;
     sendMessage: (conversationId: string, content: string, messageType?: 'text' | 'image' | 'file', fileUrl?: string, fileName?: string) => Promise<boolean>;
     markAsRead: (conversationId: string) => Promise<void>;
+    loadMessages: (conversationId: string) => Promise<void>;
   };
 }
 
@@ -37,19 +38,24 @@ export const MessengerLayout = ({
   const loading = messagingHook?.loading || false;
   const sendMessage = messagingHook?.sendMessage || (async () => false);
   const markAsRead = messagingHook?.markAsRead || (async () => {});
+  const loadMessages = messagingHook?.loadMessages || (async () => {});
   
-  // Note: This component is now unused in favor of the new MessagingInterface
-  const conversation = null;
-  const conversationLoading = false;
   const { user } = useAuth();
 
-  // Only use real conversations
-  const activeConversation = conversation;
+  // Find the active conversation from the loaded conversations
+  const activeConversation = selectedConversationId 
+    ? conversations.find(conv => conv.id === selectedConversationId) 
+    : null;
 
-  const handleSelectConversation = (conversationId: string) => {
+  const handleSelectConversation = async (conversationId: string) => {
     onSelectConversation(conversationId);
-    // Mark messages as read when opening conversation
-    markAsRead(conversationId);
+    // Load messages for the conversation and mark as read
+    try {
+      await loadMessages(conversationId);
+      await markAsRead(conversationId);
+    } catch (error) {
+      console.error('Error loading conversation:', error);
+    }
   };
 
   const handleSendMessage = async (content: string) => {
@@ -65,10 +71,16 @@ export const MessengerLayout = ({
   // Mobile layout: show either list or chat
   if (isMobile) {
     if (selectedConversationId && activeConversation) {
+      // Convert to ConversationWithMessages format
+      const conversationWithMessages: ConversationWithMessages = {
+        ...activeConversation,
+        messages: [] // Messages are loaded separately in the new system
+      };
+      
       return (
         <div className="h-full">
           <MessengerChat
-            conversation={activeConversation}
+            conversation={conversationWithMessages}
             onSendMessage={handleSendMessage}
             onBack={handleBackToList}
             showBackButton={true}
@@ -105,10 +117,20 @@ export const MessengerLayout = ({
       {/* Chat area */}
       <div className="flex-1">
         {selectedConversationId && activeConversation ? (
-          <MessengerChat
-            conversation={activeConversation}
-            onSendMessage={handleSendMessage}
-          />
+          (() => {
+            // Convert to ConversationWithMessages format
+            const conversationWithMessages: ConversationWithMessages = {
+              ...activeConversation,
+              messages: [] // Messages are loaded separately in the new system
+            };
+            
+            return (
+              <MessengerChat
+                conversation={conversationWithMessages}
+                onSendMessage={handleSendMessage}
+              />
+            );
+          })()
         ) : (
           <EmptyState onStartConversation={onStartConversation} />
         )}

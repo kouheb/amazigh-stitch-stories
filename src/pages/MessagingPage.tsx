@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { MessengerLayout } from '@/components/messaging/messenger/MessengerLayout';
+import { MessagingInterface } from '@/components/messaging/MessagingInterface';
 import { useRealTimeMessaging } from '@/hooks/useRealTimeMessaging';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -69,11 +69,8 @@ export default function MessagingPage() {
 
   return (
     <div className="h-screen">
-      <MessengerLayout 
-        selectedConversationId={selectedConversationId}
-        onSelectConversation={handleSelectConversation}
+      <MessagingInterface 
         onStartConversation={handleStartConversation}
-        messagingHook={messagingHook}
       />
     </div>
   );
