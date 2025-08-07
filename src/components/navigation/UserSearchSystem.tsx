@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, testSupabaseConnection } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -79,9 +79,12 @@ export const UserSearchSystem = ({
       return;
     }
 
-    // Check if online first
-    if (!navigator.onLine) {
-      toast.error('You are offline. Search requires an internet connection.');
+    // Test connection first
+    console.log('Testing connection before search...');
+    const connectionOk = await testSupabaseConnection();
+    if (!connectionOk) {
+      toast.error('Unable to connect to the database. Please check your internet connection.');
+      setSearching(false);
       return;
     }
 

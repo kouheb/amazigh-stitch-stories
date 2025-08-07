@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, testSupabaseConnection } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import type { Conversation, Message, ConversationWithMessages } from '@/types/messaging';
@@ -17,9 +17,11 @@ export const useMessaging = () => {
       return;
     }
 
-    // Check connection status
-    if (!navigator.onLine) {
-      toast.error('You are offline. Please check your internet connection.');
+    // Test connection first
+    console.log('Testing Supabase connection before loading conversations...');
+    const connectionOk = await testSupabaseConnection();
+    if (!connectionOk) {
+      toast.error('Unable to connect to the database. Please check your internet connection.');
       setLoading(false);
       return;
     }

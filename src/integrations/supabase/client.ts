@@ -8,4 +8,31 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+  },
+  global: {
+    headers: {
+      'apikey': SUPABASE_PUBLISHABLE_KEY,
+    },
+  },
+});
+
+// Add connection test function
+export const testSupabaseConnection = async () => {
+  try {
+    console.log('Testing Supabase connection...');
+    const { data, error } = await supabase.from('profiles').select('id').limit(1);
+    if (error) {
+      console.error('Supabase connection test failed:', error);
+      return false;
+    }
+    console.log('Supabase connection test successful');
+    return true;
+  } catch (error) {
+    console.error('Supabase connection test error:', error);
+    return false;
+  }
+};
