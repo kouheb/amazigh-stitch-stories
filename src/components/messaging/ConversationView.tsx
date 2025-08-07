@@ -2,8 +2,9 @@ import React, { useEffect, useRef } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MessageBubble } from './MessageBubble';
 import { MessageInput } from './MessageInput';
+import { EnhancedMessageInput } from './EnhancedMessageInput';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Phone, Video, MoreVertical } from 'lucide-react';
+import { ArrowLeft, Phone, Video, MoreVertical, Users } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import type { Message, Conversation } from '@/types/messaging';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,7 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 interface ConversationViewProps {
   conversation: Conversation;
   messages: Message[];
-  onSendMessage: (content: string) => Promise<boolean>;
+  onSendMessage: (content: string, type?: 'text' | 'image' | 'file', fileUrl?: string, fileName?: string) => Promise<boolean>;
   onBack: () => void;
   onMarkAsRead: () => void;
 }
@@ -112,8 +113,8 @@ export const ConversationView = ({
       </ScrollArea>
 
       {/* Message Input */}
-      <div className="border-t border-border p-4">
-        <MessageInput onSendMessage={onSendMessage} />
+      <div className="border-t border-border">
+        <EnhancedMessageInput onSendMessage={onSendMessage} />
       </div>
     </div>
   );

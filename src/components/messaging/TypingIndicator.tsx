@@ -1,24 +1,39 @@
+import React from 'react';
+import { cn } from '@/lib/utils';
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+interface TypingIndicatorProps {
+  isTyping: boolean;
+  userNames?: string[];
+  className?: string;
+}
 
-export const TypingIndicator = () => {
+export const TypingIndicator = ({ 
+  isTyping, 
+  userNames = [], 
+  className 
+}: TypingIndicatorProps) => {
+  if (!isTyping) return null;
+
+  const getTypingText = () => {
+    if (userNames.length === 0) {
+      return 'Someone is typing...';
+    } else if (userNames.length === 1) {
+      return `${userNames[0]} is typing...`;
+    } else if (userNames.length === 2) {
+      return `${userNames[0]} and ${userNames[1]} are typing...`;
+    } else {
+      return `${userNames[0]} and ${userNames.length - 1} others are typing...`;
+    }
+  };
+
   return (
-    <div className="flex gap-3 max-w-4xl">
-      <Avatar className="h-8 w-8 flex-shrink-0">
-        <AvatarImage src="https://images.unsplash.com/photo-1494790108755-2616c163f505?w=32&h=32&fit=crop&crop=face" />
-        <AvatarFallback>FM</AvatarFallback>
-      </Avatar>
-      
-      <div className="flex flex-col">
-        <div className="bg-white text-gray-800 border border-gray-200 rounded-2xl rounded-bl-md px-4 py-3 max-w-xs">
-          <div className="flex space-x-1">
-            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-          </div>
-        </div>
-        <p className="text-xs text-gray-500 mt-1 px-1">typing...</p>
+    <div className={cn("flex items-center gap-2 p-3 text-sm text-muted-foreground", className)}>
+      <div className="flex gap-1">
+        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
       </div>
+      <span className="italic">{getTypingText()}</span>
     </div>
   );
 };

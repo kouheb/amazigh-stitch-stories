@@ -330,7 +330,7 @@ export const useRealTimeMessaging = () => {
     }
   }, [user, testMode]);
 
-  // Set up real-time subscriptions
+  // Set up real-time subscriptions with improved error handling
   useEffect(() => {
     if (!user || testMode) return;
 
@@ -339,9 +339,9 @@ export const useRealTimeMessaging = () => {
     let conversationsChannel: any = null;
 
     try {
-      // Subscribe to new messages
+      // Subscribe to new messages with better filtering
       messagesChannel = supabase
-        .channel(`messages_${user.id}_${Date.now()}`)
+        .channel(`user_messages_${user.id}`)
         .on(
           'postgres_changes',
           {
@@ -351,6 +351,9 @@ export const useRealTimeMessaging = () => {
           },
           (payload) => {
             try {
+              console.log('New message received:', payload);
+              
+              // Check if this message involves the current user
               const newMessage: Message = {
                 id: payload.new.id,
                 conversation_id: payload.new.conversation_id,
@@ -362,36 +365,98 @@ export const useRealTimeMessaging = () => {
                 is_read: payload.new.is_read,
                 created_at: payload.new.created_at
               };
-              console.log('New message received:', newMessage);
 
-              // Add to messages state
-              setMessages(prev => ({
-                ...prev,
-                [newMessage.conversation_id]: [
-                  ...(prev[newMessage.conversation_id] || []),
-                  newMessage
-                ]
-              }));
+              // Check if this message is for a conversation the user is part of
+              const userConversation = conversations.find(conv => 
+                conv.id === newMessage.conversation_id
+              );
 
-              // Show notification if not from current user
-              if (newMessage.sender_id !== user.id) {
-                toast.success('New message received');
+              if (userConversation) {
+                // Add to messages state immediately for real-time effect
+                setMessages(prev => ({
+                  ...prev,
+                  [newMessage.conversation_id]: [
+                    ...(prev[newMessage.conversation_id] || []),
+                    newMessage
+                  ]
+                }));
+
+                // Show notification if not from current user
+                if (newMessage.sender_id !== user.id) {
+                  const senderName = userConversation.other_participant?.display_name 
+                    || userConversation.other_participant?.full_name 
+                    || 'Someone';
+                  
+                  toast.success(`New message from ${senderName}`, {
+                    description: newMessage.content.substring(0, 50) + 
+                      (newMessage.content.length > 50 ? '...' : ''),
+                    action: {
+                      label: "View",
+                      onClick: () => {
+                        // Could navigate to the conversation here
+                        console.log('Navigate to conversation:', newMessage.conversation_id);
+                      }
+                    }
+                  });
+                }
+
+                // Update conversation list to reflect new message
+                loadConversations();
               }
             } catch (err) {
               console.error('Error processing new message:', err);
             }
           }
         )
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'messages'
+          },
+          (payload) => {
+            try {
+              console.log('Message updated (read status):', payload);
+              
+              const updatedMessage: Message = {
+                id: payload.new.id,
+                conversation_id: payload.new.conversation_id,
+                sender_id: payload.new.sender_id,
+                content: payload.new.content,
+                message_type: payload.new.message_type as 'text' | 'image' | 'file',
+                file_url: payload.new.file_url,
+                file_name: payload.new.file_name,
+                is_read: payload.new.is_read,
+                created_at: payload.new.created_at
+              };
+
+              // Update message in state
+              setMessages(prev => ({
+                ...prev,
+                [updatedMessage.conversation_id]: (prev[updatedMessage.conversation_id] || []).map(msg =>
+                  msg.id === updatedMessage.id ? updatedMessage : msg
+                )
+              }));
+            } catch (err) {
+              console.error('Error processing message update:', err);
+            }
+          }
+        )
         .subscribe((status) => {
           console.log('Messages subscription status:', status);
-          if (status !== 'SUBSCRIBED') {
-            console.warn('Messages subscription failed, continuing without real-time');
+          if (status === 'SUBSCRIBED') {
+            console.log('Successfully subscribed to messages');
+          } else if (status === 'CLOSED') {
+            console.warn('Messages subscription closed');
+          } else if (status === 'CHANNEL_ERROR') {
+            console.error('Messages subscription error');
           }
         });
 
       // Subscribe to conversation updates
       conversationsChannel = supabase
-        .channel(`conversations_${user.id}_${Date.now()}`)
+        .channel(`user_conversations_${user.id}`)
         .on(
           'postgres_changes',
           {
@@ -400,9 +465,10 @@ export const useRealTimeMessaging = () => {
             table: 'conversations',
             filter: `participant_1_id=eq.${user.id}`
           },
-          () => {
-            console.log('Conversation updated, reloading...');
-            loadConversations();
+          (payload) => {
+            console.log('Conversation updated (participant 1):', payload);
+            // Reload conversations to get fresh data with participant info
+            setTimeout(() => loadConversations(), 100);
           }
         )
         .on(
@@ -413,15 +479,16 @@ export const useRealTimeMessaging = () => {
             table: 'conversations',
             filter: `participant_2_id=eq.${user.id}`
           },
-          () => {
-            console.log('Conversation updated, reloading...');
-            loadConversations();
+          (payload) => {
+            console.log('Conversation updated (participant 2):', payload);
+            // Reload conversations to get fresh data with participant info
+            setTimeout(() => loadConversations(), 100);
           }
         )
         .subscribe((status) => {
           console.log('Conversations subscription status:', status);
-          if (status !== 'SUBSCRIBED') {
-            console.warn('Conversations subscription failed, continuing without real-time');
+          if (status === 'SUBSCRIBED') {
+            console.log('Successfully subscribed to conversations');
           }
         });
 
@@ -442,7 +509,7 @@ export const useRealTimeMessaging = () => {
         console.warn('Error cleaning up subscriptions:', err);
       }
     };
-  }, [user, loadConversations, testMode]);
+  }, [user, testMode, conversations, loadConversations]);
 
   // Load initial data
   useEffect(() => {
