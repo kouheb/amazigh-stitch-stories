@@ -312,87 +312,112 @@ export const useRealTimeMessaging = () => {
     if (!user || testMode) return;
 
     console.log('Setting up real-time subscriptions');
+    let messagesChannel: any = null;
+    let conversationsChannel: any = null;
 
-    // Subscribe to new messages
-    const messagesChannel = supabase
-      .channel('messages_channel')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages'
-        },
-        (payload) => {
-          const newMessage: Message = {
-            id: payload.new.id,
-            conversation_id: payload.new.conversation_id,
-            sender_id: payload.new.sender_id,
-            content: payload.new.content,
-            message_type: payload.new.message_type as 'text' | 'image' | 'file',
-            file_url: payload.new.file_url,
-            file_name: payload.new.file_name,
-            is_read: payload.new.is_read,
-            created_at: payload.new.created_at
-          };
-          console.log('New message received:', newMessage);
+    try {
+      // Subscribe to new messages
+      messagesChannel = supabase
+        .channel(`messages_${user.id}_${Date.now()}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'messages'
+          },
+          (payload) => {
+            try {
+              const newMessage: Message = {
+                id: payload.new.id,
+                conversation_id: payload.new.conversation_id,
+                sender_id: payload.new.sender_id,
+                content: payload.new.content,
+                message_type: payload.new.message_type as 'text' | 'image' | 'file',
+                file_url: payload.new.file_url,
+                file_name: payload.new.file_name,
+                is_read: payload.new.is_read,
+                created_at: payload.new.created_at
+              };
+              console.log('New message received:', newMessage);
 
-          // Add to messages state
-          setMessages(prev => ({
-            ...prev,
-            [newMessage.conversation_id]: [
-              ...(prev[newMessage.conversation_id] || []),
-              newMessage
-            ]
-          }));
+              // Add to messages state
+              setMessages(prev => ({
+                ...prev,
+                [newMessage.conversation_id]: [
+                  ...(prev[newMessage.conversation_id] || []),
+                  newMessage
+                ]
+              }));
 
-          // Show notification if not from current user
-          if (newMessage.sender_id !== user.id) {
-            toast.success('New message received');
+              // Show notification if not from current user
+              if (newMessage.sender_id !== user.id) {
+                toast.success('New message received');
+              }
+            } catch (err) {
+              console.error('Error processing new message:', err);
+            }
           }
-        }
-      )
-      .subscribe((status) => {
-        console.log('Messages subscription status:', status);
-      });
+        )
+        .subscribe((status) => {
+          console.log('Messages subscription status:', status);
+          if (status !== 'SUBSCRIBED') {
+            console.warn('Messages subscription failed, continuing without real-time');
+          }
+        });
 
-    // Subscribe to conversation updates
-    const conversationsChannel = supabase
-      .channel('conversations_channel')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'conversations',
-          filter: `participant_1_id=eq.${user.id}`
-        },
-        () => {
-          console.log('Conversation updated, reloading...');
-          loadConversations();
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'conversations',
-          filter: `participant_2_id=eq.${user.id}`
-        },
-        () => {
-          console.log('Conversation updated, reloading...');
-          loadConversations();
-        }
-      )
-      .subscribe((status) => {
-        console.log('Conversations subscription status:', status);
-      });
+      // Subscribe to conversation updates
+      conversationsChannel = supabase
+        .channel(`conversations_${user.id}_${Date.now()}`)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'conversations',
+            filter: `participant_1_id=eq.${user.id}`
+          },
+          () => {
+            console.log('Conversation updated, reloading...');
+            loadConversations();
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'conversations',
+            filter: `participant_2_id=eq.${user.id}`
+          },
+          () => {
+            console.log('Conversation updated, reloading...');
+            loadConversations();
+          }
+        )
+        .subscribe((status) => {
+          console.log('Conversations subscription status:', status);
+          if (status !== 'SUBSCRIBED') {
+            console.warn('Conversations subscription failed, continuing without real-time');
+          }
+        });
+
+    } catch (err) {
+      console.warn('Failed to set up real-time subscriptions:', err);
+    }
 
     return () => {
       console.log('Cleaning up real-time subscriptions');
-      supabase.removeChannel(messagesChannel);
-      supabase.removeChannel(conversationsChannel);
+      try {
+        if (messagesChannel) {
+          supabase.removeChannel(messagesChannel);
+        }
+        if (conversationsChannel) {
+          supabase.removeChannel(conversationsChannel);
+        }
+      } catch (err) {
+        console.warn('Error cleaning up subscriptions:', err);
+      }
     };
   }, [user, loadConversations, testMode]);
 
