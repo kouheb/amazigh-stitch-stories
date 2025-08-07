@@ -23,6 +23,7 @@ import { WorkShowcase } from "@/components/profile/WorkShowcase";
 import { ProfileStats } from "@/components/profile/ProfileStats";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface UserProfile {
   id: string;
@@ -49,10 +50,13 @@ interface UserStats {
 export const PublicProfilePage = () => {
   const { username } = useParams(); // This is actually the user ID
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [stats, setStats] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("portfolio");
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [updatingFollow, setUpdatingFollow] = useState(false);
 
   useEffect(() => {
     if (username) {
@@ -99,6 +103,18 @@ export const PublicProfilePage = () => {
         });
       }
 
+      // Check follow state for current viewer
+      if (user && user.id !== userId) {
+        const { data: rel } = await supabase
+          .from('follow_relationships')
+          .select('id')
+          .eq('follower_id', user.id)
+          .eq('following_id', userId)
+          .maybeSingle();
+        setIsFollowing(!!rel);
+      } else {
+        setIsFollowing(false);
+      }
     } catch (error) {
       console.error('Error loading user profile:', error);
       toast.error('Failed to load profile');
@@ -122,14 +138,33 @@ export const PublicProfilePage = () => {
   };
 
   const handleFollow = async () => {
-    if (!profile) return;
-    
+    if (!profile || !user || profile.id === user.id || updatingFollow) return;
     try {
-      // TODO: Implement follow functionality
-      toast.success("Follow functionality coming soon!");
+      setUpdatingFollow(true);
+      if (isFollowing) {
+        const { error } = await supabase
+          .from('follow_relationships')
+          .delete()
+          .eq('follower_id', user.id)
+          .eq('following_id', profile.id);
+        if (error) throw error;
+        setIsFollowing(false);
+        setStats((prev) => prev ? { ...prev, followers_count: Math.max(0, prev.followers_count - 1) } : prev);
+        toast.success('Unfollowed');
+      } else {
+        const { error } = await supabase
+          .from('follow_relationships')
+          .insert({ follower_id: user.id, following_id: profile.id });
+        if (error) throw error;
+        setIsFollowing(true);
+        setStats((prev) => prev ? { ...prev, followers_count: prev.followers_count + 1 } : prev);
+        toast.success('Now following');
+      }
     } catch (error) {
-      console.error('Error following user:', error);
-      toast.error('Failed to follow user');
+      console.error('Error updating follow:', error);
+      toast.error('Failed to update follow');
+    } finally {
+      setUpdatingFollow(false);
     }
   };
 
@@ -236,10 +271,12 @@ export const PublicProfilePage = () => {
                         <MessageSquare className="h-4 w-4 mr-2" />
                         Message
                       </Button>
-                      <Button variant="outline" size="sm" onClick={handleFollow}>
-                        <UserPlus className="h-4 w-4 mr-2" />
-                        Follow
-                      </Button>
+                      {profile.id !== user?.id && (
+                        <Button variant="outline" size="sm" onClick={handleFollow} disabled={updatingFollow}>
+                          <UserPlus className="h-4 w-4 mr-2" />
+                          {isFollowing ? 'Unfollow' : 'Follow'}
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>

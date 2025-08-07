@@ -11,7 +11,8 @@ import {
   Settings, 
   User, 
   LogOut,
-  Plus
+  Plus,
+  Key
 } from "lucide-react";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -121,6 +122,13 @@ export const UserDropdown = ({ onCreateClick, onTabChange }: UserDropdownProps) 
           >
             <Settings className="mr-2 h-4 w-4" />
             <span>{t('nav.settings')}</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem 
+            className="text-gray-700 hover:bg-gray-100 hover:text-black cursor-pointer"
+            onClick={() => navigate('/settings/api-keys')}
+          >
+            <Key className="mr-2 h-4 w-4" />
+            <span>API Keys</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator className="bg-gray-200" />
           <DropdownMenuItem 

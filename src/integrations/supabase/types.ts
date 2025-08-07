@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      api_keys: {
+        Row: {
+          created_at: string
+          hashed_key: string
+          id: string
+          last_used_at: string | null
+          name: string | null
+          prefix: string
+          revoked: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          hashed_key: string
+          id?: string
+          last_used_at?: string | null
+          name?: string | null
+          prefix?: string
+          revoked?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          hashed_key?: string
+          id?: string
+          last_used_at?: string | null
+          name?: string | null
+          prefix?: string
+          revoked?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       calls: {
         Row: {
           call_type: string
@@ -187,6 +223,27 @@ export type Database = {
           tags?: string[] | null
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      follow_relationships: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+          id?: string
         }
         Relationships: []
       }

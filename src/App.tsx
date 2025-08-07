@@ -26,6 +26,7 @@ import { DeleteAccountPage } from "./pages/DeleteAccountPage";
 import { PlayStoreGraphicsPage } from "./pages/PlayStoreGraphicsPage";
 import { PublicProfilePage } from "./pages/PublicProfilePage";
 import NotFound from "./pages/NotFound";
+import { ApiKeysPage } from "./pages/ApiKeysPage";
 
 const queryClient = new QueryClient();
 
@@ -65,6 +66,11 @@ const App = () => (
               <Route path="/profile/:username" element={
                 <ProtectedRoute>
                   <PublicProfilePage />
+                </ProtectedRoute>
+              } />
+              <Route path="/settings/api-keys" element={
+                <ProtectedRoute>
+                  <ApiKeysPage />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
