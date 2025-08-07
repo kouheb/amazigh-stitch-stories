@@ -175,25 +175,37 @@ export const useMessaging = () => {
     try {
       console.log(`Attempting to get/create conversation with user ${otherUserId} (attempt ${retryCount + 1})`);
       
-      // Check if conversation already exists - use maybeSingle to avoid errors when no rows found
-      const { data: existingConv, error: findError } = await supabase
+      // Use simpler queries that work better with network issues
+      let existingConv = null;
+      
+      // Try first combination
+      const { data: conv1, error: error1 } = await supabase
         .from('conversations')
         .select('id')
-        .or(
-          `and(participant_1_id.eq.${user.id},participant_2_id.eq.${otherUserId}),and(participant_1_id.eq.${otherUserId},participant_2_id.eq.${user.id})`
-        )
+        .eq('participant_1_id', user.id)
+        .eq('participant_2_id', otherUserId)
         .maybeSingle();
 
-      if (findError) {
-        console.error('Error finding conversation:', findError);
-        
-        // Retry on network errors
-        if ((findError.message?.includes('Failed to fetch') || findError.message?.includes('NetworkError')) && retryCount < 2) {
-          console.log(`Retrying conversation lookup... (attempt ${retryCount + 1})`);
-          await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
-          return getOrCreateConversation(otherUserId, retryCount + 1);
+      if (conv1) {
+        existingConv = conv1;
+      } else if (!error1 || error1.message.includes('No rows found')) {
+        // Try reverse combination
+        const { data: conv2, error: error2 } = await supabase
+          .from('conversations')
+          .select('id')
+          .eq('participant_1_id', otherUserId)
+          .eq('participant_2_id', user.id)
+          .maybeSingle();
+
+        if (conv2) {
+          existingConv = conv2;
+        } else if (error2 && !error2.message.includes('No rows found')) {
+          console.error('Error finding conversation:', error2);
+          throw error2;
         }
-        return null;
+      } else {
+        console.error('Error finding conversation:', error1);
+        throw error1;
       }
 
       if (existingConv) {
