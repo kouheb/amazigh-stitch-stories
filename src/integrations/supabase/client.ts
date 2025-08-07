@@ -19,15 +19,17 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
   auth: {
     persistSession: true,
     autoRefreshToken: true,
+    storage: window.localStorage,
+    detectSessionInUrl: true
   },
   db: {
     schema: 'public'
   },
-  global: {
-    headers: {
-      'x-my-custom-header': 'my-app-name',
-    },
-  },
+  realtime: {
+    params: {
+      eventsPerSecond: 10
+    }
+  }
 });
 
 // Simple connection test without using profiles table that might not exist
