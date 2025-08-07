@@ -38,65 +38,11 @@ export const MessengerLayout = ({
   const sendMessage = messagingHook?.sendMessage || (async () => false);
   const markAsRead = messagingHook?.markAsRead || (async () => {});
   
-  // Check if this is a mock conversation (offline mode) - kept for backward compatibility
-  const isMockConversation = selectedConversationId?.startsWith('mock-');
-  const mockUserId = isMockConversation ? selectedConversationId?.replace('mock-', '') : null;
-  
-  const { conversation, loading: conversationLoading } = useConversation(isMockConversation ? null : selectedConversationId);
+  const { conversation, loading: conversationLoading } = useConversation(selectedConversationId);
   const { user } = useAuth();
 
-  // Create mock conversation for offline mode with message tracking (kept for fallback)
-  const [mockMessages, setMockMessages] = useState<Message[]>([]);
-  
-  const mockConversation = isMockConversation && mockUserId ? {
-    id: selectedConversationId,
-    participant_1_id: user?.id || 'current-user',
-    participant_2_id: mockUserId,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    last_message_at: null,
-    last_message_id: null,
-    other_participant: {
-      id: mockUserId,
-      display_name: mockUserId === 'a990b02c-5913-4bdf-9609-68dee14cdd2d' ? 'BRILYSM' : 'User',
-      full_name: mockUserId === 'a990b02c-5913-4bdf-9609-68dee14cdd2d' ? 'Nabil' : 'User',
-      email: mockUserId === 'a990b02c-5913-4bdf-9609-68dee14cdd2d' ? 'nabilguellil0@gmail.com' : 'user@email.com',
-      avatar_url: ''
-    },
-    messages: mockMessages
-  } : null;
-
-  // Listen for mock message events and initialize with welcome message (kept for fallback)
-  useEffect(() => {
-    const handleMockMessage = (event: CustomEvent) => {
-      const { message, conversationId } = event.detail;
-      if (conversationId === selectedConversationId) {
-        setMockMessages(prev => [...prev, message]);
-      }
-    };
-
-    // Initialize mock conversation with a welcome message only if it's actually a mock conversation
-    if (isMockConversation && mockMessages.length === 0) {
-      const welcomeMessage = {
-        id: `welcome-${Date.now()}`,
-        conversation_id: selectedConversationId!,
-        sender_id: mockUserId!,
-        content: "Hello! This is a mock conversation since we're currently offline. Your messages will appear here but won't be saved.",
-        message_type: 'text' as const,
-        is_read: false,
-        created_at: new Date().toISOString()
-      };
-      setMockMessages([welcomeMessage]);
-    }
-
-    window.addEventListener('mockMessageSent', handleMockMessage as EventListener);
-    return () => {
-      window.removeEventListener('mockMessageSent', handleMockMessage as EventListener);
-    };
-  }, [selectedConversationId, isMockConversation, mockUserId, mockMessages.length]);
-
-  // Use real conversation or mock conversation as fallback
-  const activeConversation = conversation || mockConversation;
+  // Only use real conversations
+  const activeConversation = conversation;
 
   const handleSelectConversation = (conversationId: string) => {
     onSelectConversation(conversationId);

@@ -260,31 +260,7 @@ export const useMessaging = () => {
   ): Promise<boolean> => {
     if (!user) return false;
 
-    // Handle mock conversations (offline mode) - allow local message sending
-    if (conversationId.startsWith('mock-')) {
-      console.log('Sending message in mock conversation:', conversationId);
-      
-      // Create a mock message that appears in the conversation
-      const mockMessage = {
-        id: `mock-msg-${Date.now()}`,
-        conversation_id: conversationId,
-        sender_id: user.id,
-        content,
-        message_type: messageType,
-        file_url: fileUrl,
-        file_name: fileName,
-        is_read: false,
-        created_at: new Date().toISOString()
-      };
-
-      // Dispatch a custom event to update the conversation with the new message
-      window.dispatchEvent(new CustomEvent('mockMessageSent', { 
-        detail: { message: mockMessage, conversationId } 
-      }));
-
-      toast.success('Message sent (offline mode)');
-      return true;
-    }
+    // Only handle real conversations - no mock conversations
 
     try {
       console.log('Sending real message to conversation:', conversationId);
