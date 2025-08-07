@@ -196,8 +196,7 @@ export const UserSearchSystem = ({
   };
 
   const handleViewProfile = (selectedUser: UserResult) => {
-    const username = selectedUser.display_name || selectedUser.full_name || selectedUser.email.split('@')[0];
-    navigate(`/profile/${username}`);
+    navigate(`/profile/${selectedUser.id}`);
     setIsOpen(false);
     setSearchQuery("");
   };
