@@ -63,7 +63,7 @@ const App = () => (
                   <MessagingPage />
                 </ProtectedRoute>
               } />
-              <Route path="/profile/:username" element={
+              <Route path="/profile/:id" element={
                 <ProtectedRoute>
                   <PublicProfilePage />
                 </ProtectedRoute>

@@ -48,7 +48,7 @@ interface UserStats {
 }
 
 export const PublicProfilePage = () => {
-  const { username } = useParams(); // This is actually the user ID
+  const { id: userIdParam } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -59,10 +59,10 @@ export const PublicProfilePage = () => {
   const [updatingFollow, setUpdatingFollow] = useState(false);
 
   useEffect(() => {
-    if (username) {
-      loadUserProfile(username);
+    if (userIdParam) {
+      loadUserProfile(userIdParam);
     }
-  }, [username]);
+  }, [userIdParam]);
 
   const loadUserProfile = async (userId: string) => {
     setLoading(true);
@@ -72,23 +72,42 @@ export const PublicProfilePage = () => {
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (profileError) {
         console.error('Error loading profile:', profileError);
-        toast.error('Profile not found');
-        navigate('/app');
-        return;
       }
 
-      setProfile(profileData);
+      if (!profileData) {
+        // Fallback to demo profile when offline or profile doesn't exist
+        if (userId === 'demo-user-1' || userId === 'a990b02c-5913-4bdf-9609-68dee14cdd2d') {
+          const demo: UserProfile = {
+            id: userId,
+            display_name: userId === 'demo-user-1' ? 'Demo User' : 'BRILYSM',
+            full_name: userId === 'demo-user-1' ? 'Demo User' : 'Nabil',
+            email: userId === 'demo-user-1' ? 'demo@example.com' : 'nabilguellil0@gmail.com',
+            bio: userId === 'demo-user-1' ? 'This is a demo user for testing purposes' : 'Developer',
+            avatar_url: '',
+            website: '',
+            region: userId === 'demo-user-1' ? 'Demo Region' : 'Algeria (Al-Jazāʾir)',
+            experience_level: userId === 'demo-user-1' ? 'Intermediate' : 'Advanced (5-10 years)',
+            social_handle: '',
+            created_at: new Date().toISOString()
+          };
+          setProfile(demo);
+        } else {
+          setProfile(null);
+        }
+      } else {
+        setProfile(profileData);
+      }
 
       // Load user stats
       const { data: statsData, error: statsError } = await supabase
         .from('user_stats')
         .select('*')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
       if (!statsError && statsData) {
         setStats(statsData);
@@ -118,7 +137,7 @@ export const PublicProfilePage = () => {
     } catch (error) {
       console.error('Error loading user profile:', error);
       toast.error('Failed to load profile');
-      navigate('/app');
+      setProfile(null);
     } finally {
       setLoading(false);
     }
