@@ -4,6 +4,8 @@ import { MessagingInterface } from '@/components/messaging/MessagingInterface';
 import { useRealTimeMessaging } from '@/hooks/useRealTimeMessaging';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 
 export default function MessagingPage() {
   const { user } = useAuth();
@@ -68,10 +70,27 @@ export default function MessagingPage() {
   }
 
   return (
-    <div className="h-screen">
-      <MessagingInterface 
-        onStartConversation={handleStartConversation}
-      />
+    <div className="h-screen flex flex-col">
+      {/* Header with back button */}
+      <div className="flex items-center gap-4 p-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </Button>
+        <h1 className="text-lg font-semibold">Messages</h1>
+      </div>
+      
+      {/* Messaging interface */}
+      <div className="flex-1">
+        <MessagingInterface 
+          onStartConversation={handleStartConversation}
+        />
+      </div>
     </div>
   );
 }
