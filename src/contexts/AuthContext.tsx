@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { cleanupAuthState } from '@/utils/authCleanup';
 
 interface AuthContextType {
   user: User | null;
@@ -106,13 +107,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      return { error };
+      // Clean up any lingering auth state first
+      cleanupAuthState();
+      try {
+        // Attempt a global sign out to revoke refresh tokens on all devices
+        const { error } = await supabase.auth.signOut({ scope: 'global' });
+        if (error) {
+          console.warn('Global signOut warning:', error);
+        }
+      } catch (err) {
+        console.warn('Global signOut attempt failed:', err);
+      }
+      return { error: null } as any;
     } catch (error) {
-      return { error };
+      return { error } as any;
     }
   };
-
   const updateProfile = async (updates: any) => {
     if (!user) return { error: { message: 'No user logged in' } };
     

@@ -36,12 +36,14 @@ export const UserDropdown = ({ onCreateClick, onTabChange }: UserDropdownProps) 
     const { error } = await signOut();
     if (error) {
       console.error("Sign out error:", error);
-      toast.error("Failed to sign out");
+      // Proceed with hard reload anyway to ensure a clean state
+      toast.error("Signed out (cleanup) – refreshing...");
     } else {
       console.log("Successfully signed out");
       toast.success("Signed out successfully");
-      navigate('/');
     }
+    // Hard redirect to reset app state completely
+    window.location.href = '/auth';
   };
 
   const handleProfileClick = () => {
