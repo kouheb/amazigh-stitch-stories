@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -7,11 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Search, Plus, MoreVertical, ArrowLeft } from "lucide-react";
 import { ChatWindow } from "@/components/messaging/ChatWindow";
 import { ChatList } from "@/components/messaging/ChatList";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { useAuth } from "@/contexts/AuthContext";
-import { GlobalCallPopup } from "@/components/calls/GlobalCallPopup";
+import { useNavigate } from "react-router-dom";
 
 interface Conversation {
   id: string;
@@ -38,173 +34,86 @@ interface Message {
 }
 
 export const MessagingPage = () => {
-  const { user } = useAuth();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const userId = searchParams.get('user');
-  const [selectedConversationId, setSelectedConversationId] = useState<string>("");
+  const [selectedConversationId, setSelectedConversationId] = useState<string>("1");
   const [searchQuery, setSearchQuery] = useState("");
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (user) {
-      loadConversations();
-    }
-  }, [user]);
-
-  const loadConversations = async () => {
-    if (!user) return;
-    
-    setLoading(true);
-    try {
-      // Get all conversations for the current user
-      const { data: conversationsData, error: conversationsError } = await supabase
-        .from('conversations')
-        .select('*')
-        .or(`participant_1_id.eq.${user.id},participant_2_id.eq.${user.id}`)
-        .order('updated_at', { ascending: false });
-
-      if (conversationsError) {
-        console.error('Error loading conversations:', conversationsError);
-        return;
-      }
-
-      if (!conversationsData || conversationsData.length === 0) {
-        setConversations([]);
-        return;
-      }
-
-      // Get all participant IDs except current user
-      const participantIds = conversationsData.flatMap(conv => 
-        [conv.participant_1_id, conv.participant_2_id].filter(id => id !== user.id)
-      );
-
-      // Get participant profiles
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('*')
-        .in('id', participantIds);
-
-      if (profilesError) {
-        console.error('Error loading participant profiles:', profilesError);
-        return;
-      }
-
-      const formattedConversations: Conversation[] = conversationsData.map(conv => {
-        const otherParticipantId = conv.participant_1_id === user.id ? conv.participant_2_id : conv.participant_1_id;
-        const otherParticipant = profiles?.find(p => p.id === otherParticipantId);
-        
-        return {
-          id: otherParticipantId,
-          participant: {
-            name: otherParticipant?.display_name || otherParticipant?.full_name || otherParticipant?.email || 'Unknown User',
-            avatar: otherParticipant?.avatar_url || "",
-            status: "offline" as const,
-            lastSeen: "recently"
-          },
-          lastMessage: {
-            text: "No messages yet",
-            timestamp: "",
-            isRead: true
-          },
-          unreadCount: 0
-        };
-      });
-
-      setConversations(formattedConversations);
-      
-      // Auto-select conversation if userId is provided
-      if (userId && formattedConversations.some(c => c.id === userId)) {
-        setSelectedConversationId(userId);
-      }
-    } catch (error) {
-      console.error('Error loading conversations:', error);
-      toast.error('Failed to load conversations');
-    } finally {
-      setLoading(false);
-    }
-  };
-  // Quick health check for messaging API permissions/key
-  const checkMessagesHealth = async () => {
-    if (!user) return;
-    try {
-      const { error } = await supabase
-        .from('conversations')
-        .select('id', { count: 'exact', head: true });
-      if (error) throw error;
-      toast.success('Messages API is healthy');
-    } catch (err: any) {
-      console.error('Messages API health check failed:', err);
-      toast.error(`Messages API check failed: ${err?.message || 'Unknown error'}`);
-    }
-  };
-
-  useEffect(() => {
-    if (userId && user) {
-      startConversationWithUser(userId);
-    }
-  }, [userId, user]);
-
-  useEffect(() => {
-    if (user) {
-      checkMessagesHealth();
-    }
-  }, [user]);
-
-  const startConversationWithUser = async (targetUserId: string) => {
-    if (!user) return;
-    
-    try {
-      // Check if conversation already exists
-      const existingConversation = conversations.find(c => c.id === targetUserId);
-      if (existingConversation) {
-        setSelectedConversationId(targetUserId);
-        return;
-      }
-
-      // Get target user profile
-      const { data: targetProfile, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', targetUserId)
-        .single();
-
-      if (error || !targetProfile) {
-        console.error('Error loading target user:', error);
-        toast.error('User not found');
-        return;
-      }
-
-      // Create new conversation in the UI
-      const newConversation: Conversation = {
-        id: targetUserId,
-        participant: {
-          name: targetProfile.display_name || targetProfile.full_name || targetProfile.email || 'Unknown User',
-          avatar: targetProfile.avatar_url || "",
-          status: "offline",
-          lastSeen: "recently"
-        },
-        lastMessage: {
-          text: "Start a conversation...",
-          timestamp: "now",
-          isRead: true
-        },
-        unreadCount: 0
-      };
-
-      setConversations(prev => [newConversation, ...prev]);
-      setSelectedConversationId(targetUserId);
-    } catch (error) {
-      console.error('Error starting conversation:', error);
-      toast.error('Failed to start conversation');
-    }
-  };
 
   const handleBackToApp = () => {
     navigate('/app');
   };
 
+  // Mock data - in real app this would come from your backend
+  const conversations: Conversation[] = [
+    {
+      id: "1",
+      participant: {
+        name: "Fatima Al-Maghribi",
+        avatar: "/api/placeholder/40/40",
+        status: "online",
+        lastSeen: "now"
+      },
+      lastMessage: {
+        text: "I'd love to learn more about traditional Zardozi techniques",
+        timestamp: "2m ago",
+        isRead: false
+      },
+      unreadCount: 2
+    },
+    {
+      id: "2",
+      participant: {
+        name: "Ahmed Ben Hassan",
+        avatar: "/api/placeholder/40/40",
+        status: "offline",
+        lastSeen: "1h ago"
+      },
+      lastMessage: {
+        text: "The beading workshop was amazing, thank you!",
+        timestamp: "1h ago",
+        isRead: true
+      },
+      unreadCount: 0
+    },
+    {
+      id: "3",
+      participant: {
+        name: "Aicha Berber",
+        avatar: "/api/placeholder/40/40",
+        status: "online",
+        lastSeen: "now"
+      },
+      lastMessage: {
+        text: "When is the next cultural event?",
+        timestamp: "3h ago",
+        isRead: true
+      },
+      unreadCount: 0
+    }
+  ];
+
+  const messages: Message[] = [
+    {
+      id: "1",
+      senderId: "other",
+      text: "Hello! I saw your profile and I'm really interested in learning traditional Amazigh crafts.",
+      timestamp: "10:30 AM",
+      isRead: true
+    },
+    {
+      id: "2",
+      senderId: "me",
+      text: "That's wonderful! I'd be happy to help you get started. What specific techniques are you most interested in?",
+      timestamp: "10:32 AM",
+      isRead: true
+    },
+    {
+      id: "3",
+      senderId: "other",
+      text: "I'd love to learn more about traditional Zardozi techniques",
+      timestamp: "10:35 AM",
+      isRead: false
+    }
+  ];
 
   const selectedConversation = conversations.find(c => c.id === selectedConversationId);
 
@@ -276,7 +185,7 @@ export const MessagingPage = () => {
         {selectedConversation ? (
           <ChatWindow
             conversation={selectedConversation}
-            recipientId={selectedConversationId}
+            messages={messages}
           />
         ) : (
           <div className="flex-1 flex items-center justify-center bg-gray-50">
@@ -290,9 +199,6 @@ export const MessagingPage = () => {
           </div>
         )}
       </div>
-      
-      {/* Global Call Popup */}
-      <GlobalCallPopup />
     </div>
   );
 };

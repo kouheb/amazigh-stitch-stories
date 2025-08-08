@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -6,12 +6,7 @@ import { Phone, Video, MoreVertical, Info } from "lucide-react";
 import { MessageInput } from "./MessageInput";
 import { MessageBubble } from "./MessageBubble";
 import { TypingIndicator } from "./TypingIndicator";
-import { ChatOptionsMenu } from "./ChatOptionsMenu";
-import { useCall } from "@/contexts/CallContext";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
 
 interface Conversation {
   id: string;
@@ -43,206 +38,79 @@ interface Message {
 
 interface ChatWindowProps {
   conversation: Conversation;
-  recipientId: string;
+  messages: Message[];
 }
 
-export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const { initiateCall } = useCall();
-  const [messageList, setMessageList] = useState<Message[]>([]);
+export const ChatWindow = ({ conversation, messages }: ChatWindowProps) => {
+  const [messageList, setMessageList] = useState<Message[]>(messages);
   const [isTyping, setIsTyping] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(true);
 
-  useEffect(() => {
-    if (user && recipientId) {
-      loadMessages();
-      
-      // Set up real-time subscription with improved filtering
-      const channel = supabase
-        .channel(`messages-${user.id}-${recipientId}`)
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'messages',
-            filter: `or(and(sender_id.eq.${user.id},recipient_id.eq.${recipientId}),and(sender_id.eq.${recipientId},recipient_id.eq.${user.id}))`
-          },
-          (payload) => {
-            console.log('Real-time message received:', payload);
-            
-            const newMessage: Message = {
-              id: payload.new.id,
-              senderId: payload.new.sender_id,
-              text: payload.new.content,
-              timestamp: new Date(payload.new.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-              isRead: payload.new.is_read,
-              type: payload.new.message_type,
-              fileUrl: payload.new.file_url || undefined,
-              fileName: payload.new.file_name || undefined
-            };
-            
-            console.log('Adding message to chat:', newMessage);
-            setMessageList(prev => {
-              const updated = [...prev, newMessage];
-              console.log('Updated message list:', updated);
-              return updated;
-            });
-          }
-        )
-        .subscribe((status) => {
-          console.log('Real-time subscription status:', status);
-        });
+  const handleSendMessage = (text: string, type: "text" | "image" | "file" = "text", fileUrl?: string, fileName?: string) => {
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      senderId: "me",
+      text,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      isRead: false,
+      status: "sending",
+      type,
+      fileUrl,
+      fileName
+    };
+    
+    setMessageList([...messageList, newMessage]);
+    
+    // Simulate message delivery
+    setTimeout(() => {
+      setMessageList(prev => prev.map(msg => 
+        msg.id === newMessage.id ? { ...msg, status: "sent" } : msg
+      ));
+    }, 500);
+    
+    setTimeout(() => {
+      setMessageList(prev => prev.map(msg => 
+        msg.id === newMessage.id ? { ...msg, status: "delivered" } : msg
+      ));
+    }, 1000);
 
-      // Return cleanup function
-      return () => {
-        console.log('Cleaning up real-time subscription');
-        supabase.removeChannel(channel);
+    // Simulate typing response
+    setTimeout(() => {
+      setIsTyping(true);
+    }, 2000);
+
+    setTimeout(() => {
+      setIsTyping(false);
+      const responseMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        senderId: "other",
+        text: "Thank you for sharing! That looks beautiful.",
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        isRead: true,
+        status: "read",
+        type: "text"
       };
-    }
-  }, [user, recipientId]);
-
-  const loadMessages = async () => {
-    if (!user) return;
-    
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('messages')
-        .select('*')
-        .or(`and(sender_id.eq.${user.id},recipient_id.eq.${recipientId}),and(sender_id.eq.${recipientId},recipient_id.eq.${user.id})`)
-        .order('created_at', { ascending: true });
-
-      if (error) {
-        console.error('Error loading messages:', error);
-        toast.error('Failed to load messages');
-        return;
-      }
-
-      const formattedMessages: Message[] = data.map(msg => ({
-        id: msg.id,
-        senderId: msg.sender_id,
-        text: msg.content,
-        timestamp: new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        isRead: msg.is_read,
-        type: msg.message_type as "text" | "image" | "file",
-        fileUrl: msg.file_url || undefined,
-        fileName: msg.file_name || undefined
-      }));
-
-      setMessageList(formattedMessages);
-    } catch (error) {
-      console.error('Error loading messages:', error);
-      toast.error('Failed to load messages');
-    } finally {
-      setLoading(false);
-    }
+      setMessageList(prev => [...prev, responseMessage]);
+    }, 4000);
   };
 
-
-  const handleSendMessage = async (text: string, type: "text" | "image" | "file" = "text", fileUrl?: string, fileName?: string) => {
-    if (!user || !text.trim()) return;
-    
-    try {
-      // Insert message into database
-      const { error: messageError } = await (supabase as any)
-        .from('messages')
-        .insert({
-          sender_id: user.id,
-          recipient_id: recipientId,
-          content: text,
-          message_type: type,
-          file_url: fileUrl,
-          file_name: fileName
-        })
-        .select()
-        .single();
-
-      if (messageError) {
-        console.error('Error sending message:', messageError);
-        toast.error('Failed to send message');
-        return;
-      }
-
-      // Send email notification
-      try {
-        const { data: senderProfile } = await supabase
-          .from('profiles')
-          .select('display_name, full_name')
-          .eq('id', user.id)
-          .single();
-
-        const senderName = senderProfile?.display_name || senderProfile?.full_name || 'Someone';
-
-        await supabase.functions.invoke('send-message-notification', {
-          body: {
-            recipientId,
-            senderName,
-            messageContent: text
-          }
-        });
-      } catch (emailError) {
-        console.error('Failed to send email notification:', emailError);
-        // Don't show error to user as message was sent successfully
-      }
-
-      toast.success("Message sent!");
-    } catch (error) {
-      console.error('Error sending message:', error);
-      toast.error('Failed to send message');
-    }
-  };
-
-  const handleVoiceCall = async () => {
+  const handleVoiceCall = () => {
     console.log(`Starting voice call with ${conversation.participant.name}`);
-    await initiateCall(recipientId, 'voice');
+    toast.success(`Connecting voice call with ${conversation.participant.name}...`);
   };
 
-  const handleVideoCall = async () => {
+  const handleVideoCall = () => {
     console.log(`Starting video call with ${conversation.participant.name}`);
-    await initiateCall(recipientId, 'video');
+    toast.success(`Connecting video call with ${conversation.participant.name}...`);
   };
 
   const handleShowInfo = () => {
     console.log(`Showing info for ${conversation.participant.name}`);
-    // Navigate to the user's profile in the same tab
-    navigate(`/profile/${recipientId}`);
-    toast.info(`Opening ${conversation.participant.name}'s profile`);
+    toast.info(`Showing profile info for ${conversation.participant.name}`);
   };
 
-  const formatCallDuration = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    
-    if (mins === 0) {
-      return `${secs}s`;
-    } else {
-      return `${mins}m ${secs}s`;
-    }
-  };
-
-  // Chat options handlers
-  const handleToggleNotifications = () => {
-    setIsNotificationsEnabled(!isNotificationsEnabled);
-    toast.success(isNotificationsEnabled ? 'Notifications muted' : 'Notifications enabled');
-  };
-
-  const handleBlockUser = () => {
-    toast.warning(`${conversation.participant.name} has been blocked`);
-  };
-
-  const handleReportUser = () => {
-    toast.warning(`Report sent for ${conversation.participant.name}`);
-  };
-
-  const handleArchiveChat = () => {
-    toast.info('Chat archived');
-  };
-
-  const handleDeleteChat = () => {
-    toast.error('Chat deleted');
+  const handleMoreOptions = () => {
+    console.log(`Opening more options for ${conversation.participant.name}`);
+    toast.info("More options menu opened");
   };
 
   return (
@@ -296,41 +164,27 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
             >
               <Info className="h-4 w-4" />
             </Button>
-            <ChatOptionsMenu
-              participantName={conversation.participant.name}
-              isNotificationsEnabled={isNotificationsEnabled}
-              onToggleNotifications={handleToggleNotifications}
-              onBlockUser={handleBlockUser}
-              onReportUser={handleReportUser}
-              onArchiveChat={handleArchiveChat}
-              onDeleteChat={handleDeleteChat}
-            />
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={handleMoreOptions}
+              className="hover:bg-gray-50"
+            >
+              <MoreVertical className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-        {loading ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-gray-500">Loading messages...</div>
-          </div>
-        ) : messageList.length === 0 ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center text-gray-500">
-              <p>No messages yet</p>
-              <p className="text-sm">Start the conversation!</p>
-            </div>
-          </div>
-        ) : (
-          messageList.map((message) => (
-            <MessageBubble
-              key={message.id}
-              message={message}
-              isOwn={message.senderId === user?.id}
-            />
-          ))
-        )}
+        {messageList.map((message) => (
+          <MessageBubble
+            key={message.id}
+            message={message}
+            isOwn={message.senderId === "me"}
+          />
+        ))}
         {isTyping && <TypingIndicator />}
       </div>
 

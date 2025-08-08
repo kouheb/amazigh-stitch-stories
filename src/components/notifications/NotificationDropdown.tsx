@@ -1,231 +1,170 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
+import { 
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Bell,
-  Check,
-  Trash2,
-  ExternalLink,
-  AlertCircle,
-  CheckCircle,
-  Info,
-  AlertTriangle
-} from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useNotifications } from "@/contexts/NotificationContext";
-import { useNavigate } from "react-router-dom";
+import { Bell, Check, X, User, MessageSquare, Calendar } from "lucide-react";
+import { toast } from "sonner";
 
-interface NotificationDropdownProps {
-  notificationCount: number;
-  onNotificationCountChange: (count: number) => void;
+interface Notification {
+  id: string;
+  type: 'message' | 'event' | 'collaboration' | 'system';
+  title: string;
+  message: string;
+  timestamp: string;
+  isRead: boolean;
+  actionUrl?: string;
 }
 
-export const NotificationDropdown = ({ notificationCount }: NotificationDropdownProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const { 
-    notifications, 
-    loading, 
-    loadNotifications, 
-    markAsRead, 
-    markAllAsRead, 
-    deleteNotification 
-  } = useNotifications();
-
-  // Load notifications when dropdown opens
-  const handleOpenChange = (open: boolean) => {
-    setIsOpen(open);
-    if (open && user) {
-      loadNotifications();
+export const NotificationDropdown = () => {
+  const [notifications, setNotifications] = useState<Notification[]>([
+    {
+      id: "1",
+      type: "message",
+      title: "New Message",
+      message: "Fatima Al-Maghribi sent you a message",
+      timestamp: "2 min ago",
+      isRead: false
+    },
+    {
+      id: "2",
+      type: "event",
+      title: "Workshop Reminder",
+      message: "Berber Weaving Workshop starts in 1 hour",
+      timestamp: "1 hour ago",
+      isRead: false
+    },
+    {
+      id: "3",
+      type: "collaboration",
+      title: "Collaboration Request",
+      message: "Ahmed wants to collaborate on a pottery project",
+      timestamp: "3 hours ago",
+      isRead: true
     }
+  ]);
+
+  const unreadCount = notifications.filter(n => !n.isRead).length;
+
+  const markAsRead = (id: string) => {
+    setNotifications(prev => 
+      prev.map(n => n.id === id ? { ...n, isRead: true } : n)
+    );
+    toast.success("Notification marked as read");
   };
 
-  const handleNotificationClick = (notification: any) => {
-    // Mark as read if not already read
-    if (!notification.is_read) {
-      markAsRead(notification.id);
-    }
-
-    // Navigate to action URL if provided
-    if (notification.action_url) {
-      navigate(notification.action_url);
-      setIsOpen(false);
-    }
+  const markAllAsRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    toast.success("All notifications marked as read");
   };
 
-  const getNotificationIcon = (type: string) => {
+  const removeNotification = (id: string) => {
+    setNotifications(prev => prev.filter(n => n.id !== id));
+    toast.success("Notification removed");
+  };
+
+  const getIcon = (type: string) => {
     switch (type) {
-      case 'success':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'warning':
-        return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
-      case 'error':
-        return <AlertCircle className="h-4 w-4 text-red-500" />;
+      case 'message':
+        return MessageSquare;
+      case 'event':
+        return Calendar;
+      case 'collaboration':
+        return User;
       default:
-        return <Info className="h-4 w-4 text-blue-500" />;
+        return Bell;
     }
-  };
-
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-
-    if (diffInMinutes < 1) return 'Just now';
-    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
-    return `${Math.floor(diffInMinutes / 1440)}d ago`;
   };
 
   return (
-    <DropdownMenu open={isOpen} onOpenChange={handleOpenChange}>
+    <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="relative text-gray-700 hover:text-black hover:bg-gray-100"
-        >
+        <Button variant="ghost" size="sm" className="relative">
           <Bell className="h-5 w-5" />
-          {notificationCount > 0 && (
-            <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-red-600 hover:bg-red-700 text-white text-xs">
-              {notificationCount > 99 ? '99+' : notificationCount}
-            </Badge>
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              {unreadCount}
+            </span>
           )}
         </Button>
       </DropdownMenuTrigger>
-      
-      <DropdownMenuContent
-        className="w-80 bg-white border-gray-200 shadow-lg z-50 p-0"
-        align="end"
-        forceMount
-      >
-        <div className="p-4 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-gray-900">Notifications</h3>
-            {notifications.some(n => !n.is_read) && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={markAllAsRead}
-                className="text-xs text-blue-600 hover:text-blue-800"
-              >
-                Mark all read
-              </Button>
-            )}
-          </div>
+      <DropdownMenuContent className="w-80 bg-white" align="end">
+        <div className="flex items-center justify-between p-3 border-b">
+          <h3 className="font-semibold">Notifications</h3>
+          {unreadCount > 0 && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={markAllAsRead}
+              className="text-xs"
+            >
+              Mark all read
+            </Button>
+          )}
         </div>
-
-        <ScrollArea className="h-96">
-          {loading ? (
-            <div className="p-4 text-center">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-500 mx-auto"></div>
-              <p className="text-sm text-gray-500 mt-2">Loading notifications...</p>
-            </div>
-          ) : notifications.length === 0 ? (
-            <div className="p-6 text-center">
-              <Bell className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500 text-sm">No notifications yet</p>
+        
+        <ScrollArea className="max-h-80">
+          {notifications.length === 0 ? (
+            <div className="p-4 text-center text-gray-500">
+              <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <p>No notifications</p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-100">
-              {notifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  className={`p-4 hover:bg-gray-50 transition-colors ${
-                    !notification.is_read ? 'bg-blue-50' : ''
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 mt-1">
-                      {getNotificationIcon(notification.type)}
-                    </div>
-                    
-                    <div
-                      className="flex-1 cursor-pointer"
-                      onClick={() => handleNotificationClick(notification)}
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1">
-                          <h4 className={`text-sm font-medium ${
-                            !notification.is_read ? 'text-gray-900' : 'text-gray-700'
-                          }`}>
-                            {notification.title}
-                          </h4>
-                          <p className="text-xs text-gray-600 mt-1">
-                            {notification.message}
-                          </p>
-                          <div className="flex items-center gap-2 mt-2">
-                            <span className="text-xs text-gray-500">
-                              {formatTime(notification.created_at)}
-                            </span>
-                            {notification.action_url && (
-                              <ExternalLink className="h-3 w-3 text-gray-400" />
+            <div className="divide-y">
+              {notifications.map((notification) => {
+                const IconComponent = getIcon(notification.type);
+                return (
+                  <div 
+                    key={notification.id} 
+                    className={`p-3 hover:bg-gray-50 ${!notification.isRead ? 'bg-blue-50' : ''}`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <IconComponent className="h-4 w-4 text-orange-600" />
+                      </div>
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <p className="font-medium text-sm">{notification.title}</p>
+                            <p className="text-sm text-gray-600">{notification.message}</p>
+                            <p className="text-xs text-gray-400 mt-1">{notification.timestamp}</p>
+                          </div>
+                          
+                          <div className="flex gap-1 ml-2">
+                            {!notification.isRead && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => markAsRead(notification.id)}
+                                className="h-6 w-6 p-0"
+                              >
+                                <Check className="h-3 w-3" />
+                              </Button>
                             )}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeNotification(notification.id)}
+                              className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
                           </div>
                         </div>
-                        
-                        {!notification.is_read && (
-                          <div className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0 mt-1"></div>
-                        )}
                       </div>
                     </div>
-
-                    <div className="flex items-center gap-1">
-                      {!notification.is_read && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            markAsRead(notification.id);
-                          }}
-                          className="h-6 w-6 p-0 text-gray-400 hover:text-green-600"
-                        >
-                          <Check className="h-3 w-3" />
-                        </Button>
-                      )}
-                      
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteNotification(notification.id);
-                        }}
-                        className="h-6 w-6 p-0 text-gray-400 hover:text-red-600"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </ScrollArea>
-
-        {notifications.length > 0 && (
-          <div className="p-3 border-t border-gray-200 text-center">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                navigate('/app?tab=notifications');
-                setIsOpen(false);
-              }}
-              className="text-xs text-blue-600 hover:text-blue-800"
-            >
-              View all notifications
-            </Button>
-          </div>
-        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

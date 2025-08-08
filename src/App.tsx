@@ -6,8 +6,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { NotificationProvider } from "@/contexts/NotificationContext";
-import { CallProvider } from "@/contexts/CallContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Membership from "./pages/Membership";
@@ -26,19 +24,16 @@ import { DeleteAccountPage } from "./pages/DeleteAccountPage";
 import { PlayStoreGraphicsPage } from "./pages/PlayStoreGraphicsPage";
 import { PublicProfilePage } from "./pages/PublicProfilePage";
 import NotFound from "./pages/NotFound";
-import UserSearchPage from "./pages/UserSearchPage";
- 
+
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <CallProvider>
-        <NotificationProvider>
-          <LanguageProvider>
-            <TooltipProvider>
-            <Toaster />
-            <Sonner />
+      <LanguageProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
@@ -64,11 +59,6 @@ const App = () => (
                   <MessagingPage />
                 </ProtectedRoute>
               } />
-              <Route path="/search" element={
-                <ProtectedRoute>
-                  <UserSearchPage />
-                </ProtectedRoute>
-              } />
               <Route path="/profile/:username" element={
                 <ProtectedRoute>
                   <PublicProfilePage />
@@ -77,11 +67,9 @@ const App = () => (
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
-           </BrowserRouter>
+          </BrowserRouter>
         </TooltipProvider>
       </LanguageProvider>
-      </NotificationProvider>
-      </CallProvider>
     </AuthProvider>
   </QueryClientProvider>
 );

@@ -1,12 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AddWorkModal } from "@/components/modals/AddWorkModal";
 import { WorkDetailModal } from "./WorkDetailModal";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { 
   Play, 
   Image, 
@@ -22,7 +20,7 @@ import {
 } from "lucide-react";
 
 interface ShowcaseItem {
-  id: string;
+  id: number;
   type: string;
   title: string;
   description: string;
@@ -38,142 +36,163 @@ interface ShowcaseItem {
 
 interface WorkShowcaseProps {
   isOwnProfile: boolean;
-  userId?: string;
 }
 
-export const WorkShowcase = ({ isOwnProfile, userId }: WorkShowcaseProps) => {
+export const WorkShowcase = ({ isOwnProfile }: WorkShowcaseProps) => {
   const [activeShowcaseTab, setActiveShowcaseTab] = useState("featured");
   const [isAddWorkModalOpen, setIsAddWorkModalOpen] = useState(false);
   const [selectedWork, setSelectedWork] = useState<any>(null);
   const [isWorkDetailModalOpen, setIsWorkDetailModalOpen] = useState(false);
-  const [showcaseItems, setShowcaseItems] = useState({
-    featured: [] as ShowcaseItem[],
-    videos: [] as ShowcaseItem[],
-    projects: [] as ShowcaseItem[],
-    achievements: [] as ShowcaseItem[]
-  });
-  const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
 
-  // Get the user ID to query (either passed prop or current user)
-  const targetUserId = userId || user?.id;
-
-  // Load showcase items from database
-  useEffect(() => {
-    const loadShowcaseItems = async () => {
-      if (!targetUserId) return;
-
-      try {
-        const { data, error } = await supabase
-          .from('showcase_items')
-          .select('*')
-          .eq('user_id', targetUserId)
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          console.error('Error loading showcase items:', error);
-          return;
-        }
-
-        if (data) {
-          const formattedItems = data.map((item: any) => ({
-            id: item.id,
-            type: item.type,
-            title: item.title,
-            description: item.description || '',
-            thumbnail: item.thumbnail_url || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop',
-            duration: item.duration,
-            views: item.views,
-            likes: item.likes,
-            date: new Date(item.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-            status: item.status,
-            client: item.client,
-            organization: item.organization
-          }));
-
-          // Categorize items
-          const categorized = {
-            featured: formattedItems.slice(0, 6), // Show latest 6 as featured
-            videos: formattedItems.filter((item: ShowcaseItem) => item.type === 'video'),
-            projects: formattedItems.filter((item: ShowcaseItem) => ['project', 'image'].includes(item.type)),
-            achievements: formattedItems.filter((item: ShowcaseItem) => ['award', 'certification'].includes(item.type))
-          };
-
-          setShowcaseItems(categorized);
-        }
-      } catch (error) {
-        console.error('Error loading showcase items:', error);
-      } finally {
-        setLoading(false);
+  const initialShowcaseItems = {
+    featured: [
+      {
+        id: 1,
+        type: "video",
+        title: "Zardozi Embroidery Process",
+        description: "Step-by-step demonstration of traditional Zardozi techniques",
+        thumbnail: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop",
+        duration: "12:34",
+        views: 2500,
+        likes: 189,
+        date: "March 2024"
+      },
+      {
+        id: 2,
+        type: "image",
+        title: "Award-Winning Kaftan Design",
+        description: "Winner of the 2023 Amazigh Fashion Heritage Award",
+        thumbnail: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&h=300&fit=crop",
+        views: 1800,
+        likes: 234,
+        date: "November 2023"
       }
-    };
-
-    loadShowcaseItems();
-  }, [targetUserId]);
-
-  const handleWorkAdded = async (newWork: any) => {
-    if (!user?.id) return;
-
-    try {
-      // Insert into database
-      const { data, error } = await supabase
-        .from('showcase_items')
-        .insert({
-          user_id: user.id,
-          type: newWork.type,
-          title: newWork.title,
-          description: newWork.description,
-          thumbnail_url: newWork.thumbnail,
-          duration: newWork.duration,
-          status: newWork.status,
-          client: newWork.client,
-          organization: newWork.organization
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error adding showcase item:', error);
-        return;
+    ],
+    videos: [
+      {
+        id: 1,
+        type: "video",
+        title: "Zardozi Embroidery Process",
+        description: "Step-by-step demonstration of traditional Zardozi techniques",
+        thumbnail: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop",
+        duration: "12:34",
+        views: 2500,
+        likes: 189,
+        date: "March 2024"
+      },
+      {
+        id: 3,
+        type: "video",
+        title: "Traditional Pattern Making",
+        description: "Creating geometric patterns inspired by Berber art",
+        thumbnail: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=300&fit=crop",
+        duration: "8:42",
+        views: 1200,
+        likes: 145,
+        date: "February 2024"
+      },
+      {
+        id: 4,
+        type: "video",
+        title: "Sustainable Dyeing Workshop",
+        description: "Natural dye extraction and application techniques",
+        thumbnail: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&h=300&fit=crop",
+        duration: "15:21",
+        views: 980,
+        likes: 87,
+        date: "January 2024"
       }
+    ],
+    projects: [
+      {
+        id: 2,
+        type: "project",
+        title: "Award-Winning Kaftan Design",
+        description: "Winner of the 2023 Amazigh Fashion Heritage Award",
+        thumbnail: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&h=300&fit=crop",
+        views: 1800,
+        likes: 234,
+        date: "November 2023",
+        status: "Completed",
+        client: "Heritage Fashion Show"
+      },
+      {
+        id: 5,
+        type: "project",
+        title: "Berber Textile Documentation",
+        description: "Comprehensive study of traditional weaving patterns",
+        thumbnail: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop",
+        views: 650,
+        likes: 92,
+        date: "December 2023",
+        status: "Ongoing",
+        client: "Cultural Heritage Foundation"
+      }
+    ],
+    achievements: [
+      {
+        id: 6,
+        type: "award",
+        title: "Amazigh Heritage Preservation Award",
+        description: "Recognized for outstanding contribution to preserving traditional crafts",
+        thumbnail: "https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?w=400&h=300&fit=crop",
+        date: "November 2023",
+        organization: "Amazigh Cultural Foundation"
+      },
+      {
+        id: 7,
+        type: "certification",
+        title: "Master Artisan Certificate",
+        description: "Certified master in traditional Zardozi embroidery",
+        thumbnail: "https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?w=400&h=300&fit=crop",
+        date: "June 2022",
+        organization: "Ministry of Handicrafts"
+      }
+    ]
+  };
 
-      // Format the new item
-      const formattedItem: ShowcaseItem = {
-        id: data.id,
-        type: data.type,
-        title: data.title,
-        description: data.description || '',
-        thumbnail: data.thumbnail_url || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop',
-        duration: data.duration,
-        views: data.views,
-        likes: data.likes,
-        date: new Date(data.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-        status: data.status,
-        client: data.client,
-        organization: data.organization
+  const [showcaseItems, setShowcaseItems] = useState(initialShowcaseItems);
+
+  const handleWorkAdded = (newWork: any) => {
+    setShowcaseItems(prev => {
+      const newItems = { ...prev };
+      
+      // Add to featured
+      const featuredItem = {
+        ...newWork,
+        views: newWork.views || 0,
+        likes: newWork.likes || 0
       };
-
-      // Add to local state
-      setShowcaseItems(prev => {
-        const newItems = { ...prev };
-        
-        // Add to featured
-        newItems.featured = [formattedItem, ...prev.featured.slice(0, 5)]; // Keep only 6 featured items
-        
-        // Add to appropriate category based on type
-        if (formattedItem.type === "video") {
-          newItems.videos = [formattedItem, ...prev.videos];
-        } else if (formattedItem.type === "project" || formattedItem.type === "image") {
-          newItems.projects = [formattedItem, ...prev.projects];
-        } else if (formattedItem.type === "award" || formattedItem.type === "certification") {
-          newItems.achievements = [formattedItem, ...prev.achievements];
-        }
-        
-        return newItems;
-      });
-    } catch (error) {
-      console.error('Error adding showcase item:', error);
-    }
+      newItems.featured = [featuredItem, ...prev.featured];
+      
+      // Add to appropriate category based on type
+      if (newWork.type === "video") {
+        const videoItem = {
+          ...newWork,
+          duration: newWork.duration || "0:00",
+          views: newWork.views || 0,
+          likes: newWork.likes || 0
+        };
+        newItems.videos = [videoItem, ...prev.videos];
+      } else if (newWork.type === "project" || newWork.type === "image") {
+        const projectItem = {
+          ...newWork,
+          status: newWork.status || "Completed",
+          client: newWork.client || "Personal Project",
+          views: newWork.views || 0,
+          likes: newWork.likes || 0
+        };
+        newItems.projects = [projectItem, ...prev.projects];
+      } else if (newWork.type === "award") {
+        const achievementItem = {
+          ...newWork,
+          organization: newWork.organization || "Unknown Organization"
+        };
+        newItems.achievements = [achievementItem, ...prev.achievements];
+      }
+      
+      return newItems;
+    });
   };
 
   const handleWorkClick = (item: any) => {
@@ -267,17 +286,6 @@ export const WorkShowcase = ({ isOwnProfile, userId }: WorkShowcaseProps) => {
     </Card>
   );
 
-  if (loading) {
-    return (
-      <Card className="p-6">
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading showcase...</p>
-        </div>
-      </Card>
-    );
-  }
-
   return (
     <>
       <Card className="p-6">
@@ -306,67 +314,27 @@ export const WorkShowcase = ({ isOwnProfile, userId }: WorkShowcaseProps) => {
           </TabsList>
 
           <TabsContent value="featured">
-            {showcaseItems.featured.length === 0 ? (
-              <div className="text-center py-12">
-                <Award className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-600 mb-2">No featured items yet</h3>
-                <p className="text-gray-500">
-                  {isOwnProfile ? "Start by adding some showcase content" : "This user hasn't showcased any work yet"}
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {showcaseItems.featured.map(renderShowcaseItem)}
-              </div>
-            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {showcaseItems.featured.map(renderShowcaseItem)}
+            </div>
           </TabsContent>
 
           <TabsContent value="videos">
-            {showcaseItems.videos.length === 0 ? (
-              <div className="text-center py-12">
-                <Play className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-600 mb-2">No videos yet</h3>
-                <p className="text-gray-500">
-                  {isOwnProfile ? "Share your video content with your audience" : "This user hasn't shared any videos yet"}
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {showcaseItems.videos.map(renderShowcaseItem)}
-              </div>
-            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {showcaseItems.videos.map(renderShowcaseItem)}
+            </div>
           </TabsContent>
 
           <TabsContent value="projects">
-            {showcaseItems.projects.length === 0 ? (
-              <div className="text-center py-12">
-                <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-600 mb-2">No projects yet</h3>
-                <p className="text-gray-500">
-                  {isOwnProfile ? "Add your projects to showcase your work" : "This user hasn't added any projects yet"}
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {showcaseItems.projects.map(renderShowcaseItem)}
-              </div>
-            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {showcaseItems.projects.map(renderShowcaseItem)}
+            </div>
           </TabsContent>
 
           <TabsContent value="achievements">
-            {showcaseItems.achievements.length === 0 ? (
-              <div className="text-center py-12">
-                <Award className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-600 mb-2">No achievements yet</h3>
-                <p className="text-gray-500">
-                  {isOwnProfile ? "Add your awards and certifications" : "This user hasn't shared any achievements yet"}
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {showcaseItems.achievements.map(renderShowcaseItem)}
-              </div>
-            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {showcaseItems.achievements.map(renderShowcaseItem)}
+            </div>
           </TabsContent>
         </Tabs>
       </Card>

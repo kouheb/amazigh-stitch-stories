@@ -1,12 +1,10 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AddWorkModal } from "@/components/modals/AddWorkModal";
 import { WorkDetailModal } from "./WorkDetailModal";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { 
   Upload, 
   Heart, 
@@ -21,7 +19,7 @@ import {
 } from "lucide-react";
 
 interface WorkItem {
-  id: string;
+  id: number;
   title: string;
   category: string;
   image: string;
@@ -35,63 +33,67 @@ interface WorkItem {
 
 interface PortfolioGalleryProps {
   isOwnProfile: boolean;
-  userId?: string;
 }
 
-export const PortfolioGallery = ({ isOwnProfile, userId }: PortfolioGalleryProps) => {
+export const PortfolioGallery = ({ isOwnProfile }: PortfolioGalleryProps) => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isAddWorkModalOpen, setIsAddWorkModalOpen] = useState(false);
   const [selectedWork, setSelectedWork] = useState<any>(null);
   const [isWorkDetailModalOpen, setIsWorkDetailModalOpen] = useState(false);
-  const [portfolioItems, setPortfolioItems] = useState<WorkItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
 
-  // Get the user ID to query (either passed prop or current user)
-  const targetUserId = userId || user?.id;
+  const initialPortfolioItems: WorkItem[] = [
+    {
+      id: 1,
+      title: "Traditional Kaftan Collection",
+      category: "Fashion Design",
+      image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&h=300&fit=crop",
+      likes: 234,
+      views: 1560,
+      comments: 45,
+      description: "Modern interpretation of traditional Amazigh kaftan with intricate Zardozi embroidery",
+      tags: ["Traditional", "Kaftan", "Zardozi", "Fashion"],
+      date: "March 2024"
+    },
+    {
+      id: 2,
+      title: "Berber Jewelry Redesign",
+      category: "Jewelry Design",
+      image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=300&fit=crop",
+      likes: 189,
+      views: 890,
+      comments: 23,
+      description: "Contemporary take on traditional Berber silver jewelry",
+      tags: ["Jewelry", "Silver", "Contemporary", "Berber"],
+      date: "February 2024"
+    },
+    {
+      id: 3,
+      title: "Textile Pattern Study",
+      category: "Research",
+      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop",
+      likes: 156,
+      views: 670,
+      comments: 18,
+      description: "Documentation of traditional weaving patterns from the Atlas Mountains",
+      tags: ["Research", "Patterns", "Weaving", "Documentation"],
+      date: "January 2024"
+    },
+    {
+      id: 4,
+      title: "Sustainable Fashion Line",
+      category: "Fashion Design",
+      image: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&h=300&fit=crop",
+      likes: 298,
+      views: 2100,
+      comments: 67,
+      description: "Eco-friendly fashion collection using organic dyes and traditional techniques",
+      tags: ["Sustainable", "Organic", "Fashion", "Eco-friendly"],
+      date: "December 2023"
+    }
+  ];
 
-  // Load portfolio items from database
-  useEffect(() => {
-    const loadPortfolioItems = async () => {
-      if (!targetUserId) return;
-
-      try {
-        const { data, error } = await supabase
-          .from('portfolio_items')
-          .select('*')
-          .eq('user_id', targetUserId)
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          console.error('Error loading portfolio items:', error);
-          return;
-        }
-
-        if (data) {
-          const formattedItems: WorkItem[] = data.map((item: any) => ({
-            id: item.id,
-            title: item.title,
-            category: item.category,
-            image: item.image_url || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop',
-            likes: item.likes,
-            views: item.views,
-            comments: item.comments,
-            description: item.description || '',
-            tags: item.tags || [],
-            date: new Date(item.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
-          }));
-          setPortfolioItems(formattedItems);
-        }
-      } catch (error) {
-        console.error('Error loading portfolio items:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadPortfolioItems();
-  }, [targetUserId]);
+  const [portfolioItems, setPortfolioItems] = useState<WorkItem[]>(initialPortfolioItems);
 
   const categories = ["all", "Fashion Design", "Jewelry Design", "Research", "Textiles", "Traditional Crafts", "Contemporary Design"];
 
@@ -99,46 +101,12 @@ export const PortfolioGallery = ({ isOwnProfile, userId }: PortfolioGalleryProps
     ? portfolioItems 
     : portfolioItems.filter(item => item.category === selectedCategory);
 
-  const handleWorkAdded = async (newWork: any) => {
-    if (!user?.id) return;
-
-    try {
-      // Insert into database
-      const { data, error } = await supabase
-        .from('portfolio_items')
-        .insert({
-          user_id: user.id,
-          title: newWork.title,
-          category: newWork.category,
-          description: newWork.description,
-          image_url: newWork.thumbnail || newWork.image,
-          tags: newWork.tags || []
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error adding portfolio item:', error);
-        return;
-      }
-
-      // Add to local state
-      const portfolioWork: WorkItem = {
-        id: data.id,
-        title: data.title,
-        category: data.category,
-        image: data.image_url || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop',
-        likes: data.likes,
-        views: data.views,
-        comments: data.comments,
-        description: data.description || '',
-        tags: data.tags || [],
-        date: new Date(data.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
-      };
-      setPortfolioItems(prev => [portfolioWork, ...prev]);
-    } catch (error) {
-      console.error('Error adding portfolio item:', error);
-    }
+  const handleWorkAdded = (newWork: any) => {
+    const portfolioWork: WorkItem = {
+      ...newWork,
+      image: newWork.thumbnail || newWork.image
+    };
+    setPortfolioItems(prev => [portfolioWork, ...prev]);
   };
 
   const handleWorkClick = (item: WorkItem) => {
@@ -150,29 +118,13 @@ export const PortfolioGallery = ({ isOwnProfile, userId }: PortfolioGalleryProps
     setIsWorkDetailModalOpen(true);
   };
 
-  if (loading) {
-    return (
-      <Card className="p-6">
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading portfolio...</p>
-        </div>
-      </Card>
-    );
-  }
-
   return (
     <>
       <Card className="p-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
           <div>
             <h2 className="text-2xl font-bold text-gray-800 mb-2">Portfolio</h2>
-            <p className="text-gray-600">
-              {portfolioItems.length === 0 
-                ? "No portfolio items yet" 
-                : `${portfolioItems.length} works showcasing traditional and contemporary designs`
-              }
-            </p>
+            <p className="text-gray-600">{portfolioItems.length} works showcasing traditional and contemporary designs</p>
           </div>
           
           <div className="flex items-center gap-3">
@@ -224,36 +176,11 @@ export const PortfolioGallery = ({ isOwnProfile, userId }: PortfolioGalleryProps
         </div>
 
         {/* Portfolio Grid/List */}
-        {filteredItems.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-gray-400 mb-4">
-              <Upload className="h-16 w-16 mx-auto mb-4" />
-            </div>
-            <h3 className="text-lg font-medium text-gray-600 mb-2">
-              {isOwnProfile ? "No portfolio items yet" : "No portfolio items to display"}
-            </h3>
-            <p className="text-gray-500 mb-6">
-              {isOwnProfile 
-                ? "Start building your portfolio by adding your first work" 
-                : "This user hasn't added any portfolio items yet"
-              }
-            </p>
-            {isOwnProfile && (
-              <Button 
-                className="bg-orange-600 hover:bg-orange-700"
-                onClick={() => setIsAddWorkModalOpen(true)}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Your First Work
-              </Button>
-            )}
-          </div>
-        ) : (
-          <div className={viewMode === "grid" 
-            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" 
-            : "space-y-6"
-          }>
-            {filteredItems.map((item) => (
+        <div className={viewMode === "grid" 
+          ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" 
+          : "space-y-6"
+        }>
+          {filteredItems.map((item) => (
             <Card 
               key={item.id} 
               className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
@@ -347,9 +274,8 @@ export const PortfolioGallery = ({ isOwnProfile, userId }: PortfolioGalleryProps
                 </div>
               )}
             </Card>
-            ))}
-          </div>
-        )}
+          ))}
+        </div>
       </Card>
 
       <AddWorkModal 

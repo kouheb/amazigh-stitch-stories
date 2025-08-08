@@ -21,260 +21,371 @@ import { PortfolioGallery } from "@/components/profile/PortfolioGallery";
 import { SkillsSection } from "@/components/profile/SkillsSection";
 import { WorkShowcase } from "@/components/profile/WorkShowcase";
 import { ProfileStats } from "@/components/profile/ProfileStats";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-interface UserProfile {
-  id: string;
-  display_name?: string;
-  full_name?: string;
-  email?: string;
-  bio?: string;
-  avatar_url?: string;
-  website?: string;
-  region?: string;
-  experience_level?: string;
-  social_handle?: string;
-  created_at: string;
-}
-
-interface UserStats {
-  followers_count: number;
-  following_count: number;
-  likes_received: number;
-  profile_views: number;
-  connections_count: number;
-}
+// Mock data for artisan profiles
+const mockArtisanProfiles = {
+  "fatima-al-zahra": {
+    id: 1,
+    name: "Fatima Al-Zahra",
+    title: "Master Traditional Embroidery Artist",
+    skill: "Traditional Embroidery",
+    location: "Fez, Morocco",
+    memberSince: "2018",
+    website: "https://fatima-embroidery.com",
+    bio: "Master artisan with over 15 years of experience in traditional Moroccan embroidery. Specializing in Zardozi, goldwork, and silk threading techniques passed down through generations. I am passionate about preserving cultural heritage while creating contemporary applications for traditional crafts.",
+    avatar: "https://images.unsplash.com/photo-1494790108755-2616c163f505?w=150&h=150&fit=crop&crop=face",
+    coverImage: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=300&fit=crop",
+    followers: 1247,
+    following: 89,
+    likes: 5680,
+    experience: "15+ Years",
+    skills: ["Zardozi Embroidery", "Goldwork", "Silk Threading", "Pattern Design", "Cultural Preservation"],
+    specialties: ["Traditional Moroccan Crafts", "Heritage Techniques", "Contemporary Applications"],
+    verified: true,
+    rating: 4.9,
+    reviewCount: 127,
+    email: "fatima@example.com",
+    phone: "+212 123 456 789",
+    isOnline: true
+  },
+  "ahmed-ben-ali": {
+    id: 2,
+    name: "Ahmed Ben Ali",
+    title: "Traditional Leather Craftsman",
+    skill: "Leather Crafting",
+    location: "Marrakech, Morocco",
+    memberSince: "2019",
+    website: "https://ahmed-leather.com",
+    bio: "Traditional leather artisan from Marrakech, specializing in authentic Moroccan leather goods. I create handcrafted bags, belts, and decorative items using traditional techniques learned from master craftsmen in the medina. Each piece tells a story of Moroccan heritage.",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+    coverImage: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=300&fit=crop",
+    followers: 896,
+    following: 156,
+    likes: 3420,
+    experience: "12+ Years",
+    skills: ["Leather Crafting", "Bag Making", "Belt Design", "Decorative Tooling", "Traditional Techniques"],
+    specialties: ["Handbags", "Belts", "Decorative Items", "Custom Leather Work"],
+    verified: true,
+    rating: 4.8,
+    reviewCount: 89,
+    email: "ahmed@example.com",
+    phone: "+212 987 654 321",
+    isOnline: false
+  },
+  "yasmin-berber": {
+    id: 3,
+    name: "Yasmin Berber",
+    title: "Contemporary Ceramic Artist",
+    skill: "Ceramic Arts",
+    location: "Tunis, Tunisia",
+    memberSince: "2017",
+    website: "https://yasmin-ceramics.com",
+    bio: "Contemporary ceramic artist blending traditional North African pottery techniques with modern design aesthetics. My work explores the intersection of heritage and innovation, creating functional art pieces that honor our ancestors while speaking to contemporary life.",
+    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+    coverImage: "https://images.unsplash.com/photo-1578849278619-e73505e9610f?w=800&h=300&fit=crop",
+    followers: 2156,
+    following: 342,
+    likes: 8945,
+    experience: "18+ Years",
+    skills: ["Ceramic Arts", "Pottery", "Glazing", "Sculptural Ceramics", "Contemporary Design"],
+    specialties: ["Pottery", "Glazing", "Sculptural Ceramics", "Contemporary Applications"],
+    verified: true,
+    rating: 5.0,
+    reviewCount: 203,
+    email: "yasmin@example.com",
+    phone: "+216 123 456 789",
+    isOnline: true
+  },
+  "omar-tuareg": {
+    id: 4,
+    name: "Omar Tuareg",
+    title: "Traditional Tuareg Silversmith",
+    skill: "Silver Jewelry",
+    location: "Algiers, Algeria",
+    memberSince: "2020",
+    website: "https://omar-silver.com",
+    bio: "Traditional Tuareg silversmith creating authentic jewelry pieces that embody the spirit of the desert nomads. Each piece is handcrafted using ancient techniques, carrying forward the rich cultural heritage of the Tuareg people through contemporary jewelry design.",
+    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+    coverImage: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&h=300&fit=crop",
+    followers: 1543,
+    following: 267,
+    likes: 6234,
+    experience: "10+ Years",
+    skills: ["Silver Jewelry", "Traditional Metalwork", "Engraving", "Stone Setting", "Cultural Design"],
+    specialties: ["Rings", "Necklaces", "Bracelets", "Traditional Symbols"],
+    verified: true,
+    rating: 4.7,
+    reviewCount: 156,
+    email: "omar@example.com",
+    phone: "+213 345 678 901",
+    isOnline: true
+  }
+};
 
 export const PublicProfilePage = () => {
-  const { username } = useParams(); // This is actually the user ID
+  const { username } = useParams<{ username: string }>();
   const navigate = useNavigate();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [stats, setStats] = useState<UserStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("portfolio");
+  const [activeTab, setActiveTab] = useState("overview");
+  const [isLoading, setIsLoading] = useState(true);
+  const [profileData, setProfileData] = useState<any>(null);
 
   useEffect(() => {
-    if (username) {
-      loadUserProfile(username);
-    }
-  }, [username]);
-
-  const loadUserProfile = async (userId: string) => {
-    setLoading(true);
-    try {
-      // Load profile data
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (profileError) {
-        console.error('Error loading profile:', profileError);
-        toast.error('Profile not found');
-        navigate('/app');
+    const loadProfile = () => {
+      if (!username) {
+        setIsLoading(false);
         return;
       }
 
-      setProfile(profileData);
+      // Simulate loading delay
+      setTimeout(() => {
+        const profile = mockArtisanProfiles[username as keyof typeof mockArtisanProfiles];
+        if (profile) {
+          setProfileData(profile);
+        }
+        setIsLoading(false);
+      }, 500);
+    };
 
-      // Load user stats
-      const { data: statsData, error: statsError } = await supabase
-        .from('user_stats')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
+    loadProfile();
+  }, [username]);
 
-      if (!statsError && statsData) {
-        setStats(statsData);
-      } else {
-        // Set default stats if none exist
-        setStats({
-          followers_count: 0,
-          following_count: 0,
-          likes_received: 0,
-          profile_views: 0,
-          connections_count: 0
-        });
-      }
-
-    } catch (error) {
-      console.error('Error loading user profile:', error);
-      toast.error('Failed to load profile');
-      navigate('/app');
-    } finally {
-      setLoading(false);
-    }
+  const handleMessageClick = () => {
+    console.log("Message clicked for", profileData?.name);
+    toast.success(`Opening chat with ${profileData?.name}...`);
+    navigate('/messaging');
   };
 
-  const handleBackToApp = () => {
-    navigate('/app');
+  const handleFollowClick = () => {
+    console.log("Follow clicked for", profileData?.name);
+    toast.success(`Now following ${profileData?.name}!`);
   };
 
-  const formatMemberSince = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.getFullYear().toString();
+  const handleShareClick = () => {
+    console.log("Share clicked for", profileData?.name);
+    navigator.clipboard.writeText(window.location.href);
+    toast.success("Profile URL copied to clipboard!");
   };
 
-  const handleMessage = () => {
-    navigate(`/messaging?user=${profile?.id}`);
+  const handleBackClick = () => {
+    navigate(-1);
   };
 
-  const handleFollow = async () => {
-    if (!profile) return;
-    
-    try {
-      // TODO: Implement follow functionality
-      toast.success("Follow functionality coming soon!");
-    } catch (error) {
-      console.error('Error following user:', error);
-      toast.error('Failed to follow user');
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
-      </div>
-    );
-  }
-
-  if (!profile) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Profile not found</h2>
-          <Button onClick={handleBackToApp}>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!profileData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">Profile Not Found</h1>
+          <p className="text-gray-600 mb-4">The profile you're looking for doesn't exist.</p>
+          <Button onClick={handleBackClick}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to App
+            Go Back
           </Button>
         </div>
       </div>
     );
   }
 
-  const displayName = profile.display_name || profile.full_name || profile.email || 'Unknown User';
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <Button 
-            variant="ghost" 
-            onClick={handleBackToApp}
-            className="text-gray-600 hover:text-gray-900"
-          >
+    <div className="min-h-screen bg-gray-50 pb-8">
+      {/* Back Button */}
+      <div className="bg-white border-b">
+        <div className="max-w-6xl mx-auto px-6 py-4">
+          <Button variant="ghost" onClick={handleBackClick}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to App
+            Back to Network
           </Button>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        {/* Cover Image */}
-        <div className="relative h-48 md:h-64 bg-gradient-to-r from-orange-400 to-red-500 rounded-lg overflow-hidden mb-6">
-          <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+      {/* Cover Photo & Profile Header */}
+      <div className="relative">
+        <div 
+          className="h-64 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${profileData.coverImage})`
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-orange-400/20 via-red-400/20 to-pink-400/20"></div>
         </div>
-
-        {/* Profile Header */}
-        <Card className="p-6 -mt-20 relative z-10 mb-6">
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-            <Avatar className="h-32 w-32 border-4 border-white shadow-lg">
-              <AvatarImage src={profile.avatar_url} alt={displayName} />
-              <AvatarFallback className="bg-orange-100 text-orange-600 text-2xl">
-                {displayName.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            
-            <div className="flex-1">
-              <div className="flex flex-col md:flex-row md:items-start md:justify-between">
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900 mb-1">
-                    {displayName}
-                  </h1>
-                  <p className="text-lg text-gray-600 mb-2">
-                    {profile.experience_level ? `${profile.experience_level} Experience` : 'Artisan'}
-                  </p>
-                  <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
-                    {profile.region && (
+        
+        <div className="absolute bottom-0 left-0 right-0 transform translate-y-1/2">
+          <div className="max-w-6xl mx-auto px-6">
+            <div className="flex flex-col md:flex-row items-start md:items-end gap-6">
+              <div className="relative">
+                <Avatar className="h-32 w-32 border-4 border-white shadow-lg">
+                  <AvatarImage src={profileData.avatar} />
+                  <AvatarFallback className="text-2xl bg-orange-100">
+                    {profileData.name.split(' ').map((n: string) => n[0]).join('')}
+                  </AvatarFallback>
+                </Avatar>
+                {profileData.isOnline && (
+                  <div className="absolute bottom-2 right-2 w-6 h-6 bg-green-500 border-2 border-white rounded-full"></div>
+                )}
+              </div>
+              
+              <div className="flex-1 bg-white rounded-lg p-6 shadow-lg">
+                <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <h1 className="text-3xl font-bold text-gray-800">{profileData.name}</h1>
+                      {profileData.verified && (
+                        <Badge className="bg-blue-600">
+                          <Star className="h-3 w-3 mr-1" />
+                          Verified
+                        </Badge>
+                      )}
+                      {profileData.isOnline && (
+                        <Badge className="bg-green-600">Online</Badge>
+                      )}
+                    </div>
+                    <p className="text-lg text-gray-600 mb-3">{profileData.title}</p>
+                    
+                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                      {profileData.email && (
+                        <div className="flex items-center gap-1">
+                          <Mail className="h-4 w-4" />
+                          {profileData.email}
+                        </div>
+                      )}
                       <div className="flex items-center gap-1">
                         <MapPin className="h-4 w-4" />
-                        <span>{profile.region}</span>
+                        {profileData.location}
                       </div>
-                    )}
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      <span>Member since {formatMemberSince(profile.created_at)}</span>
-                    </div>
-                    {profile.website && (
                       <div className="flex items-center gap-1">
-                        <Globe className="h-4 w-4" />
-                        <a 
-                          href={profile.website} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800"
-                        >
-                          Website
-                        </a>
+                        <Calendar className="h-4 w-4" />
+                        Member since {profileData.memberSince}
                       </div>
-                    )}
+                      {profileData.website && (
+                        <div className="flex items-center gap-1">
+                          <Globe className="h-4 w-4" />
+                          <a href={profileData.website} className="text-orange-600 hover:underline" target="_blank" rel="noopener noreferrer">
+                            Portfolio Website
+                          </a>
+                        </div>
+                      )}
+                      <div className="flex items-center gap-1">
+                        <Star className="h-4 w-4 text-yellow-500" />
+                        {profileData.rating} ({profileData.reviewCount} reviews)
+                      </div>
+                    </div>
                   </div>
                   
-                  {/* Bio */}
-                  <p className="text-gray-700 mb-4 max-w-2xl">
-                    {profile.bio || 'Welcome to my profile! I am passionate about creative work and looking forward to connecting with fellow artists and designers.'}
-                  </p>
-                </div>
-                
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={handleMessage}>
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                    Message
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={handleFollow}>
-                    <UserPlus className="h-4 w-4 mr-2" />
-                    Follow
-                  </Button>
+                  <div className="flex items-center gap-3">
+                    <Button className="bg-orange-600 hover:bg-orange-700" onClick={handleMessageClick}>
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      Message
+                    </Button>
+                    <Button variant="outline" onClick={handleFollowClick}>
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Follow
+                    </Button>
+                    <Button variant="outline" onClick={handleShareClick}>
+                      <Share className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Profile Content */}
+      <div className="max-w-6xl mx-auto px-6 mt-20">
+        {/* Profile Stats */}
+        <ProfileStats 
+          followers={profileData.followers}
+          following={profileData.following}
+          likes={profileData.likes}
+          experience={profileData.experience}
+        />
+
+        {/* Bio Section */}
+        <Card className="p-6 mt-8">
+          <h2 className="text-xl font-semibold mb-4">About</h2>
+          <p className="text-gray-700 leading-relaxed">{profileData.bio}</p>
+          
+          {/* Contact Information */}
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <h3 className="text-lg font-semibold mb-3">Contact Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {profileData.email && (
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-gray-500" />
+                  <span className="text-gray-700">{profileData.email}</span>
+                </div>
+              )}
+              {profileData.phone && (
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4 text-gray-500" />
+                  <span className="text-gray-700">{profileData.phone}</span>
+                </div>
+              )}
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-gray-500" />
+                <span className="text-gray-700">{profileData.location}</span>
+              </div>
+              {profileData.website && (
+                <div className="flex items-center gap-2">
+                  <Globe className="h-4 w-4 text-gray-500" />
+                  <a href={profileData.website} className="text-orange-600 hover:underline" target="_blank" rel="noopener noreferrer">
+                    {profileData.website}
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
         </Card>
 
-        {/* Stats */}
-        {stats && (
-          <ProfileStats 
-            followers={stats.followers_count}
-            following={stats.following_count}
-            likes={stats.likes_received}
-            experience={profile.experience_level || 'New'}
-          />
-        )}
-
-        {/* Tabs */}
+        {/* Profile Tabs */}
         <div className="mt-8">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
-              <TabsTrigger value="showcase">Showcase</TabsTrigger>
               <TabsTrigger value="skills">Skills</TabsTrigger>
+              <TabsTrigger value="showcase">Showcase</TabsTrigger>
             </TabsList>
-            
-            <TabsContent value="portfolio" className="mt-6">
-              <PortfolioGallery userId={profile.id} isOwnProfile={false} />
-            </TabsContent>
-            
-            <TabsContent value="showcase" className="mt-6">
-              <WorkShowcase userId={profile.id} isOwnProfile={false} />
-            </TabsContent>
-            
-            <TabsContent value="skills" className="mt-6">
-              <SkillsSection skills={[]} specialties={[]} isOwnProfile={false} />
-            </TabsContent>
+
+            <div className="mt-6">
+              <TabsContent value="overview">
+                <div className="space-y-8">
+                  <SkillsSection 
+                    skills={profileData.skills}
+                    specialties={profileData.specialties}
+                    isOwnProfile={false}
+                  />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="portfolio">
+                <PortfolioGallery isOwnProfile={false} />
+              </TabsContent>
+
+              <TabsContent value="skills">
+                <SkillsSection 
+                  skills={profileData.skills}
+                  specialties={profileData.specialties}
+                  isOwnProfile={false}
+                />
+              </TabsContent>
+
+              <TabsContent value="showcase">
+                <WorkShowcase isOwnProfile={false} />
+              </TabsContent>
+            </div>
           </Tabs>
         </div>
       </div>
