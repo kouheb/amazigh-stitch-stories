@@ -12,67 +12,17 @@ import { TestingPage } from "./TestingPage";
 import { ArtisanDashboard } from "@/components/dashboard/ArtisanDashboard";
 import ProfileCreationScreen from "@/components/wireframe/ProfileCreationScreen";
 import Membership from "./Membership";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 
 export const MainApp = () => {
-  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("home");
-  const [isProfileComplete, setIsProfileComplete] = useState<boolean | null>(null);
-  const [checkingProfile, setCheckingProfile] = useState(true);
-
-  // Check if user profile is complete when user is loaded
-  useEffect(() => {
-    const checkProfileCompletion = async () => {
-      if (!user) {
-        setCheckingProfile(false);
-        return;
-      }
-
-      try {
-        const { data: profile, error } = await supabase
-          .from('profiles')
-          .select('full_name, display_name, bio, region, experience_level')
-          .eq('id', user.id)
-          .single();
-
-        if (error) {
-          console.error('Error checking profile:', error);
-          // If profile doesn't exist, consider it incomplete
-          setIsProfileComplete(false);
-        } else {
-          // Consider profile complete if at least full_name and display_name are filled
-          const isComplete = !!(profile?.full_name && profile?.display_name);
-          setIsProfileComplete(isComplete);
-          
-          // If profile is incomplete, automatically show profile creation
-          if (!isComplete) {
-            setActiveTab("create-profile");
-          }
-        }
-      } catch (error) {
-        console.error('Error checking profile completion:', error);
-        setIsProfileComplete(false);
-      } finally {
-        setCheckingProfile(false);
-      }
-    };
-
-    checkProfileCompletion();
-  }, [user]);
+  const [isProfileComplete, setIsProfileComplete] = useState(false);
 
   const handleTabChange = (tab: string) => {
-    // Prevent navigation away from profile creation if profile is incomplete
-    if (isProfileComplete === false && tab !== "create-profile") {
-      console.log("Profile must be completed before navigating");
-      return;
-    }
-    
     console.log(`Tab changed to: ${tab}`);
     setActiveTab(tab);
   };
 
-  const handleProfileComplete = async () => {
+  const handleProfileComplete = () => {
     console.log("Profile creation completed");
     setIsProfileComplete(true);
     setActiveTab("home");
@@ -113,18 +63,6 @@ export const MainApp = () => {
         return <HomePage />;
     }
   };
-
-  // Show loading while checking profile
-  if (checkingProfile) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your profile...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <AppLayout activeTab={activeTab} onTabChange={handleTabChange}>

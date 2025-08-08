@@ -4,7 +4,7 @@ import { MainNavbar } from "@/components/navigation/MainNavbar";
 import { Sidebar } from "@/components/navigation/Sidebar";
 import { BottomNavigation } from "@/components/navigation/BottomNavigation";
 import { Footer } from "@/components/layout/Footer";
-
+import { GlobalCallPopup } from "@/components/calls/GlobalCallPopup";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -29,17 +29,6 @@ export const AppLayout = ({ children, activeTab, onTabChange }: AppLayoutProps) 
     onTabChange(tab);
     setSidebarOpen(false); // Close sidebar on mobile when navigating
   };
-
-  // Hide navigation during profile creation
-  const isProfileCreation = activeTab === "create-profile";
-  
-  if (isProfileCreation) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        {children}
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -70,6 +59,8 @@ export const AppLayout = ({ children, activeTab, onTabChange }: AppLayoutProps) 
         />
       </div>
 
+      {/* Global Call Popup */}
+      <GlobalCallPopup />
     </div>
   );
 };
