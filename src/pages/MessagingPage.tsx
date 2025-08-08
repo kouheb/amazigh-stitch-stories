@@ -41,6 +41,7 @@ export const MessagingPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { conversations, messages, sendMessage } = useRealtimeMessaging(selectedConversationId);
   const [peopleResults, setPeopleResults] = useState<any[]>([]);
+  const [messageResults, setMessageResults] = useState<any[]>([]);
 
   const handleBackToApp = () => {
     navigate('/app');
@@ -55,6 +56,15 @@ export const MessagingPage = () => {
         .or(`display_name.ilike.%${searchQuery}%,full_name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`)
         .limit(10);
       setPeopleResults(data || []);
+    };
+    run();
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const run = async () => {
+      if (!searchQuery) return setMessageResults([]);
+      const { data, error } = await supabase.rpc('search_user_messages', { q: searchQuery, limit_count: 20, offset_count: 0 });
+      if (!error) setMessageResults(data || []);
     };
     run();
   }, [searchQuery]);
@@ -155,6 +165,20 @@ export const MessagingPage = () => {
             ))}
           </div>
         )}
+        {messageResults.length > 0 && (
+          <div className="p-2 border-b border-gray-200 max-h-60 overflow-y-auto">
+            {messageResults.map((m: any) => (
+              <button
+                key={m.id}
+                onClick={() => { setSelectedConversationId(m.conversation_id); setSearchQuery(""); setPeopleResults([]); setMessageResults([]); }}
+                className="w-full text-left px-3 py-2 rounded hover:bg-gray-50"
+              >
+                <div className="text-sm text-gray-800 line-clamp-1">{m.content}</div>
+                <div className="text-xs text-gray-500">{new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Conversations List */}
         <ChatList
@@ -171,6 +195,11 @@ export const MessagingPage = () => {
           <ChatWindow
             conversation={selectedConversation as any}
             messages={messages as any}
+            onSend={(text, type, fileUrl, fileName) => {
+              if (selectedConversationId) {
+                sendMessage(selectedConversationId, text, type, fileUrl, fileName);
+              }
+            }}
           />
         ) : (
           <div className="flex-1 flex items-center justify-center bg-gray-50">

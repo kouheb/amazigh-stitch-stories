@@ -39,9 +39,10 @@ interface Message {
 interface ChatWindowProps {
   conversation: Conversation;
   messages: Message[];
+  onSend?: (text: string, type?: "text" | "image" | "file", fileUrl?: string, fileName?: string) => void;
 }
 
-export const ChatWindow = ({ conversation, messages }: ChatWindowProps) => {
+export const ChatWindow = ({ conversation, messages, onSend }: ChatWindowProps) => {
   const [messageList, setMessageList] = useState<Message[]>(messages);
   const [isTyping, setIsTyping] = useState(false);
 
@@ -53,53 +54,39 @@ export const ChatWindow = ({ conversation, messages }: ChatWindowProps) => {
     setMessageList(messages);
   }, [messages]);
 
-  const handleSendMessage = (text: string, type: "text" | "image" | "file" = "text", fileUrl?: string, fileName?: string) => {
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      senderId: "me",
-      text,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      isRead: false,
-      status: "sending",
-      type,
-      fileUrl,
-      fileName
-    };
-    
-    setMessageList([...messageList, newMessage]);
-    
-    // Simulate message delivery
-    setTimeout(() => {
-      setMessageList(prev => prev.map(msg => 
-        msg.id === newMessage.id ? { ...msg, status: "sent" } : msg
-      ));
-    }, 500);
-    
-    setTimeout(() => {
-      setMessageList(prev => prev.map(msg => 
-        msg.id === newMessage.id ? { ...msg, status: "delivered" } : msg
-      ));
-    }, 1000);
+const handleSendMessage = (text: string, type: "text" | "image" | "file" = "text", fileUrl?: string, fileName?: string) => {
+  if (onSend) {
+    onSend(text, type, fileUrl, fileName);
+    return;
+  }
 
-    // Simulate typing response
-    setTimeout(() => {
-      setIsTyping(true);
-    }, 2000);
-
-    setTimeout(() => {
-      setIsTyping(false);
-      const responseMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        senderId: "other",
-        text: "Thank you for sharing! That looks beautiful.",
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        isRead: true,
-        status: "read",
-        type: "text"
-      };
-      setMessageList(prev => [...prev, responseMessage]);
-    }, 4000);
+  const newMessage: Message = {
+    id: Date.now().toString(),
+    senderId: "me",
+    text,
+    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    isRead: false,
+    status: "sending",
+    type,
+    fileUrl,
+    fileName
   };
+  
+  setMessageList([...messageList, newMessage]);
+  
+  // Simulate message delivery
+  setTimeout(() => {
+    setMessageList(prev => prev.map(msg => 
+      msg.id === newMessage.id ? { ...msg, status: "sent" } : msg
+    ));
+  }, 500);
+  
+  setTimeout(() => {
+    setMessageList(prev => prev.map(msg => 
+      msg.id === newMessage.id ? { ...msg, status: "delivered" } : msg
+    ));
+  }, 1000);
+};
 
   const handleVoiceCall = () => {
     console.log(`Starting voice call with ${conversation.participant.name}`);
