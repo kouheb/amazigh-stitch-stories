@@ -50,15 +50,18 @@ export const MessagingPage = () => {
   useEffect(() => {
     const run = async () => {
       if (!searchQuery) return setPeopleResults([]);
-      const { data } = await supabase
+      const term = searchQuery.trim();
+      const q = `%${term}%`;
+      const { data, error } = await supabase
         .from('profiles')
-        .select('id, display_name, full_name, email, avatar_url')
-        .or(`display_name.ilike.%${searchQuery}%,full_name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`)
+        .select('id, username, display_name, full_name, email, avatar_url')
+        .or(`username.ilike.${q},display_name.ilike.${q},full_name.ilike.${q},email.ilike.${q}`)
+        .neq('id', user?.id || '')
         .limit(10);
-      setPeopleResults(data || []);
+      if (!error) setPeopleResults(data || []);
     };
     run();
-  }, [searchQuery]);
+  }, [searchQuery, user?.id]);
 
   useEffect(() => {
     const run = async () => {

@@ -385,6 +385,7 @@ export type Database = {
           region: string | null
           social_handle: string | null
           updated_at: string
+          username: string | null
           website: string | null
         }
         Insert: {
@@ -399,6 +400,7 @@ export type Database = {
           region?: string | null
           social_handle?: string | null
           updated_at?: string
+          username?: string | null
           website?: string | null
         }
         Update: {
@@ -413,6 +415,7 @@ export type Database = {
           region?: string | null
           social_handle?: string | null
           updated_at?: string
+          username?: string | null
           website?: string | null
         }
         Relationships: []
@@ -620,6 +623,7 @@ export type Database = {
           region: string | null
           social_handle: string | null
           updated_at: string
+          username: string | null
           website: string | null
         }[]
       }
