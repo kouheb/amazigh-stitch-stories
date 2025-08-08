@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { useRealtimeMessaging } from "@/hooks/useRealtimeMessaging";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { searchUsers as searchUsersUtil } from "@/utils/searchUsers";
 
 interface Conversation {
   id: string;
@@ -50,15 +51,8 @@ export const MessagingPage = () => {
   useEffect(() => {
     const run = async () => {
       if (!searchQuery) return setPeopleResults([]);
-      const term = searchQuery.trim();
-      const q = `%${term}%`;
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, username, display_name, full_name, email, avatar_url')
-        .or(`username.ilike.${q},display_name.ilike.${q},full_name.ilike.${q},email.ilike.${q}`)
-        .neq('id', user?.id || '')
-        .limit(10);
-      if (!error) setPeopleResults(data || []);
+      const data = await searchUsersUtil(searchQuery, user?.id || "");
+      setPeopleResults(data || []);
     };
     run();
   }, [searchQuery, user?.id]);
