@@ -86,6 +86,9 @@ const translations = {
     'status.inProgress': 'In Progress',
     'status.available': 'Available',
     'status.busy': 'Busy until next month',
+    
+    // Common
+    'common.noResults': 'No results found',
   },
   
   ar: {
@@ -162,6 +165,9 @@ const translations = {
     'status.inProgress': 'قيد التنفيذ',
     'status.available': 'متاح',
     'status.busy': 'مشغول حتى الشهر المقبل',
+    
+    // Common - Arabic
+    'common.noResults': 'لا توجد نتائج',
   },
   
   fr: {
@@ -238,6 +244,9 @@ const translations = {
     'status.inProgress': 'En cours',
     'status.available': 'Disponible',
     'status.busy': 'Occupé jusqu\'au mois prochain',
+    
+    // Commun - Français
+    'common.noResults': 'Aucun résultat',
   }
 };
 
