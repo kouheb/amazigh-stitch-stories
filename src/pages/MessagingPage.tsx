@@ -125,12 +125,32 @@ export const MessagingPage = () => {
       setLoading(false);
     }
   };
+  // Quick health check for messaging API permissions/key
+  const checkMessagesHealth = async () => {
+    if (!user) return;
+    try {
+      const { error } = await supabase
+        .from('conversations')
+        .select('id', { count: 'exact', head: true });
+      if (error) throw error;
+      toast.success('Messages API is healthy');
+    } catch (err: any) {
+      console.error('Messages API health check failed:', err);
+      toast.error(`Messages API check failed: ${err?.message || 'Unknown error'}`);
+    }
+  };
 
   useEffect(() => {
     if (userId && user) {
       startConversationWithUser(userId);
     }
   }, [userId, user]);
+
+  useEffect(() => {
+    if (user) {
+      checkMessagesHealth();
+    }
+  }, [user]);
 
   const startConversationWithUser = async (targetUserId: string) => {
     if (!user) return;
