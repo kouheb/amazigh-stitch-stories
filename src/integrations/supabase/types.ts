@@ -14,42 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      api_keys: {
-        Row: {
-          created_at: string
-          hashed_key: string
-          id: string
-          last_used_at: string | null
-          name: string | null
-          prefix: string
-          revoked: boolean
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          hashed_key: string
-          id?: string
-          last_used_at?: string | null
-          name?: string | null
-          prefix?: string
-          revoked?: boolean
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          hashed_key?: string
-          id?: string
-          last_used_at?: string | null
-          name?: string | null
-          prefix?: string
-          revoked?: boolean
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       calls: {
         Row: {
           call_type: string
@@ -94,6 +58,7 @@ export type Database = {
           created_at: string
           id: string
           last_message_at: string | null
+          last_message_id: string | null
           participant_1_id: string
           participant_2_id: string
           updated_at: string
@@ -102,6 +67,7 @@ export type Database = {
           created_at?: string
           id?: string
           last_message_at?: string | null
+          last_message_id?: string | null
           participant_1_id: string
           participant_2_id: string
           updated_at?: string
@@ -110,186 +76,51 @@ export type Database = {
           created_at?: string
           id?: string
           last_message_at?: string | null
+          last_message_id?: string | null
           participant_1_id?: string
           participant_2_id?: string
           updated_at?: string
         }
         Relationships: []
       }
-      event_registrations: {
-        Row: {
-          email: string
-          event_id: string
-          full_name: string
-          id: string
-          phone: string | null
-          registration_date: string
-          special_requests: string | null
-          status: string | null
-          user_id: string | null
-        }
-        Insert: {
-          email: string
-          event_id: string
-          full_name: string
-          id?: string
-          phone?: string | null
-          registration_date?: string
-          special_requests?: string | null
-          status?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          email?: string
-          event_id?: string
-          full_name?: string
-          id?: string
-          phone?: string | null
-          registration_date?: string
-          special_requests?: string | null
-          status?: string | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "event_registrations_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      events: {
-        Row: {
-          approval_status: string | null
-          category: string
-          created_at: string
-          created_by: string | null
-          creator_email: string | null
-          current_attendees: number | null
-          date_time: string
-          description: string | null
-          id: string
-          image_url: string | null
-          location: string
-          max_attendees: number | null
-          organizer: string | null
-          price: string | null
-          status: string | null
-          submission_date: string | null
-          tags: string[] | null
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          approval_status?: string | null
-          category: string
-          created_at?: string
-          created_by?: string | null
-          creator_email?: string | null
-          current_attendees?: number | null
-          date_time: string
-          description?: string | null
-          id?: string
-          image_url?: string | null
-          location: string
-          max_attendees?: number | null
-          organizer?: string | null
-          price?: string | null
-          status?: string | null
-          submission_date?: string | null
-          tags?: string[] | null
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          approval_status?: string | null
-          category?: string
-          created_at?: string
-          created_by?: string | null
-          creator_email?: string | null
-          current_attendees?: number | null
-          date_time?: string
-          description?: string | null
-          id?: string
-          image_url?: string | null
-          location?: string
-          max_attendees?: number | null
-          organizer?: string | null
-          price?: string | null
-          status?: string | null
-          submission_date?: string | null
-          tags?: string[] | null
-          title?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      follow_relationships: {
-        Row: {
-          created_at: string
-          follower_id: string
-          following_id: string
-          id: string
-        }
-        Insert: {
-          created_at?: string
-          follower_id: string
-          following_id: string
-          id?: string
-        }
-        Update: {
-          created_at?: string
-          follower_id?: string
-          following_id?: string
-          id?: string
-        }
-        Relationships: []
-      }
       messages: {
         Row: {
           content: string
-          conversation_id: string
           created_at: string
           file_name: string | null
           file_url: string | null
           id: string
           is_read: boolean
           message_type: string
+          recipient_id: string
           sender_id: string
+          updated_at: string
         }
         Insert: {
           content: string
-          conversation_id: string
           created_at?: string
           file_name?: string | null
           file_url?: string | null
           id?: string
           is_read?: boolean
           message_type?: string
+          recipient_id: string
           sender_id: string
+          updated_at?: string
         }
         Update: {
           content?: string
-          conversation_id?: string
           created_at?: string
           file_name?: string | null
           file_url?: string | null
           id?: string
           is_read?: boolean
           message_type?: string
+          recipient_id?: string
           sender_id?: string
+          updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "messages_conversation_id_fkey"
-            columns: ["conversation_id"]
-            isOneToOne: false
-            referencedRelation: "conversations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       notifications: {
         Row: {

@@ -47,8 +47,31 @@ export const AddEventModal = ({ isOpen, onClose, onAddEvent, selectedDate }: Add
       return;
     }
 
-    // Pass form data to parent component for database handling
-    onAddEvent(formData);
+    const newEvent = {
+      id: Date.now(), // Simple ID generation
+      title: formData.title,
+      description: formData.description,
+      date: new Date(formData.date).toLocaleDateString('en-US', { 
+        month: 'long', 
+        day: 'numeric', 
+        year: 'numeric' 
+      }),
+      time: formData.time,
+      location: formData.location,
+      category: formData.category,
+      price: formData.price || "Free",
+      organizer: formData.organizer || "Community",
+      attendees: 0,
+      image: getCategoryEmoji(formData.category),
+      tags: [formData.category.charAt(0).toUpperCase() + formData.category.slice(1)]
+    };
+
+    onAddEvent(newEvent);
+    
+    toast({
+      title: "Event Created",
+      description: "Your event has been successfully added to the calendar."
+    });
 
     // Reset form
     setFormData({
@@ -76,40 +99,8 @@ export const AddEventModal = ({ isOpen, onClose, onAddEvent, selectedDate }: Add
     return emojis[category] || "📅";
   };
 
-  // Input validation and sanitization
-  const sanitizeInput = (input: string): string => {
-    return input.trim().replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-  };
-
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
   const handleInputChange = (field: string, value: string) => {
-    // Sanitize input to prevent XSS
-    const sanitizedValue = sanitizeInput(value);
-    
-    // Additional validation based on field type
-    if (field === 'title' && sanitizedValue.length > 100) {
-      toast({
-        title: "Input too long",
-        description: "Event title must be less than 100 characters.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    if (field === 'description' && sanitizedValue.length > 1000) {
-      toast({
-        title: "Input too long",
-        description: "Description must be less than 1000 characters.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    setFormData(prev => ({ ...prev, [field]: sanitizedValue }));
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   return (

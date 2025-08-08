@@ -6,19 +6,17 @@ import { NetworkPage } from "./NetworkPage";
 import { LearningPage } from "./LearningPage";
 import { EventsPage } from "./EventsPage";
 import { ProfilePage } from "./ProfilePage";
-import { MessagingTab } from "@/components/messaging/MessagingTab";
+import { MessagingPage } from "./MessagingPage";
 import { MarketplacePage } from "./MarketplacePage";
 import { TestingPage } from "./TestingPage";
 import { ArtisanDashboard } from "@/components/dashboard/ArtisanDashboard";
 import ProfileCreationScreen from "@/components/wireframe/ProfileCreationScreen";
 import Membership from "./Membership";
 import { useAuth } from "@/contexts/AuthContext";
-import { useGlobalMessaging } from "@/hooks/useGlobalMessaging";
 import { supabase } from "@/integrations/supabase/client";
 
 export const MainApp = () => {
   const { user } = useAuth();
-  const { unreadCount } = useGlobalMessaging();
   const [activeTab, setActiveTab] = useState("home");
   const [isProfileComplete, setIsProfileComplete] = useState<boolean | null>(null);
   const [checkingProfile, setCheckingProfile] = useState(true);
@@ -40,14 +38,8 @@ export const MainApp = () => {
 
         if (error) {
           console.error('Error checking profile:', error);
-          // If there's a network/connection error, allow navigation instead of blocking
-          if (error.message.includes('Failed to fetch') || error.message.includes('fetch')) {
-            console.log('Network error detected, allowing navigation');
-            setIsProfileComplete(true); // Allow navigation despite error
-          } else {
-            // If profile doesn't exist, consider it incomplete
-            setIsProfileComplete(false);
-          }
+          // If profile doesn't exist, consider it incomplete
+          setIsProfileComplete(false);
         } else {
           // Consider profile complete if at least full_name and display_name are filled
           const isComplete = !!(profile?.full_name && profile?.display_name);
@@ -60,9 +52,7 @@ export const MainApp = () => {
         }
       } catch (error) {
         console.error('Error checking profile completion:', error);
-        // On catch errors (like network issues), allow navigation
-        console.log('Caught error, allowing navigation');
-        setIsProfileComplete(true);
+        setIsProfileComplete(false);
       } finally {
         setCheckingProfile(false);
       }
@@ -72,10 +62,7 @@ export const MainApp = () => {
   }, [user]);
 
   const handleTabChange = (tab: string) => {
-    console.log(`MainApp handleTabChange called with: ${tab}`);
-    console.log(`Current isProfileComplete: ${isProfileComplete}`);
-    
-    // Only prevent navigation if profile is explicitly incomplete (not null or true)
+    // Prevent navigation away from profile creation if profile is incomplete
     if (isProfileComplete === false && tab !== "create-profile") {
       console.log("Profile must be completed before navigating");
       return;
@@ -108,7 +95,7 @@ export const MainApp = () => {
       case "events":
         return <EventsPage />;
       case "messages":
-        return <MessagingTab />;
+        return <MessagingPage />;
       case "marketplace":
         return <MarketplacePage />;
       case "profile":

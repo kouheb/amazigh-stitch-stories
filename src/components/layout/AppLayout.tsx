@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { MainNavbar } from "@/components/navigation/MainNavbar";
 import { Sidebar } from "@/components/navigation/Sidebar";
-
 import { BottomNavigation } from "@/components/navigation/BottomNavigation";
 import { Footer } from "@/components/layout/Footer";
 

@@ -24,40 +24,17 @@ export const ImageUpload = ({ currentImage, onImageChange, className = "", size 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Enhanced security validation
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-      if (!allowedTypes.includes(file.type)) {
-        toast.error("Only JPEG, PNG, GIF, and WebP images are allowed");
-        return;
-      }
-
       if (file.size > 5 * 1024 * 1024) {
         toast.error("Image size must be less than 5MB");
-        return;
-      }
-
-      // Check for suspicious file names
-      const suspiciousPatterns = /\.(php|js|exe|bat|cmd|scr|pif|com)$/i;
-      if (suspiciousPatterns.test(file.name)) {
-        toast.error("Invalid file type detected");
         return;
       }
 
       const reader = new FileReader();
       reader.onload = (e) => {
         const imageUrl = e.target?.result as string;
-        
-        // Validate that the file is actually an image
-        const img = new Image();
-        img.onload = () => {
-          setPreviewImage(imageUrl);
-          onImageChange(imageUrl);
-          toast.success("Image uploaded successfully!");
-        };
-        img.onerror = () => {
-          toast.error("Invalid image file");
-        };
-        img.src = imageUrl;
+        setPreviewImage(imageUrl);
+        onImageChange(imageUrl);
+        toast.success("Image uploaded successfully!");
       };
       reader.readAsDataURL(file);
     }
@@ -114,7 +91,7 @@ export const ImageUpload = ({ currentImage, onImageChange, className = "", size 
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/jpeg,image/png,image/gif,image/webp"
+        accept="image/*"
         onChange={handleFileSelect}
         className="hidden"
       />

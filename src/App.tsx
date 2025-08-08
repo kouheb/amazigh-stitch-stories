@@ -20,13 +20,12 @@ import { AppBannerPage } from "./pages/AppBannerPage";
 import { IconBannerPage } from "./pages/IconBannerPage";
 import { DeveloperIconPage } from "./pages/DeveloperIconPage";
 import { DeveloperHeaderPage } from "./pages/DeveloperHeaderPage";
-import MessagingPage from "./pages/MessagingPage";
+import { MessagingPage } from "./pages/MessagingPage";
 import { PrivacyPolicy } from "./pages/PrivacyPolicy";
 import { DeleteAccountPage } from "./pages/DeleteAccountPage";
 import { PlayStoreGraphicsPage } from "./pages/PlayStoreGraphicsPage";
 import { PublicProfilePage } from "./pages/PublicProfilePage";
 import NotFound from "./pages/NotFound";
-import { ApiKeysPage } from "./pages/ApiKeysPage";
 
 const queryClient = new QueryClient();
 
@@ -63,14 +62,9 @@ const App = () => (
                   <MessagingPage />
                 </ProtectedRoute>
               } />
-              <Route path="/profile/:id" element={
+              <Route path="/profile/:username" element={
                 <ProtectedRoute>
                   <PublicProfilePage />
-                </ProtectedRoute>
-              } />
-              <Route path="/settings/api-keys" element={
-                <ProtectedRoute>
-                  <ApiKeysPage />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

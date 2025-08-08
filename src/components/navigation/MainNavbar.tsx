@@ -5,7 +5,7 @@ import { MobileLogo } from "@/components/ui/MobileLogo";
 import { Logo } from "@/components/ui/Logo";
 import { LanguageSelector } from "./LanguageSelector";
 import { UserDropdown } from "./UserDropdown";
-import { UserSearchSystem } from "./UserSearchSystem";
+import { SearchBar } from "./SearchBar";
 import { AuthButtons } from "./AuthButtons";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -53,13 +53,10 @@ export const MainNavbar = ({ onMenuToggle, onCreateClick, onTabChange }: MainNav
           </div>
         </div>
 
-        {/* Center - New User Search System (only when authenticated) */}
+        {/* Center - Search (only when authenticated) */}
         {isAuthenticated && (
-          <div className="hidden md:flex flex-1 max-w-lg mx-6">
-            <UserSearchSystem 
-              placeholder="Search users by name, email, or skills..."
-              className="w-full"
-            />
+          <div className="hidden md:flex flex-1 max-w-md mx-6">
+            <SearchBar />
           </div>
         )}
 
@@ -75,13 +72,10 @@ export const MainNavbar = ({ onMenuToggle, onCreateClick, onTabChange }: MainNav
         </div>
       </div>
 
-      {/* Mobile user search (only when authenticated) */}
+      {/* Mobile search bar (only when authenticated) */}
       {isAuthenticated && (
-        <div className="md:hidden mt-3 px-4">
-          <UserSearchSystem 
-            placeholder="Search users..."
-            className="w-full"
-          />
+        <div className="md:hidden mt-3">
+          <SearchBar isMobile={true} />
         </div>
       )}
     </nav>

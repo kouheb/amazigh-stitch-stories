@@ -60,8 +60,8 @@ export const NotificationProvider = ({ children }: NotificationProviderProps) =>
         .limit(50);
 
       if (error) {
-        console.warn('Failed to load notifications');
-        // Silently fail - don't show error toast
+        console.error('Error loading notifications:', error);
+        toast.error('Failed to load notifications');
         return;
       }
 
@@ -76,7 +76,7 @@ export const NotificationProvider = ({ children }: NotificationProviderProps) =>
       })));
     } catch (error) {
       console.error('Error loading notifications:', error);
-      // Silently fail - don't show error toast
+      toast.error('Failed to load notifications');
     } finally {
       setLoading(false);
     }

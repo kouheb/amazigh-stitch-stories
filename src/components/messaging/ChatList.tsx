@@ -19,19 +19,19 @@ interface Conversation {
   unreadCount: number;
 }
 
-interface ConversationListProps {
+interface ChatListProps {
   conversations: Conversation[];
   selectedId: string;
   onSelect: (id: string) => void;
   searchQuery: string;
 }
 
-export const ConversationList = ({ 
+export const ChatList = ({ 
   conversations, 
   selectedId, 
   onSelect, 
   searchQuery 
-}: ConversationListProps) => {
+}: ChatListProps) => {
   const filteredConversations = conversations.filter(conversation =>
     conversation.participant.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -43,12 +43,12 @@ export const ConversationList = ({
           key={conversation.id}
           onClick={() => onSelect(conversation.id)}
           className={cn(
-            "p-4 cursor-pointer hover:bg-gray-50 transition-colors border-b border-gray-100",
-            selectedId === conversation.id && "bg-orange-50 border-orange-200"
+            "p-4 cursor-pointer hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0",
+            selectedId === conversation.id && "bg-orange-50 border-orange-200 hover:bg-orange-50"
           )}
         >
           <div className="flex items-start gap-3">
-            <div className="relative">
+            <div className="relative flex-shrink-0">
               <Avatar className="h-12 w-12">
                 <AvatarImage src={conversation.participant.avatar} />
                 <AvatarFallback>
@@ -65,21 +65,21 @@ export const ConversationList = ({
                 <h4 className="font-semibold text-gray-800 truncate">
                   {conversation.participant.name}
                 </h4>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-500 flex-shrink-0">
                   {conversation.lastMessage.timestamp}
                 </span>
               </div>
               
               <div className="flex items-center justify-between">
                 <p className={cn(
-                  "text-sm truncate",
+                  "text-sm truncate flex-1",
                   conversation.lastMessage.isRead ? "text-gray-600" : "text-gray-800 font-medium"
                 )}>
                   {conversation.lastMessage.text}
                 </p>
                 
                 {conversation.unreadCount > 0 && (
-                  <Badge className="bg-orange-600 text-white text-xs ml-2">
+                  <Badge className="bg-orange-600 text-white text-xs ml-2 flex-shrink-0">
                     {conversation.unreadCount}
                   </Badge>
                 )}
@@ -92,6 +92,14 @@ export const ConversationList = ({
       {filteredConversations.length === 0 && searchQuery && (
         <div className="p-8 text-center">
           <p className="text-gray-500">No conversations found</p>
+          <p className="text-sm text-gray-400 mt-1">Try adjusting your search</p>
+        </div>
+      )}
+      
+      {filteredConversations.length === 0 && !searchQuery && (
+        <div className="p-8 text-center">
+          <p className="text-gray-500">No conversations yet</p>
+          <p className="text-sm text-gray-400 mt-1">Start a new conversation to connect with artisans</p>
         </div>
       )}
     </div>

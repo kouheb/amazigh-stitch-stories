@@ -31,29 +31,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     let isMounted = true;
 
-    // Set up auth state listener FIRST to catch all auth events
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log('Auth state change:', event, !!session);
-        if (isMounted) {
-          setSession(session);
-          setUser(session?.user ?? null);
-          setLoading(false);
-          
-          // Cleanup on sign out
-          if (event === 'SIGNED_OUT') {
-            cleanupAuthState();
-          }
-        }
-      }
-    );
-
-    // THEN check for existing session
+    // Get initial session
     const getInitialSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
-          console.warn('Session retrieval failed:', error.message);
+          console.error('Error getting session:', error);
         }
         
         if (isMounted) {
@@ -62,16 +45,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setLoading(false);
         }
       } catch (error) {
-        console.warn('Session initialization failed:', error);
+        console.error('Error in getInitialSession:', error);
         if (isMounted) {
-          setSession(null);
-          setUser(null);
           setLoading(false);
         }
       }
     };
 
     getInitialSession();
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.email);
+        if (isMounted) {
+          setSession(session);
+          setUser(session?.user ?? null);
+          setLoading(false);
+        }
+      }
+    );
 
     return () => {
       isMounted = false;
@@ -111,43 +104,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const cleanupAuthState = () => {
-    // Remove all Supabase auth keys from localStorage
-    Object.keys(localStorage).forEach((key) => {
-      if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
-        localStorage.removeItem(key);
-      }
-    });
-    // Remove from sessionStorage if in use
-    Object.keys(sessionStorage || {}).forEach((key) => {
-      if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
-        sessionStorage.removeItem(key);
-      }
-    });
-  };
-
   const signOut = async () => {
     try {
-      // Clean up auth state first
-      cleanupAuthState();
-      
-      // Attempt global sign out (fallback if it fails)
-      try {
-        await supabase.auth.signOut({ scope: 'global' });
-      } catch (err) {
-        console.log('Sign out error (continuing anyway):', err);
-        // Continue even if this fails
-      }
-      
-      // Force page reload for a clean state
-      window.location.href = '/';
-      
-      return { error: null };
+      const { error } = await supabase.auth.signOut();
+      return { error };
     } catch (error) {
-      console.error('Sign out error:', error);
-      // Even on error, try to clean up and redirect
-      cleanupAuthState();
-      window.location.href = '/';
       return { error };
     }
   };

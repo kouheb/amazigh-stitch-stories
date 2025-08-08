@@ -13,29 +13,21 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
   useEffect(() => {
     if (!loading && !user) {
-      console.log('No user found, redirecting to auth');
-      navigate('/auth', { replace: true });
+      navigate('/auth');
     }
   }, [user, loading, navigate]);
 
-  // Show loading spinner while checking auth state
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-orange-600"></div>
       </div>
     );
   }
 
-  // If no user after loading, show nothing (redirect will handle)
   if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-muted-foreground">Redirecting to login...</div>
-      </div>
-    );
+    return null;
   }
 
-  // User is authenticated, render children
   return <>{children}</>;
 };
