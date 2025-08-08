@@ -14,6 +14,364 @@ export type Database = {
   }
   public: {
     Tables: {
+      api_keys: {
+        Row: {
+          created_at: string
+          hashed_key: string
+          id: string
+          last_used_at: string | null
+          name: string | null
+          prefix: string
+          revoked: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          hashed_key: string
+          id?: string
+          last_used_at?: string | null
+          name?: string | null
+          prefix?: string
+          revoked?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          hashed_key?: string
+          id?: string
+          last_used_at?: string | null
+          name?: string | null
+          prefix?: string
+          revoked?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      calls: {
+        Row: {
+          call_type: string
+          caller_id: string
+          created_at: string
+          duration: number | null
+          ended_at: string | null
+          id: string
+          recipient_id: string
+          started_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          call_type: string
+          caller_id: string
+          created_at?: string
+          duration?: number | null
+          ended_at?: string | null
+          id?: string
+          recipient_id: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          call_type?: string
+          caller_id?: string
+          created_at?: string
+          duration?: number | null
+          ended_at?: string | null
+          id?: string
+          recipient_id?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      conversations: {
+        Row: {
+          created_at: string
+          id: string
+          last_message_at: string | null
+          participant_1_id: string
+          participant_2_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_message_at?: string | null
+          participant_1_id: string
+          participant_2_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_message_at?: string | null
+          participant_1_id?: string
+          participant_2_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      event_registrations: {
+        Row: {
+          email: string
+          event_id: string
+          full_name: string
+          id: string
+          phone: string | null
+          registration_date: string
+          special_requests: string | null
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          email: string
+          event_id: string
+          full_name: string
+          id?: string
+          phone?: string | null
+          registration_date?: string
+          special_requests?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          email?: string
+          event_id?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+          registration_date?: string
+          special_requests?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_registrations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          approval_status: string | null
+          category: string
+          created_at: string
+          created_by: string | null
+          creator_email: string | null
+          current_attendees: number | null
+          date_time: string
+          description: string | null
+          id: string
+          image_url: string | null
+          location: string
+          max_attendees: number | null
+          organizer: string | null
+          price: string | null
+          status: string | null
+          submission_date: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          approval_status?: string | null
+          category: string
+          created_at?: string
+          created_by?: string | null
+          creator_email?: string | null
+          current_attendees?: number | null
+          date_time: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          location: string
+          max_attendees?: number | null
+          organizer?: string | null
+          price?: string | null
+          status?: string | null
+          submission_date?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          approval_status?: string | null
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          creator_email?: string | null
+          current_attendees?: number | null
+          date_time?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          location?: string
+          max_attendees?: number | null
+          organizer?: string | null
+          price?: string | null
+          status?: string | null
+          submission_date?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      follow_relationships: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          file_name: string | null
+          file_url: string | null
+          id: string
+          is_read: boolean
+          message_type: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          is_read?: boolean
+          message_type?: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          is_read?: boolean
+          message_type?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          action_url: string | null
+          created_at: string
+          id: string
+          is_read: boolean
+          message: string
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          action_url?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message: string
+          title: string
+          type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          action_url?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      portfolio_items: {
+        Row: {
+          category: string
+          comments: number
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          likes: number
+          tags: string[] | null
+          title: string
+          updated_at: string
+          user_id: string
+          views: number
+        }
+        Insert: {
+          category: string
+          comments?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          likes?: number
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          user_id: string
+          views?: number
+        }
+        Update: {
+          category?: string
+          comments?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          likes?: number
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          views?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -59,6 +417,57 @@ export type Database = {
         }
         Relationships: []
       }
+      showcase_items: {
+        Row: {
+          client: string | null
+          created_at: string
+          description: string | null
+          duration: string | null
+          id: string
+          likes: number | null
+          organization: string | null
+          status: string | null
+          thumbnail_url: string | null
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+          views: number | null
+        }
+        Insert: {
+          client?: string | null
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          id?: string
+          likes?: number | null
+          organization?: string | null
+          status?: string | null
+          thumbnail_url?: string | null
+          title: string
+          type: string
+          updated_at?: string
+          user_id: string
+          views?: number | null
+        }
+        Update: {
+          client?: string | null
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          id?: string
+          likes?: number | null
+          organization?: string | null
+          status?: string | null
+          thumbnail_url?: string | null
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+          views?: number | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -80,6 +489,81 @@ export type Database = {
         }
         Relationships: []
       }
+      user_skills: {
+        Row: {
+          created_at: string
+          id: string
+          proficiency_level: string | null
+          skill_name: string
+          skill_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          proficiency_level?: string | null
+          skill_name: string
+          skill_type?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          proficiency_level?: string | null
+          skill_name?: string
+          skill_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_stats: {
+        Row: {
+          books_count: number
+          connections_count: number
+          created_at: string
+          experience_years: number | null
+          followers_count: number
+          following_count: number
+          id: string
+          likes_received: number
+          messages_count: number
+          notifications_count: number
+          profile_views: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          books_count?: number
+          connections_count?: number
+          created_at?: string
+          experience_years?: number | null
+          followers_count?: number
+          following_count?: number
+          id?: string
+          likes_received?: number
+          messages_count?: number
+          notifications_count?: number
+          profile_views?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          books_count?: number
+          connections_count?: number
+          created_at?: string
+          experience_years?: number | null
+          followers_count?: number
+          following_count?: number
+          id?: string
+          likes_received?: number
+          messages_count?: number
+          notifications_count?: number
+          profile_views?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -91,6 +575,37 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
         }
         Returns: boolean
+      }
+      search_profiles: {
+        Args: { q: string; limit_count?: number }
+        Returns: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          display_name: string | null
+          email: string | null
+          experience_level: string | null
+          full_name: string | null
+          id: string
+          region: string | null
+          social_handle: string | null
+          updated_at: string
+          website: string | null
+        }[]
+      }
+      search_user_messages: {
+        Args: { q: string; limit_count?: number; offset_count?: number }
+        Returns: {
+          id: string
+          conversation_id: string
+          sender_id: string
+          is_read: boolean
+          created_at: string
+          content: string
+          message_type: string
+          file_url: string
+          file_name: string
+        }[]
       }
     }
     Enums: {

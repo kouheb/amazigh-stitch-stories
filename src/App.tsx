@@ -35,6 +35,10 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            {/* Global realtime message notifications */}
+            {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+            {/* @ts-ignore */}
+            {(await import('./components/notifications/RealtimeMessageToaster')).RealtimeMessageToaster && null}
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<AuthPage />} />

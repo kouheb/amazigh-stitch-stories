@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -44,6 +44,14 @@ interface ChatWindowProps {
 export const ChatWindow = ({ conversation, messages }: ChatWindowProps) => {
   const [messageList, setMessageList] = useState<Message[]>(messages);
   const [isTyping, setIsTyping] = useState(false);
+
+  // Keep local state in sync when prop changes
+  // This ensures realtime updates from parent propagate into the window
+  // without losing local UX (e.g., typing indicator)
+  import { useEffect } from 'react';
+  useEffect(() => {
+    setMessageList(messages);
+  }, [messages]);
 
   const handleSendMessage = (text: string, type: "text" | "image" | "file" = "text", fileUrl?: string, fileName?: string) => {
     const newMessage: Message = {

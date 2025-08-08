@@ -1,1 +1,4 @@
 project_id = "tatsijulcgjpadcjnalv"
+
+[functions.messages]
+verify_jwt = true

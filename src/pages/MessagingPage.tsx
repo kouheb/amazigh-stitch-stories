@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Search, Plus, MoreVertical, ArrowLeft } from "lucide-react";
 import { ChatWindow } from "@/components/messaging/ChatWindow";
 import { ChatList } from "@/components/messaging/ChatList";
 import { useNavigate } from "react-router-dom";
+import { useRealtimeMessaging } from "@/hooks/useRealtimeMessaging";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Conversation {
   id: string;
@@ -35,87 +36,59 @@ interface Message {
 
 export const MessagingPage = () => {
   const navigate = useNavigate();
-  const [selectedConversationId, setSelectedConversationId] = useState<string>("1");
+  const { user } = useAuth();
+  const [selectedConversationId, setSelectedConversationId] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
+  const { conversations, messages, sendMessage } = useRealtimeMessaging(selectedConversationId);
+  const [peopleResults, setPeopleResults] = useState<any[]>([]);
 
   const handleBackToApp = () => {
     navigate('/app');
   };
 
-  // Mock data - in real app this would come from your backend
-  const conversations: Conversation[] = [
-    {
-      id: "1",
-      participant: {
-        name: "Fatima Al-Maghribi",
-        avatar: "/api/placeholder/40/40",
-        status: "online",
-        lastSeen: "now"
-      },
-      lastMessage: {
-        text: "I'd love to learn more about traditional Zardozi techniques",
-        timestamp: "2m ago",
-        isRead: false
-      },
-      unreadCount: 2
-    },
-    {
-      id: "2",
-      participant: {
-        name: "Ahmed Ben Hassan",
-        avatar: "/api/placeholder/40/40",
-        status: "offline",
-        lastSeen: "1h ago"
-      },
-      lastMessage: {
-        text: "The beading workshop was amazing, thank you!",
-        timestamp: "1h ago",
-        isRead: true
-      },
-      unreadCount: 0
-    },
-    {
-      id: "3",
-      participant: {
-        name: "Aicha Berber",
-        avatar: "/api/placeholder/40/40",
-        status: "online",
-        lastSeen: "now"
-      },
-      lastMessage: {
-        text: "When is the next cultural event?",
-        timestamp: "3h ago",
-        isRead: true
-      },
-      unreadCount: 0
-    }
-  ];
+  useEffect(() => {
+    const run = async () => {
+      if (!searchQuery) return setPeopleResults([]);
+      const { data } = await supabase
+        .from('profiles')
+        .select('id, display_name, full_name, email, avatar_url')
+        .or(`display_name.ilike.%${searchQuery}%,full_name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`)
+        .limit(10);
+      setPeopleResults(data || []);
+    };
+    run();
+  }, [searchQuery]);
 
-  const messages: Message[] = [
-    {
-      id: "1",
-      senderId: "other",
-      text: "Hello! I saw your profile and I'm really interested in learning traditional Amazigh crafts.",
-      timestamp: "10:30 AM",
-      isRead: true
-    },
-    {
-      id: "2",
-      senderId: "me",
-      text: "That's wonderful! I'd be happy to help you get started. What specific techniques are you most interested in?",
-      timestamp: "10:32 AM",
-      isRead: true
-    },
-    {
-      id: "3",
-      senderId: "other",
-      text: "I'd love to learn more about traditional Zardozi techniques",
-      timestamp: "10:35 AM",
-      isRead: false
-    }
-  ];
+  const startConversation = async (otherUserId: string) => {
+    if (!user?.id || !otherUserId) return;
+    // Check if conversation exists
+    const { data: existing } = await supabase
+      .from('conversations')
+      .select('id')
+      .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${otherUserId}),and(participant_1_id.eq.${otherUserId},participant_2_id.eq.${user.id})`)
+      .limit(1);
 
-  const selectedConversation = conversations.find(c => c.id === selectedConversationId);
+    let convId = existing && existing.length > 0 ? existing[0].id : undefined;
+
+    if (!convId) {
+      const { data, error } = await supabase
+        .from('conversations')
+        .insert({ participant_1_id: user.id, participant_2_id: otherUserId })
+        .select('id')
+        .maybeSingle();
+      if (error) {
+        console.error('Error creating conversation', error);
+        return;
+      }
+      convId = data?.id;
+    }
+
+    if (convId) setSelectedConversationId(convId);
+    setSearchQuery("");
+    setPeopleResults([]);
+  };
+
+  const selectedConversation = useMemo(() => conversations.find(c => c.id === selectedConversationId), [conversations, selectedConversationId]);
 
   return (
     <div className="h-screen flex bg-gray-50">
@@ -163,7 +136,7 @@ export const MessagingPage = () => {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
-              placeholder="Search conversations..."
+              placeholder="Search conversations or people..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -171,9 +144,21 @@ export const MessagingPage = () => {
           </div>
         </div>
 
+        {/* People results */}
+        {peopleResults.length > 0 && (
+          <div className="p-2 border-b border-gray-200 max-h-60 overflow-y-auto">
+            {peopleResults.map((p) => (
+              <button key={p.id} onClick={() => startConversation(p.id)} className="w-full text-left px-3 py-2 rounded hover:bg-gray-50">
+                <div className="font-medium text-gray-800">{p.display_name || p.full_name || p.email}</div>
+                <div className="text-xs text-gray-500">Start chat</div>
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* Conversations List */}
         <ChatList
-          conversations={conversations}
+          conversations={conversations as unknown as Conversation[]}
           selectedId={selectedConversationId}
           onSelect={setSelectedConversationId}
           searchQuery={searchQuery}
@@ -184,8 +169,8 @@ export const MessagingPage = () => {
       <div className="flex-1 flex flex-col">
         {selectedConversation ? (
           <ChatWindow
-            conversation={selectedConversation}
-            messages={messages}
+            conversation={selectedConversation as any}
+            messages={messages as any}
           />
         ) : (
           <div className="flex-1 flex items-center justify-center bg-gray-50">
@@ -194,7 +179,7 @@ export const MessagingPage = () => {
                 <Search className="h-8 w-8 text-gray-400" />
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">No conversation selected</h3>
-              <p className="text-gray-500">Choose a conversation to start messaging</p>
+              <p className="text-gray-500">Choose a conversation or search for a user to start messaging</p>
             </div>
           </div>
         )}
