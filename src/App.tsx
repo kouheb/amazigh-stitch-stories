@@ -26,7 +26,8 @@ import { DeleteAccountPage } from "./pages/DeleteAccountPage";
 import { PlayStoreGraphicsPage } from "./pages/PlayStoreGraphicsPage";
 import { PublicProfilePage } from "./pages/PublicProfilePage";
 import NotFound from "./pages/NotFound";
-
+import UserSearchPage from "./pages/UserSearchPage";
+ 
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -61,6 +62,11 @@ const App = () => (
               <Route path="/messaging" element={
                 <ProtectedRoute>
                   <MessagingPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/search" element={
+                <ProtectedRoute>
+                  <UserSearchPage />
                 </ProtectedRoute>
               } />
               <Route path="/profile/:username" element={

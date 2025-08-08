@@ -147,7 +147,7 @@ export const ChatWindow = ({ conversation, recipientId }: ChatWindowProps) => {
     
     try {
       // Insert message into database
-      const { data: messageData, error: messageError } = await supabase
+      const { error: messageError } = await (supabase as any)
         .from('messages')
         .insert({
           sender_id: user.id,

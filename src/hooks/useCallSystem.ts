@@ -163,7 +163,7 @@ export const useCallSystem = () => {
       const callMessage = `${callIcon} ${callTypeText} - ${durationText}`;
 
       // Save call history message to chat (only once from the caller's perspective)
-      const { error: messageError } = await supabase
+      const { error: messageError } = await (supabase as any)
         .from('messages')
         .insert({
           sender_id: call.caller_id,
