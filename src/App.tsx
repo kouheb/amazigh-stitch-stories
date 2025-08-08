@@ -24,6 +24,7 @@ import { DeleteAccountPage } from "./pages/DeleteAccountPage";
 import { PlayStoreGraphicsPage } from "./pages/PlayStoreGraphicsPage";
 import { PublicProfilePage } from "./pages/PublicProfilePage";
 import NotFound from "./pages/NotFound";
+import { RealtimeMessageToaster } from "./components/notifications/RealtimeMessageToaster";
 
 const queryClient = new QueryClient();
 
@@ -36,9 +37,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             {/* Global realtime message notifications */}
-            {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-            {/* @ts-ignore */}
-            {(await import('./components/notifications/RealtimeMessageToaster')).RealtimeMessageToaster && null}
+            <RealtimeMessageToaster />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<AuthPage />} />
