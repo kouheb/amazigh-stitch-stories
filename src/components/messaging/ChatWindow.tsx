@@ -48,7 +48,7 @@ export const ChatWindow = ({ conversation, messages }: ChatWindowProps) => {
   // Keep local state in sync when prop changes
   // This ensures realtime updates from parent propagate into the window
   // without losing local UX (e.g., typing indicator)
-  import { useEffect } from 'react';
+  
   useEffect(() => {
     setMessageList(messages);
   }, [messages]);
