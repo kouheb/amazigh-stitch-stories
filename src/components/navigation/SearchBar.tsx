@@ -40,7 +40,7 @@ export const SearchBar = ({ className = "", isMobile = false }: SearchBarProps) 
         setOpen(false);
         return;
       }
-      const data = await searchUsers(term, user?.id);
+      const data = await searchUsers(term);
       setResults(data);
       setOpen(true);
       setActiveIndex(0);
