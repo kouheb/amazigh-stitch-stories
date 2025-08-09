@@ -4,28 +4,30 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { 
-  Bell, 
-  X, 
-  Check, 
-  MessageCircle, 
+import {
+  Bell,
+  X,
+  Check,
+  MessageCircle,
   Heart,
   Calendar,
-  ShoppingBag,
   Users,
   Award,
-  Settings
+  Settings,
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
-interface Notification {
+interface DBNotification {
   id: string;
-  type: 'message' | 'like' | 'follow' | 'booking' | 'event' | 'achievement';
+  user_id: string;
   title: string;
   message: string;
-  timestamp: string;
-  read: boolean;
-  avatar?: string;
-  actionUrl?: string;
+  type: string;
+  is_read: boolean;
+  created_at: string;
+  action_url?: string | null;
 }
 
 interface NotificationCenterProps {
@@ -34,66 +36,51 @@ interface NotificationCenterProps {
 }
 
 export const NotificationCenter = ({ isOpen, onClose }: NotificationCenterProps) => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const { user } = useAuth();
+  const [notifications, setNotifications] = useState<DBNotification[]>([]);
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
 
-  const mockNotifications: Notification[] = [
-    {
-      id: "1",
-      type: "message",
-      title: "New message from Fatima",
-      message: "I'd love to discuss your embroidery project...",
-      timestamp: "2 minutes ago",
-      read: false,
-      avatar: "/api/placeholder/40/40"
-    },
-    {
-      id: "2",
-      type: "like",
-      title: "Someone liked your work",
-      message: "Ahmed liked your 'Traditional Berber Carpet' post",
-      timestamp: "1 hour ago",
-      read: false,
-      avatar: "/api/placeholder/40/40"
-    },
-    {
-      id: "3",
-      type: "booking",
-      title: "Booking confirmation",
-      message: "Your consultation with Zahra is confirmed for tomorrow",
-      timestamp: "3 hours ago",
-      read: true
-    },
-    {
-      id: "4",
-      type: "follow",
-      title: "New follower",
-      message: "Sarah started following you",
-      timestamp: "5 hours ago",
-      read: true,
-      avatar: "/api/placeholder/40/40"
-    },
-    {
-      id: "5",
-      type: "event",
-      title: "Event reminder",
-      message: "Fez Artisan Festival starts tomorrow",
-      timestamp: "1 day ago",
-      read: true
-    },
-    {
-      id: "6",
-      type: "achievement",
-      title: "Achievement unlocked!",
-      message: "You've completed 10 projects this month",
-      timestamp: "2 days ago",
-      read: true
-    }
-  ];
-
   useEffect(() => {
-    setNotifications(mockNotifications);
-  }, []);
+    if (!user?.id) return;
+
+    const load = async () => {
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('id, user_id, title, message, type, is_read, created_at, action_url')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      if (error) {
+        console.error('Load notifications error', error);
+        return;
+      }
+      setNotifications(data || []);
+    };
+
+    load();
+
+    const channel = supabase
+      .channel(`notifications-center:${user.id}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` },
+        (payload) => setNotifications((prev) => [payload.new as DBNotification, ...prev])
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` },
+        (payload) => setNotifications((prev) => prev.map(n => n.id === (payload.new as any).id ? (payload.new as DBNotification) : n))
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` },
+        (payload) => setNotifications((prev) => prev.filter(n => n.id !== (payload.old as any).id))
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id]);
 
   const getIcon = (type: string) => {
     switch (type) {
@@ -103,8 +90,6 @@ export const NotificationCenter = ({ isOpen, onClose }: NotificationCenterProps)
         return Heart;
       case 'follow':
         return Users;
-      case 'booking':
-        return ShoppingBag;
       case 'event':
         return Calendar;
       case 'achievement':
@@ -114,50 +99,31 @@ export const NotificationCenter = ({ isOpen, onClose }: NotificationCenterProps)
     }
   };
 
-  const getIconColor = (type: string) => {
-    switch (type) {
-      case 'message':
-        return 'text-blue-600';
-      case 'like':
-        return 'text-red-600';
-      case 'follow':
-        return 'text-green-600';
-      case 'booking':
-        return 'text-orange-600';
-      case 'event':
-        return 'text-purple-600';
-      case 'achievement':
-        return 'text-yellow-600';
-      default:
-        return 'text-gray-600';
-    }
+  const markAsRead = async (id: string) => {
+    const { error } = await supabase.from('notifications').update({ is_read: true }).eq('id', id);
+    if (error) return toast.error('Failed to mark as read');
   };
 
-  const markAsRead = (id: string) => {
-    setNotifications(prev => 
-      prev.map(notif => 
-        notif.id === id ? { ...notif, read: true } : notif
-      )
-    );
+  const markAllAsRead = async () => {
+    if (!user?.id) return;
+    const { error } = await supabase.from('notifications').update({ is_read: true }).eq('user_id', user.id).eq('is_read', false);
+    if (error) return toast.error('Failed to mark all as read');
   };
 
-  const markAllAsRead = () => {
-    setNotifications(prev => 
-      prev.map(notif => ({ ...notif, read: true }))
-    );
+  const deleteNotification = async (id: string) => {
+    const { error } = await supabase.from('notifications').delete().eq('id', id);
+    if (error) return toast.error('Failed to delete');
   };
 
-  const deleteNotification = (id: string) => {
-    setNotifications(prev => prev.filter(notif => notif.id !== id));
-  };
-
-  const filteredNotifications = filter === 'unread' 
-    ? notifications.filter(n => !n.read)
+  const filteredNotifications = filter === 'unread'
+    ? notifications.filter((n) => !n.is_read)
     : notifications;
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   if (!isOpen) return null;
+
+  const formatTime = (iso: string) => new Date(iso).toLocaleString();
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-center pt-16">
@@ -221,23 +187,14 @@ export const NotificationCenter = ({ isOpen, onClose }: NotificationCenterProps)
                   <div
                     key={notification.id}
                     className={`p-4 hover:bg-gray-50 transition-colors ${
-                      !notification.read ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+                      !notification.is_read ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
                     }`}
                   >
                     <div className="flex items-start gap-3">
-                      {notification.avatar ? (
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={notification.avatar} />
-                          <AvatarFallback>
-                            <IconComponent className={`h-4 w-4 ${getIconColor(notification.type)}`} />
-                          </AvatarFallback>
-                        </Avatar>
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                          <IconComponent className={`h-4 w-4 ${getIconColor(notification.type)}`} />
-                        </div>
-                      )}
-                      
+                      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                        <IconComponent className={`h-4 w-4`} />
+                      </div>
+
                       <div className="flex-1 min-w-0">
                         <h4 className="text-sm font-medium text-gray-900">
                           {notification.title}
@@ -246,12 +203,12 @@ export const NotificationCenter = ({ isOpen, onClose }: NotificationCenterProps)
                           {notification.message}
                         </p>
                         <p className="text-xs text-gray-500 mt-1">
-                          {notification.timestamp}
+                          {formatTime(notification.created_at)}
                         </p>
                       </div>
-                      
+
                       <div className="flex items-center gap-1">
-                        {!notification.read && (
+                        {!notification.is_read && (
                           <Button
                             variant="ghost"
                             size="sm"
