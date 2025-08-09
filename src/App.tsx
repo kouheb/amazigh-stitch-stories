@@ -23,6 +23,7 @@ import { PrivacyPolicy } from "./pages/PrivacyPolicy";
 import { DeleteAccountPage } from "./pages/DeleteAccountPage";
 import { PlayStoreGraphicsPage } from "./pages/PlayStoreGraphicsPage";
 import { PublicProfilePage } from "./pages/PublicProfilePage";
+import { ProfilePage } from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 import { RealtimeMessageToaster } from "./components/notifications/RealtimeMessageToaster";
 
@@ -65,6 +66,11 @@ const App = () => (
               <Route path="/profile/:username" element={
                 <ProtectedRoute>
                   <PublicProfilePage />
+                </ProtectedRoute>
+              } />
+              <Route path="/profile/id/:id" element={
+                <ProtectedRoute>
+                  <ProfilePage />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

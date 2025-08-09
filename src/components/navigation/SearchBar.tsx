@@ -62,8 +62,11 @@ export const SearchBar = ({ className = "", isMobile = false }: SearchBarProps) 
   const onSelect = (u: UserResult) => {
     setOpen(false);
     setQuery("");
-    const handle = u.username || u.id;
-    navigate(`/profile/${handle}`);
+    if (u.username) {
+      navigate(`/profile/${u.username}`);
+    } else {
+      navigate(`/profile/id/${u.id}`);
+    }
   };
 
   const onKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {

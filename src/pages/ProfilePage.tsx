@@ -27,13 +27,17 @@ import { EditProfileModal } from "@/components/profile/EditProfileModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useParams } from "react-router-dom";
 
 export const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("overview");
-  const [isOwnProfile] = useState(true);
+  
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
+  const { id: routeId } = useParams();
+  const viewedUserId = routeId || user?.id || null;
+  const isOwnProfile = !routeId || (routeId === user?.id);
 
   // Get user's display name or fall back to email or default
   const getUserDisplayName = () => {
@@ -75,13 +79,16 @@ export const ProfilePage = () => {
   // Load profile data from database on component mount
   useEffect(() => {
     const loadProfileData = async () => {
-      if (!user) return;
+      if (!viewedUserId) {
+        setIsLoading(false);
+        return;
+      }
 
       try {
         const { data: profile, error } = await supabase
           .from('profiles')
           .select('*')
-          .eq('id', user.id)
+          .eq('id', viewedUserId)
           .maybeSingle();
 
         if (error) {
@@ -109,7 +116,7 @@ export const ProfilePage = () => {
     };
 
     loadProfileData();
-  }, [user]);
+  }, [user, routeId, viewedUserId]);
 
   // Update profile data when user metadata changes
   useEffect(() => {
