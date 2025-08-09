@@ -27,7 +27,7 @@ import { EditProfileModal } from "@/components/profile/EditProfileModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 export const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -36,9 +36,9 @@ export const ProfilePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
   const { id: routeId } = useParams();
+  const navigate = useNavigate();
   const viewedUserId = routeId || user?.id || null;
   const isOwnProfile = !routeId || (routeId === user?.id);
-
   // Get user's display name or fall back to email or default
   const getUserDisplayName = () => {
     if (user?.user_metadata?.display_name) {
@@ -160,8 +160,9 @@ export const ProfilePage = () => {
   };
 
   const handleMessageClick = () => {
-    console.log("Message clicked");
-    toast.info("Messaging feature coming soon");
+    if (!viewedUserId) return;
+    navigate(`/messaging?userId=${viewedUserId}`);
+    toast.success("Opening chat...");
   };
 
   const handleFollowClick = () => {

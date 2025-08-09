@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Search, Plus, MoreVertical, ArrowLeft } from "lucide-react";
 import { ChatWindow } from "@/components/messaging/ChatWindow";
 import { ChatList } from "@/components/messaging/ChatList";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useRealtimeMessaging } from "@/hooks/useRealtimeMessaging";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -43,6 +43,7 @@ export const MessagingPage = () => {
   const { conversations, messages, sendMessage } = useRealtimeMessaging(selectedConversationId);
   const [peopleResults, setPeopleResults] = useState<any[]>([]);
   const [messageResults, setMessageResults] = useState<any[]>([]);
+  const [searchParams] = useSearchParams();
 
   const handleBackToApp = () => {
     navigate('/app');
@@ -65,6 +66,13 @@ export const MessagingPage = () => {
     };
     run();
   }, [searchQuery]);
+
+  useEffect(() => {
+    const uid = searchParams.get('userId');
+    if (uid && user?.id && !selectedConversationId) {
+      startConversation(uid);
+    }
+  }, [searchParams, user?.id, selectedConversationId]);
 
   const startConversation = async (otherUserId: string) => {
     if (!user?.id || !otherUserId) return;
