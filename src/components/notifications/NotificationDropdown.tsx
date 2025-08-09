@@ -42,7 +42,7 @@ export const NotificationDropdown = () => {
         console.error("Load notifications error", error);
         return;
       }
-      setNotifications(data || []);
+      setNotifications((data as any) || []);
     };
 
     load();

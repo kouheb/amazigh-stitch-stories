@@ -54,7 +54,7 @@ export const NotificationCenter = ({ isOpen, onClose }: NotificationCenterProps)
         console.error('Load notifications error', error);
         return;
       }
-      setNotifications(data || []);
+      setNotifications((data as any) || []);
     };
 
     load();
@@ -101,22 +101,24 @@ export const NotificationCenter = ({ isOpen, onClose }: NotificationCenterProps)
   };
 
   const markAsRead = async (id: string) => {
-    // Optimistic update
-    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)));
-    const { error } = await supabase.from('notifications').update({ is_read: true }).eq('id', id);
+    const { error } = await supabase
+      .from('notifications')
+      .update({ is_read: true, read_at: new Date().toISOString() })
+      .eq('id', id);
     if (error) return toast.error('Failed to mark as read');
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, is_read: true, read_at: new Date().toISOString() } : n)));
   };
 
   const markAllAsRead = async () => {
     if (!user?.id) return;
-    // Optimistic update
-    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+    const nowIso = new Date().toISOString();
     const { error } = await supabase
       .from('notifications')
-      .update({ is_read: true })
+      .update({ is_read: true, read_at: nowIso })
       .eq('user_id', user.id)
       .eq('is_read', false);
     if (error) return toast.error('Failed to mark all as read');
+    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true, read_at: nowIso })));
   };
 
   const deleteNotification = async (id: string) => {
