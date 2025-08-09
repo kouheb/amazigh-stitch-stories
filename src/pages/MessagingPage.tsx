@@ -40,7 +40,7 @@ export const MessagingPage = () => {
   const { user } = useAuth();
   const [selectedConversationId, setSelectedConversationId] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
-  const { conversations, messages, sendMessage } = useRealtimeMessaging(selectedConversationId);
+  const { conversations, messages, sendMessage, refreshConversations } = useRealtimeMessaging(selectedConversationId);
   const [peopleResults, setPeopleResults] = useState<any[]>([]);
   const [messageResults, setMessageResults] = useState<any[]>([]);
   const [searchParams] = useSearchParams();
@@ -98,9 +98,13 @@ export const MessagingPage = () => {
       convId = data?.id;
     }
 
-    if (convId) setSelectedConversationId(convId);
+    if (convId) {
+      await refreshConversations();
+      setSelectedConversationId(convId);
+    }
     setSearchQuery("");
     setPeopleResults([]);
+    setMessageResults([]);
   };
 
   const selectedConversation = useMemo(() => conversations.find(c => c.id === selectedConversationId), [conversations, selectedConversationId]);
