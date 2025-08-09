@@ -239,6 +239,15 @@ export const useRealtimeMessaging = (selectedConversationId?: string) => {
 
     if (error) console.error("Error marking read", error);
 
+    // Also mark message-type notifications as read for this user (keeps bell badge in sync)
+    const { error: nErr } = await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('user_id', userId)
+      .eq('type', 'message')
+      .eq('is_read', false);
+    if (nErr) console.error('Error marking message notifications read', nErr);
+
     setConversations((prev) => prev.map((c) => (c.id === conversationId ? { ...c, unreadCount: 0 } : c)));
   };
 

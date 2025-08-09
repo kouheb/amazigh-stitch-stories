@@ -100,13 +100,21 @@ export const NotificationCenter = ({ isOpen, onClose }: NotificationCenterProps)
   };
 
   const markAsRead = async (id: string) => {
+    // Optimistic update
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)));
     const { error } = await supabase.from('notifications').update({ is_read: true }).eq('id', id);
     if (error) return toast.error('Failed to mark as read');
   };
 
   const markAllAsRead = async () => {
     if (!user?.id) return;
-    const { error } = await supabase.from('notifications').update({ is_read: true }).eq('user_id', user.id).eq('is_read', false);
+    // Optimistic update
+    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+    const { error } = await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('user_id', user.id)
+      .eq('is_read', false);
     if (error) return toast.error('Failed to mark all as read');
   };
 
