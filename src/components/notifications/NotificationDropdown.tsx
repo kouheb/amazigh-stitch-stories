@@ -21,6 +21,7 @@ interface DBNotification {
   type: string;
   is_read: boolean;
   created_at: string;
+  read_at?: string | null;
   action_url?: string | null;
 }
 
@@ -34,7 +35,7 @@ export const NotificationDropdown = () => {
     const load = async () => {
       const { data, error } = await supabase
         .from("notifications")
-        .select("id, user_id, title, message, type, is_read, created_at, action_url")
+        .select("id, user_id, title, message, type, is_read, created_at, read_at, action_url")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
       if (error) {
@@ -79,24 +80,24 @@ export const NotificationDropdown = () => {
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   const markAsRead = async (id: string) => {
-    // Optimistic update
-    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)));
-    const { error } = await supabase.from('notifications').update({ is_read: true }).eq('id', id);
+    const { error } = await supabase
+      .from('notifications')
+      .update({ is_read: true, read_at: new Date().toISOString() })
+      .eq('id', id);
     if (error) return toast.error('Failed to mark as read');
-    toast.success('Notification marked as read');
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, is_read: true, read_at: new Date().toISOString() } : n)));
   };
 
   const markAllAsRead = async () => {
     if (!user?.id) return;
-    // Optimistic update
-    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+    const nowIso = new Date().toISOString();
     const { error } = await supabase
       .from('notifications')
-      .update({ is_read: true })
+      .update({ is_read: true, read_at: nowIso })
       .eq('user_id', user.id)
       .eq('is_read', false);
     if (error) return toast.error('Failed to mark all as read');
-    toast.success('All notifications marked as read');
+    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true, read_at: nowIso })));
   };
 
   const removeNotification = async (id: string) => {
@@ -160,6 +161,7 @@ export const NotificationDropdown = () => {
                 return (
                   <div
                     key={notification.id}
+                    onClick={() => !notification.is_read && markAsRead(notification.id)}
                     className={`p-3 hover:bg-gray-50 ${!notification.is_read ? 'bg-blue-50' : ''}`}
                   >
                     <div className="flex items-start gap-3">

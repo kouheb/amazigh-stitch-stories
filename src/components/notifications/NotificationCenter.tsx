@@ -27,6 +27,7 @@ interface DBNotification {
   type: string;
   is_read: boolean;
   created_at: string;
+  read_at?: string | null;
   action_url?: string | null;
 }
 
@@ -46,7 +47,7 @@ export const NotificationCenter = ({ isOpen, onClose }: NotificationCenterProps)
     const load = async () => {
       const { data, error } = await supabase
         .from('notifications')
-        .select('id, user_id, title, message, type, is_read, created_at, action_url')
+        .select('id, user_id, title, message, type, is_read, created_at, read_at, action_url')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
       if (error) {

@@ -240,9 +240,10 @@ export const useRealtimeMessaging = (selectedConversationId?: string) => {
     if (error) console.error("Error marking read", error);
 
     // Also mark message-type notifications as read for this user (keeps bell badge in sync)
+    const nowIso = new Date().toISOString();
     const { error: nErr } = await supabase
       .from('notifications')
-      .update({ is_read: true })
+      .update({ is_read: true, read_at: nowIso })
       .eq('user_id', userId)
       .eq('type', 'message')
       .eq('is_read', false);

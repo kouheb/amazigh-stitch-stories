@@ -16,6 +16,7 @@ import {
   LogOut,
   Plus
 } from "lucide-react";
+import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -70,11 +71,6 @@ export const UserDropdown = ({ onCreateClick, onTabChange }: UserDropdownProps) 
     }
   };
 
-  const handleNotificationsClick = () => {
-    console.log("Notifications clicked");
-    toast.info("Notifications feature coming soon");
-  };
-
   return (
     <div className="flex items-center gap-3">
       {/* Create button - hidden on mobile */}
@@ -88,17 +84,7 @@ export const UserDropdown = ({ onCreateClick, onTabChange }: UserDropdownProps) 
       </Button>
 
       {/* Notifications */}
-      <Button 
-        variant="ghost" 
-        size="sm" 
-        className="relative text-gray-700 hover:text-black hover:bg-gray-100"
-        onClick={handleNotificationsClick}
-      >
-        <Bell className="h-5 w-5" />
-        <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-gray-800 hover:bg-gray-700 text-white text-xs">
-          3
-        </Badge>
-      </Button>
+      <NotificationDropdown />
 
       {/* Profile Dropdown */}
       <DropdownMenu>
