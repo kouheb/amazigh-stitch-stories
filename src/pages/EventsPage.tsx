@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,9 @@ import {
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
+
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const initialEvents = [
   {
@@ -118,6 +121,88 @@ export const EventsPage = () => {
     { id: "networking", label: "Networking" }
   ];
 
+  const { toast } = useToast();
+
+  const getCategoryEmoji = (category: string) => {
+    const emojis: Record<string, string> = {
+      workshop: "🛠️",
+      cultural: "🎭",
+      exhibition: "🖼️",
+      market: "🛍️",
+      networking: "🤝",
+    };
+    return emojis[category] || "📅";
+  };
+
+  const mapDbEventToCard = (e: any) => ({
+    id: e.id,
+    title: e.title,
+    description: e.description,
+    date: new Date(e.date_time).toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    }),
+    time: new Date(e.date_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    location: e.location,
+    category: e.category,
+    attendees: e.current_attendees || 0,
+    price: e.price || "Free",
+    organizer: e.organizer || "Community",
+    image: getCategoryEmoji(e.category),
+    tags: e.tags || [],
+  });
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadEvents = async () => {
+      const { data, error } = await supabase
+        .from("events")
+        .select("*")
+        .eq("status", "active")
+        .order("date_time", { ascending: true });
+
+      if (error) {
+        console.error("Failed to load events:", error);
+        toast({
+          title: "Failed to load events",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!isMounted) return;
+      const mapped = (data || []).map(mapDbEventToCard);
+      setEventsList(prev => {
+        const existingIds = new Set(prev.map((e: any) => e.id));
+        const newOnes = mapped.filter(m => !existingIds.has(m.id));
+        return [...newOnes, ...prev];
+      });
+    };
+
+    loadEvents();
+
+    const channel = supabase
+      .channel("public:events")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "events" },
+        (payload) => {
+          const row: any = (payload as any).new || (payload as any).record || (payload as any);
+          if (row?.status !== "active") return;
+          const mapped = mapDbEventToCard(row);
+          setEventsList(prev => [mapped, ...prev.filter((e: any) => e.id !== mapped.id)]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      isMounted = false;
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   const forumTopics = [
     {
