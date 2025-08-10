@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface AddEventModalProps {
   isOpen: boolean;
@@ -16,6 +18,7 @@ interface AddEventModalProps {
 
 export const AddEventModal = ({ isOpen, onClose, onAddEvent, selectedDate }: AddEventModalProps) => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -35,57 +38,99 @@ export const AddEventModal = ({ isOpen, onClose, onAddEvent, selectedDate }: Add
     { value: "networking", label: "Networking" }
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.title || !formData.date || !formData.location || !formData.category) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
 
-    const newEvent = {
-      id: Date.now(), // Simple ID generation
-      title: formData.title,
-      description: formData.description,
-      date: new Date(formData.date).toLocaleDateString('en-US', { 
-        month: 'long', 
-        day: 'numeric', 
-        year: 'numeric' 
-      }),
-      time: formData.time,
-      location: formData.location,
-      category: formData.category,
-      price: formData.price || "Free",
-      organizer: formData.organizer || "Community",
-      attendees: 0,
-      image: getCategoryEmoji(formData.category),
-      tags: [formData.category.charAt(0).toUpperCase() + formData.category.slice(1)]
-    };
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to create an event.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    onAddEvent(newEvent);
-    
-    toast({
-      title: "Event Created",
-      description: "Your event has been successfully added to the calendar."
-    });
+    try {
+      const dateTimeStr = `${formData.date}T${formData.time ? formData.time : "00:00"}:00`;
+      const date_time = new Date(dateTimeStr).toISOString();
 
-    // Reset form
-    setFormData({
-      title: "",
-      description: "",
-      date: "",
-      time: "",
-      location: "",
-      category: "",
-      price: "",
-      organizer: ""
-    });
-    
-    onClose();
+      const { data, error } = await supabase
+        .from("events")
+        .insert({
+          title: formData.title,
+          description: formData.description || null,
+          date_time,
+          location: formData.location,
+          category: formData.category,
+          max_attendees: null,
+          price: formData.price || "Free",
+          organizer: formData.organizer || "Community",
+          tags: [formData.category.charAt(0).toUpperCase() + formData.category.slice(1)],
+          created_by: user.id,
+        })
+        .select("*")
+        .single();
+
+      if (error) throw error;
+
+      const created = data!;
+
+      const newEvent = {
+        id: created.id,
+        title: created.title,
+        description: created.description,
+        date: new Date(created.date_time).toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        }),
+        time: formData.time,
+        location: created.location,
+        category: created.category,
+        price: created.price || "Free",
+        organizer: created.organizer || "Community",
+        attendees: created.current_attendees || 0,
+        image: getCategoryEmoji(created.category),
+        tags: created.tags || [formData.category.charAt(0).toUpperCase() + formData.category.slice(1)],
+      };
+
+      onAddEvent(newEvent);
+
+      toast({
+        title: "Event Created",
+        description: "Your event has been successfully added.",
+      });
+
+      // Reset form
+      setFormData({
+        title: "",
+        description: "",
+        date: "",
+        time: "",
+        location: "",
+        category: "",
+        price: "",
+        organizer: "",
+      });
+
+      onClose();
+    } catch (err: any) {
+      console.error("Error creating event:", err);
+      toast({
+        title: "Failed to create event",
+        description: err?.message || "Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const getCategoryEmoji = (category: string) => {

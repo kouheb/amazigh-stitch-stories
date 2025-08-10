@@ -325,7 +325,7 @@ export const EventsPage = () => {
               <Filter className="h-4 w-4 mr-2" />
               Filters
             </Button>
-            <Button className="bg-black hover:bg-gray-800">
+            <Button className="bg-black hover:bg-gray-800" onClick={() => setIsAddEventModalOpen(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Create Event
             </Button>
