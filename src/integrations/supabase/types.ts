@@ -126,7 +126,7 @@ export type Database = {
           registration_date: string
           special_requests: string | null
           status: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           email: string
@@ -137,7 +137,7 @@ export type Database = {
           registration_date?: string
           special_requests?: string | null
           status?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           email?: string
@@ -148,7 +148,7 @@ export type Database = {
           registration_date?: string
           special_requests?: string | null
           status?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: [
           {
@@ -163,6 +163,7 @@ export type Database = {
       events: {
         Row: {
           approval_status: string | null
+          attendees_public: boolean
           category: string
           created_at: string
           created_by: string | null
@@ -184,6 +185,7 @@ export type Database = {
         }
         Insert: {
           approval_status?: string | null
+          attendees_public?: boolean
           category: string
           created_at?: string
           created_by?: string | null
@@ -205,6 +207,7 @@ export type Database = {
         }
         Update: {
           approval_status?: string | null
+          attendees_public?: boolean
           category?: string
           created_at?: string
           created_by?: string | null
