@@ -25,6 +25,10 @@ import { PlayStoreGraphicsPage } from "./pages/PlayStoreGraphicsPage";
 import { PublicProfilePage } from "./pages/PublicProfilePage";
 import { ProfilePage } from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
+import { LearningPage } from "./pages/LearningPage";
+import { CourseDetailPage } from "./pages/CourseDetailPage";
+import { LearningCreatorDashboard } from "./pages/LearningCreatorDashboard";
+import { LearningStudentDashboard } from "./pages/LearningStudentDashboard";
 import { RealtimeMessageToaster } from "./components/notifications/RealtimeMessageToaster";
 
 const queryClient = new QueryClient();
@@ -39,43 +43,57 @@ const App = () => (
           <BrowserRouter>
             {/* Global realtime message notifications */}
             <RealtimeMessageToaster />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="/membership" element={<Membership />} />
-              <Route path="/wireframe" element={<Wireframe />} />
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/delete-account" element={<DeleteAccountPage />} />
-              <Route path="/playstore-banner" element={<PlayStoreBannerPage />} />
-              <Route path="/app-banner" element={<AppBannerPage />} />
-              <Route path="/icon-banner" element={<IconBannerPage />} />
-              <Route path="/developer-icon" element={<DeveloperIconPage />} />
-              <Route path="/developer-header" element={<DeveloperHeaderPage />} />
-              <Route path="/playstore-graphics" element={<PlayStoreGraphicsPage />} />
-              <Route path="/app" element={
-                <ProtectedRoute>
-                  <MainApp />
-                </ProtectedRoute>
-              } />
-              <Route path="/messaging" element={
-                <ProtectedRoute>
-                  <MessagingPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/profile/:username" element={
-                <ProtectedRoute>
-                  <PublicProfilePage />
-                </ProtectedRoute>
-              } />
-              <Route path="/profile/id/:id" element={
-                <ProtectedRoute>
-                  <ProfilePage />
-                </ProtectedRoute>
-              } />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/auth" element={<AuthPage />} />
+                <Route path="/membership" element={<Membership />} />
+                <Route path="/wireframe" element={<Wireframe />} />
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/delete-account" element={<DeleteAccountPage />} />
+                <Route path="/playstore-banner" element={<PlayStoreBannerPage />} />
+                <Route path="/app-banner" element={<AppBannerPage />} />
+                <Route path="/icon-banner" element={<IconBannerPage />} />
+                <Route path="/developer-icon" element={<DeveloperIconPage />} />
+                <Route path="/developer-header" element={<DeveloperHeaderPage />} />
+                <Route path="/playstore-graphics" element={<PlayStoreGraphicsPage />} />
+                <Route path="/app" element={
+                  <ProtectedRoute>
+                    <MainApp />
+                  </ProtectedRoute>
+                } />
+                <Route path="/messaging" element={
+                  <ProtectedRoute>
+                    <MessagingPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/profile/:username" element={
+                  <ProtectedRoute>
+                    <PublicProfilePage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/profile/id/:id" element={
+                  <ProtectedRoute>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                } />
+                {/* Learning public browse and detail */}
+                <Route path="/learning" element={<LearningPage />} />
+                <Route path="/learning/course/:id" element={<CourseDetailPage />} />
+                {/* Creator and Student dashboards */}
+                <Route path="/learning/creator" element={
+                  <ProtectedRoute>
+                    <LearningCreatorDashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/learning/my" element={
+                  <ProtectedRoute>
+                    <LearningStudentDashboard />
+                  </ProtectedRoute>
+                } />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
           </BrowserRouter>
         </TooltipProvider>
       </LanguageProvider>
