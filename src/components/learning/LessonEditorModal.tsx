@@ -21,7 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
+import { ArrowLeft } from "lucide-react";
 interface LessonEditorModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -83,6 +83,10 @@ export function LessonEditorModal({ open, onOpenChange, moduleId, onSaved }: Les
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
+        <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)} className="mb-2">
+          <ArrowLeft />
+          Back
+        </Button>
         <DialogHeader>
           <DialogTitle>Add Lesson</DialogTitle>
           <DialogDescription>

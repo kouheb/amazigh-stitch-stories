@@ -7,9 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { LessonEditorModal } from "@/components/learning/LessonEditorModal";
-
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 export const LearningCreatorDashboard = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [myCourses, setMyCourses] = useState<any[]>([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -147,6 +149,10 @@ export const LearningCreatorDashboard = () => {
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
       <header className="space-y-2">
+        <Button variant="ghost" size="sm" onClick={() => navigate('/learning')}>
+          <ArrowLeft />
+          Back
+        </Button>
         <h1 className="text-3xl font-bold">Learning Creator Dashboard</h1>
         <p className="text-muted-foreground">Create and manage your courses</p>
       </header>
