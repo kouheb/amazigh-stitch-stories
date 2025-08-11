@@ -25,10 +25,7 @@ export const LearningStudentDashboard = () => {
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">My Learning</h1>
-        <Button size="sm" variant="outline" onClick={() => location.assign('/learning/certificates')}>My Certificates</Button>
-      </div>
+      <h1 className="text-3xl font-bold">My Learning</h1>
       {loading ? (
         <p className="text-sm text-muted-foreground">Loading...</p>
       ) : (

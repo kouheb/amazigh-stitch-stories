@@ -29,9 +29,6 @@ import { LearningPage } from "./pages/LearningPage";
 import { CourseDetailPage } from "./pages/CourseDetailPage";
 import { LearningCreatorDashboard } from "./pages/LearningCreatorDashboard";
 import { LearningStudentDashboard } from "./pages/LearningStudentDashboard";
-import MyCertificatesPage from "./pages/MyCertificatesPage";
-import IssuedCertificatesPage from "./pages/IssuedCertificatesPage";
-import VerifyCertificatePage from "./pages/VerifyCertificatePage";
 import { RealtimeMessageToaster } from "./components/notifications/RealtimeMessageToaster";
 
 const queryClient = new QueryClient();
@@ -83,18 +80,6 @@ const App = () => (
                 {/* Learning public browse and detail */}
                 <Route path="/learning" element={<LearningPage />} />
                 <Route path="/learning/course/:id" element={<CourseDetailPage />} />
-                {/* Certificates */}
-                <Route path="/certificates/verify/:code" element={<VerifyCertificatePage />} />
-                <Route path="/learning/certificates" element={
-                  <ProtectedRoute>
-                    <MyCertificatesPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/learning/issued-certificates" element={
-                  <ProtectedRoute>
-                    <IssuedCertificatesPage />
-                  </ProtectedRoute>
-                } />
                 {/* Creator and Student dashboards */}
                 <Route path="/learning/creator" element={
                   <ProtectedRoute>

@@ -89,45 +89,6 @@ export type Database = {
         }
         Relationships: []
       }
-      certificates: {
-        Row: {
-          code: string
-          course_id: string
-          created_at: string
-          enrollment_id: string
-          id: string
-          instructor_id: string
-          instructor_name: string | null
-          issued_at: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          code: string
-          course_id: string
-          created_at?: string
-          enrollment_id: string
-          id?: string
-          instructor_id: string
-          instructor_name?: string | null
-          issued_at?: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          code?: string
-          course_id?: string
-          created_at?: string
-          enrollment_id?: string
-          id?: string
-          instructor_id?: string
-          instructor_name?: string | null
-          issued_at?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       conversations: {
         Row: {
           created_at: string
@@ -854,10 +815,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      _generate_certificate_code: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
       can_access_course: {
         Args: { _course_id: string }
         Returns: boolean
@@ -903,20 +860,6 @@ export type Database = {
           message_type: string
           file_url: string
           file_name: string
-        }[]
-      }
-      verify_certificate: {
-        Args: { _code: string }
-        Returns: {
-          id: string
-          code: string
-          issued_at: string
-          student_id: string
-          student_name: string
-          course_id: string
-          course_title: string
-          instructor_id: string
-          instructor_name: string
         }[]
       }
     }
