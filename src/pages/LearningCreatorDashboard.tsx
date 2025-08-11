@@ -18,9 +18,76 @@ export const LearningCreatorDashboard = () => {
   useEffect(() => { document.title = 'Creator Dashboard | Learning'; }, []);
 
   const load = async () => {
-    const { data, error } = await supabase.from('courses').select('*').order('created_at', { ascending: false });
-    if (error) toast({ title: 'Load failed', description: error.message, variant: 'destructive' });
-    setMyCourses(data || []);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast({ title: 'Sign in required' });
+      setMyCourses([]);
+      return;
+    }
+
+    const { data: courses, error } = await supabase
+      .from('courses')
+      .select('*')
+      .eq('creator_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      toast({ title: 'Load failed', description: error.message, variant: 'destructive' });
+      setMyCourses([]);
+      return;
+    }
+
+    if (!courses || courses.length === 0) {
+      setMyCourses([]);
+      return;
+    }
+
+    const { data: modules, error: modulesError } = await supabase
+      .from('course_modules')
+      .select('*')
+      .in('course_id', courses.map(c => c.id))
+      .order('order_index', { ascending: true });
+
+    if (modulesError || !modules) {
+      if (modulesError) {
+        toast({ title: 'Load modules failed', description: modulesError.message, variant: 'destructive' });
+      }
+      setMyCourses(courses);
+      return;
+    }
+
+    const moduleIds = modules.map(m => m.id);
+    let lessonsByModule: Record<string, any[]> = {};
+
+    if (moduleIds.length > 0) {
+      const { data: lessons, error: lessonsError } = await supabase
+        .from('lessons')
+        .select('*')
+        .in('module_id', moduleIds)
+        .order('order_index', { ascending: true });
+
+      if (lessonsError) {
+        toast({ title: 'Load lessons failed', description: lessonsError.message, variant: 'destructive' });
+      } else if (lessons) {
+        lessonsByModule = lessons.reduce((acc: Record<string, any[]>, l: any) => {
+          (acc[l.module_id] ||= []).push(l);
+          return acc;
+        }, {});
+      }
+    }
+
+    const modulesByCourse = modules.reduce((acc: Record<string, any[]>, m: any) => {
+      const lessons = lessonsByModule[m.id] || [];
+      (acc[m.course_id] ||= []).push({ ...m, lessons });
+      return acc;
+    }, {});
+
+    const enriched = courses.map((c: any) => ({
+      ...c,
+      modules_list: modulesByCourse[c.id] || []
+    }));
+
+    setMyCourses(enriched);
   };
   useEffect(() => { load(); }, []);
 
