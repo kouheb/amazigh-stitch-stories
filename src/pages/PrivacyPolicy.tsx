@@ -10,6 +10,7 @@ export const PrivacyPolicy = () => {
   }, []);
 
   const navigate = useNavigate();
+  const handleBack = () => { if (window.history.length > 1) navigate(-1); else navigate('/'); };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -19,7 +20,7 @@ export const PrivacyPolicy = () => {
           <a href="/" className="text-xl font-bold text-gray-800">
             Fil et Toile Studio
           </a>
-          <button onClick={() => navigate(-1)} className="text-gray-600 hover:text-gray-900">
+          <button onClick={handleBack} className="text-gray-600 hover:text-gray-900">
             Back
           </button>
         </div>

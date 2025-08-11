@@ -91,6 +91,8 @@ export const AuthPage = () => {
     );
   }
 
+  const handleBack = () => { if (window.history.length > 1) navigate(-1); else navigate('/'); };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex flex-col">
       {/* Header */}
@@ -99,7 +101,7 @@ export const AuthPage = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate(-1)}
+            onClick={handleBack}
             className="text-gray-600 hover:text-gray-800"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />

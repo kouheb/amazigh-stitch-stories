@@ -46,7 +46,8 @@ export const MessagingPage = () => {
   const [searchParams] = useSearchParams();
 
   const handleBackToApp = () => {
-    navigate(-1);
+    if (window.history.length > 1) navigate(-1);
+    else navigate('/app');
   };
 
   useEffect(() => {

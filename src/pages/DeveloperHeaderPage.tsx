@@ -45,13 +45,12 @@ export const DeveloperHeaderPage = () => {
       }
     }
   };
-
+  const handleBack = () => { if (window.history.length > 1) navigate(-1); else navigate('/'); };
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
-          <Button variant="ghost" onClick={() => navigate(-1)} className="inline-flex items-center text-orange-600 hover:text-orange-700 mb-4">
+          <Button variant="ghost" onClick={handleBack} className="inline-flex items-center text-orange-600 hover:text-orange-700 mb-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>

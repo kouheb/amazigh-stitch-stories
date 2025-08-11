@@ -93,9 +93,11 @@ export const CourseDetailPage = () => {
   const completed = useMemo(() => Object.values(progress).filter(Boolean).length, [progress]);
   const percent = totalLessons ? Math.round((completed / totalLessons) * 100) : 0;
 
+  const handleBack = () => { if (window.history.length > 1) navigate(-1); else navigate('/learning'); };
+
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
-      <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="w-fit">
+      <Button variant="ghost" size="sm" onClick={handleBack} className="w-fit">
         <ArrowLeft className="h-4 w-4 mr-2" />
         Back
       </Button>

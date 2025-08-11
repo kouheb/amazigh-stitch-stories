@@ -146,10 +146,12 @@ export const LearningCreatorDashboard = () => {
     load();
   };
 
+  const handleBack = () => { if (window.history.length > 1) navigate(-1); else navigate('/learning'); };
+
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
       <header className="space-y-2">
-        <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+        <Button variant="ghost" size="sm" onClick={handleBack}>
           <ArrowLeft />
           Back
         </Button>

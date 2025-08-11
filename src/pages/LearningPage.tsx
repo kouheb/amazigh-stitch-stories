@@ -62,10 +62,10 @@ export const LearningPage = () => {
       return matchCat && matchSearch;
     });
   }, [courses, activeCategory, searchTerm]);
-
+  const handleBack = () => { if (window.history.length > 1) navigate(-1); else navigate('/'); };
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-8">
-      <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="w-fit">
+     <div className="p-6 max-w-7xl mx-auto space-y-8">
+      <Button variant="ghost" size="sm" onClick={handleBack} className="w-fit">
         <ArrowLeft className="h-4 w-4 mr-2" />
         Back
       </Button>
