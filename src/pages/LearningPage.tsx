@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, Filter, BookOpen, Plus } from "lucide-react";
+import { Search, Filter, BookOpen, Plus, ArrowLeft } from "lucide-react";
 
 interface Course {
   id: string;
@@ -65,6 +65,10 @@ export const LearningPage = () => {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-8">
+      <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="w-fit">
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Back
+      </Button>
       <header className="text-center">
         <h1 className="text-3xl font-bold mb-2">Learning Platform</h1>
         <p className="text-muted-foreground">Browse published courses and start learning</p>
