@@ -46,7 +46,7 @@ export const MessagingPage = () => {
   const [searchParams] = useSearchParams();
 
   const handleBackToApp = () => {
-    navigate('/app');
+    navigate(-1);
   };
 
   useEffect(() => {

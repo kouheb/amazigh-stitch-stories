@@ -8,11 +8,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertTriangle, Mail } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 export const DeleteAccountPage = () => {
   const [email, setEmail] = useState("");
   const [reason, setReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,9 +51,9 @@ export const DeleteAccountPage = () => {
           <a href="/" className="text-xl font-bold text-gray-800">
             Fil et Toile Studio
           </a>
-          <a href="/" className="text-gray-600 hover:text-gray-900">
-            Back to Home
-          </a>
+          <button onClick={() => navigate(-1)} className="text-gray-600 hover:text-gray-900">
+            Back
+          </button>
         </div>
       </nav>
 

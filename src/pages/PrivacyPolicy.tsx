@@ -2,11 +2,14 @@
 import { Footer } from "@/components/layout/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const PrivacyPolicy = () => {
   useEffect(() => {
     console.log("Privacy Policy page loaded successfully");
   }, []);
+
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -16,9 +19,9 @@ export const PrivacyPolicy = () => {
           <a href="/" className="text-xl font-bold text-gray-800">
             Fil et Toile Studio
           </a>
-          <a href="/" className="text-gray-600 hover:text-gray-900">
-            Back to Home
-          </a>
+          <button onClick={() => navigate(-1)} className="text-gray-600 hover:text-gray-900">
+            Back
+          </button>
         </div>
       </nav>
 

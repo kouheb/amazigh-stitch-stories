@@ -99,11 +99,11 @@ export const AuthPage = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate('/')}
+            onClick={() => navigate(-1)}
             className="text-gray-600 hover:text-gray-800"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Home
+            Back
           </Button>
         </div>
       </div>

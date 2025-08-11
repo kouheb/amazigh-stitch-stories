@@ -3,10 +3,11 @@ import { DeveloperHeader } from "@/components/icons/DeveloperHeader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Download, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import html2canvas from 'html2canvas';
 
 export const DeveloperHeaderPage = () => {
+  const navigate = useNavigate();
   const handleDownload = async () => {
     const headerElement = document.getElementById('developer-header');
     if (headerElement) {
@@ -50,10 +51,10 @@ export const DeveloperHeaderPage = () => {
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
-          <Link to="/" className="inline-flex items-center text-orange-600 hover:text-orange-700 mb-4">
+          <Button variant="ghost" onClick={() => navigate(-1)} className="inline-flex items-center text-orange-600 hover:text-orange-700 mb-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Home
-          </Link>
+            Back
+          </Button>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Developer Header Generator</h1>
           <p className="text-gray-600">
             Your developer page header image (4096px × 2304px)
