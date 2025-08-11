@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { LessonEditorModal } from "@/components/learning/LessonEditorModal";
 
 export const LearningCreatorDashboard = () => {
   const { toast } = useToast();
@@ -14,8 +15,18 @@ export const LearningCreatorDashboard = () => {
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [price, setPrice] = useState<number | undefined>(undefined);
+  const [lessonModalOpen, setLessonModalOpen] = useState(false);
+  const [selectedModuleId, setSelectedModuleId] = useState<string | null>(null);
 
-  useEffect(() => { document.title = 'Creator Dashboard | Learning'; }, []);
+  useEffect(() => {
+    document.title = 'Learning Creator Dashboard | Courses';
+    const content = 'Learning Creator Dashboard to create courses, modules, and video lessons.';
+    let md = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
+    if (md) md.content = content; else { const m = document.createElement('meta'); m.name = 'description'; m.content = content; document.head.appendChild(m); }
+    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    const href = window.location.origin + '/learning/creator';
+    if (canonical) canonical.href = href; else { const l = document.createElement('link'); l.rel = 'canonical'; l.href = href; document.head.appendChild(l); }
+  }, []);
 
   const load = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -123,18 +134,10 @@ export const LearningCreatorDashboard = () => {
     load();
   };
 
-  const addLesson = async (moduleId: string) => {
-    const title = prompt('Lesson title?');
-    if (!title) return;
-    const type = prompt('Type (video,text,quiz)?', 'text') || 'text';
-    const content = prompt('Content or video URL?') || '';
-    const payload: any = { module_id: moduleId, title, type };
-    if (type === 'video') payload.video_url = content; else payload.content = content;
-    const { error } = await supabase.from('lessons').insert(payload);
-    if (error) { toast({ title: 'Add lesson failed', description: error.message, variant: 'destructive' }); }
-    load();
+  const addLesson = (moduleId: string) => {
+    setSelectedModuleId(moduleId);
+    setLessonModalOpen(true);
   };
-
   const publishLesson = async (lessonId: string, is_published: boolean) => {
     const { error } = await supabase.from('lessons').update({ is_published: !is_published }).eq('id', lessonId);
     if (error) { toast({ title: 'Update lesson failed', description: error.message, variant: 'destructive' }); }
@@ -144,7 +147,7 @@ export const LearningCreatorDashboard = () => {
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
       <header className="space-y-2">
-        <h1 className="text-3xl font-bold">Creator Dashboard</h1>
+        <h1 className="text-3xl font-bold">Learning Creator Dashboard</h1>
         <p className="text-muted-foreground">Create and manage your courses</p>
       </header>
 
@@ -202,6 +205,12 @@ export const LearningCreatorDashboard = () => {
           </Card>
         ))}
       </section>
+      <LessonEditorModal
+        open={lessonModalOpen}
+        onOpenChange={(o) => { setLessonModalOpen(o); if (!o) setSelectedModuleId(null); }}
+        moduleId={selectedModuleId}
+        onSaved={() => { setLessonModalOpen(false); setSelectedModuleId(null); load(); }}
+      />
     </div>
   );
 };
