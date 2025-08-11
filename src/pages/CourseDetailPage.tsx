@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { ArrowLeft } from "lucide-react";
 
 interface Course { id: string; title: string; description: string | null; category: string | null; creator_id: string; }
 interface Module { id: string; title: string; order_index: number; }
@@ -15,6 +16,7 @@ export const CourseDetailPage = () => {
   const { id } = useParams();
   const courseId = id as string;
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const [course, setCourse] = useState<Course | null>(null);
   const [modules, setModules] = useState<Module[]>([]);
@@ -93,6 +95,10 @@ export const CourseDetailPage = () => {
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
+      <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="w-fit">
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Back
+      </Button>
       {course && (
         <header className="space-y-2">
           <h1 className="text-3xl font-bold">{course.title}</h1>
