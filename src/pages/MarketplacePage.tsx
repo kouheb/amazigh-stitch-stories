@@ -35,75 +35,14 @@ export const MarketplacePage = () => {
   const [showFilters, setShowFilters] = useState(false);
 
   const categories = [
-    { id: "all", name: t('marketplace.allServices'), count: 127 },
-    { id: "embroidery", name: "Embroidery", count: 45 },
-    { id: "beading", name: "Beading", count: 32 },
-    { id: "weaving", name: "Weaving", count: 28 },
-    { id: "jewelry", name: "Jewelry Making", count: 22 }
+    { id: "all", name: t('marketplace.allServices'), count: 0 },
+    { id: "embroidery", name: "Embroidery", count: 0 },
+    { id: "beading", name: "Beading", count: 0 },
+    { id: "weaving", name: "Weaving", count: 0 },
+    { id: "jewelry", name: "Jewelry Making", count: 0 }
   ];
 
-  const services = [
-    {
-      id: "1",
-      title: "Custom Zardozi Wedding Dress Embroidery",
-      artisan: {
-        name: "Fatima El Mansouri",
-        avatar: "/api/placeholder/40/40",
-        rating: 4.9,
-        reviews: 156,
-        verified: true
-      },
-      price: { min: 300, max: 800 },
-      duration: "2-4 weeks",
-      category: "embroidery",
-      featured: true,
-      images: ["/api/placeholder/300/200"],
-      description: "Exquisite traditional Zardozi embroidery for special occasions",
-      location: "Casablanca, Morocco",
-      skills: ["Zardozi", "Gold Thread", "Traditional Patterns"],
-      availability: "Available"
-    },
-    {
-      id: "2",
-      title: "Modern Beadwork & Jewelry Design",
-      artisan: {
-        name: "Zahra Oudghiri",
-        avatar: "/api/placeholder/40/40",
-        rating: 4.8,
-        reviews: 89,
-        verified: true
-      },
-      price: { min: 80, max: 250 },
-      duration: "1-2 weeks",
-      category: "beading",
-      featured: false,
-      images: ["/api/placeholder/300/200"],
-      description: "Contemporary beadwork combining traditional techniques with modern aesthetics",
-      location: "Rabat, Morocco",
-      skills: ["Beadwork", "Jewelry", "Contemporary Design"],
-      availability: "Busy"
-    },
-    {
-      id: "3",
-      title: "Traditional Berber Carpet Weaving",
-      artisan: {
-        name: "Ahmed Benali",
-        avatar: "/api/placeholder/40/40",
-        rating: 4.7,
-        reviews: 203,
-        verified: true
-      },
-      price: { min: 500, max: 1200 },
-      duration: "1-3 months",
-      category: "weaving",
-      featured: true,
-      images: ["/api/placeholder/300/200"],
-      description: "Authentic Berber carpets woven using ancestral techniques",
-      location: "Marrakech, Morocco",
-      skills: ["Carpet Weaving", "Traditional Patterns", "Natural Dyes"],
-      availability: "Available"
-    }
-  ];
+  const services: any[] = [];
 
   const filteredServices = services.filter(service => {
     const matchesSearch = service.title.toLowerCase().includes(searchQuery.toLowerCase()) ||

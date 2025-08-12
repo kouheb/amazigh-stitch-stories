@@ -23,105 +23,7 @@ import { WorkShowcase } from "@/components/profile/WorkShowcase";
 import { ProfileStats } from "@/components/profile/ProfileStats";
 import { toast } from "sonner";
 
-// Mock data for artisan profiles
-const mockArtisanProfiles = {
-  "fatima-al-zahra": {
-    id: 1,
-    name: "Fatima Al-Zahra",
-    title: "Master Traditional Embroidery Artist",
-    skill: "Traditional Embroidery",
-    location: "Fez, Morocco",
-    memberSince: "2018",
-    website: "https://fatima-embroidery.com",
-    bio: "Master artisan with over 15 years of experience in traditional Moroccan embroidery. Specializing in Zardozi, goldwork, and silk threading techniques passed down through generations. I am passionate about preserving cultural heritage while creating contemporary applications for traditional crafts.",
-    avatar: "https://images.unsplash.com/photo-1494790108755-2616c163f505?w=150&h=150&fit=crop&crop=face",
-    coverImage: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=300&fit=crop",
-    followers: 1247,
-    following: 89,
-    likes: 5680,
-    experience: "15+ Years",
-    skills: ["Zardozi Embroidery", "Goldwork", "Silk Threading", "Pattern Design", "Cultural Preservation"],
-    specialties: ["Traditional Moroccan Crafts", "Heritage Techniques", "Contemporary Applications"],
-    verified: true,
-    rating: 4.9,
-    reviewCount: 127,
-    email: "fatima@example.com",
-    phone: "+212 123 456 789",
-    isOnline: true
-  },
-  "ahmed-ben-ali": {
-    id: 2,
-    name: "Ahmed Ben Ali",
-    title: "Traditional Leather Craftsman",
-    skill: "Leather Crafting",
-    location: "Marrakech, Morocco",
-    memberSince: "2019",
-    website: "https://ahmed-leather.com",
-    bio: "Traditional leather artisan from Marrakech, specializing in authentic Moroccan leather goods. I create handcrafted bags, belts, and decorative items using traditional techniques learned from master craftsmen in the medina. Each piece tells a story of Moroccan heritage.",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-    coverImage: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=300&fit=crop",
-    followers: 896,
-    following: 156,
-    likes: 3420,
-    experience: "12+ Years",
-    skills: ["Leather Crafting", "Bag Making", "Belt Design", "Decorative Tooling", "Traditional Techniques"],
-    specialties: ["Handbags", "Belts", "Decorative Items", "Custom Leather Work"],
-    verified: true,
-    rating: 4.8,
-    reviewCount: 89,
-    email: "ahmed@example.com",
-    phone: "+212 987 654 321",
-    isOnline: false
-  },
-  "yasmin-berber": {
-    id: 3,
-    name: "Yasmin Berber",
-    title: "Contemporary Ceramic Artist",
-    skill: "Ceramic Arts",
-    location: "Tunis, Tunisia",
-    memberSince: "2017",
-    website: "https://yasmin-ceramics.com",
-    bio: "Contemporary ceramic artist blending traditional North African pottery techniques with modern design aesthetics. My work explores the intersection of heritage and innovation, creating functional art pieces that honor our ancestors while speaking to contemporary life.",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-    coverImage: "https://images.unsplash.com/photo-1578849278619-e73505e9610f?w=800&h=300&fit=crop",
-    followers: 2156,
-    following: 342,
-    likes: 8945,
-    experience: "18+ Years",
-    skills: ["Ceramic Arts", "Pottery", "Glazing", "Sculptural Ceramics", "Contemporary Design"],
-    specialties: ["Pottery", "Glazing", "Sculptural Ceramics", "Contemporary Applications"],
-    verified: true,
-    rating: 5.0,
-    reviewCount: 203,
-    email: "yasmin@example.com",
-    phone: "+216 123 456 789",
-    isOnline: true
-  },
-  "omar-tuareg": {
-    id: 4,
-    name: "Omar Tuareg",
-    title: "Traditional Tuareg Silversmith",
-    skill: "Silver Jewelry",
-    location: "Algiers, Algeria",
-    memberSince: "2020",
-    website: "https://omar-silver.com",
-    bio: "Traditional Tuareg silversmith creating authentic jewelry pieces that embody the spirit of the desert nomads. Each piece is handcrafted using ancient techniques, carrying forward the rich cultural heritage of the Tuareg people through contemporary jewelry design.",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-    coverImage: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&h=300&fit=crop",
-    followers: 1543,
-    following: 267,
-    likes: 6234,
-    experience: "10+ Years",
-    skills: ["Silver Jewelry", "Traditional Metalwork", "Engraving", "Stone Setting", "Cultural Design"],
-    specialties: ["Rings", "Necklaces", "Bracelets", "Traditional Symbols"],
-    verified: true,
-    rating: 4.7,
-    reviewCount: 156,
-    email: "omar@example.com",
-    phone: "+213 345 678 901",
-    isOnline: true
-  }
-};
+import { supabase } from "@/integrations/supabase/client";
 
 export const PublicProfilePage = () => {
   const { username } = useParams<{ username: string }>();
@@ -131,20 +33,60 @@ export const PublicProfilePage = () => {
   const [profileData, setProfileData] = useState<any>(null);
 
   useEffect(() => {
-    const loadProfile = () => {
+    const loadProfile = async () => {
+      setIsLoading(true);
       if (!username) {
         setIsLoading(false);
         return;
       }
-
-      // Simulate loading delay
-      setTimeout(() => {
-        const profile = mockArtisanProfiles[username as keyof typeof mockArtisanProfiles];
-        if (profile) {
-          setProfileData(profile);
+      try {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('username', username)
+          .maybeSingle();
+        if (error) throw error;
+        if (!profile) {
+          setProfileData(null);
+          setIsLoading(false);
+          return;
         }
+
+        const [{ data: stats }, { data: skills }] = await Promise.all([
+          supabase.from('user_stats').select('followers_count, following_count, likes_received, experience_years').eq('user_id', profile.id).maybeSingle(),
+          supabase.from('user_skills').select('skill_name').eq('user_id', profile.id).limit(20),
+        ]);
+
+        const mapped = {
+          name: profile.display_name || profile.full_name || profile.email || username,
+          title: profile.experience_level ? `${profile.experience_level} Artisan` : 'Artisan',
+          skill: undefined,
+          location: profile.region || '—',
+          memberSince: profile.created_at ? new Date(profile.created_at).getFullYear().toString() : '',
+          website: profile.website,
+          bio: profile.bio,
+          avatar: profile.avatar_url || '',
+          coverImage: profile.avatar_url || '/placeholder.svg',
+          followers: stats?.followers_count || 0,
+          following: stats?.following_count || 0,
+          likes: stats?.likes_received || 0,
+          experience: stats?.experience_years ? `${stats.experience_years}+ Years` : undefined,
+          skills: (skills || []).map((s: any) => s.skill_name),
+          specialties: [],
+          verified: false,
+          rating: 0,
+          reviewCount: 0,
+          email: profile.email,
+          phone: null,
+          isOnline: false,
+        };
+        setProfileData(mapped);
+      } catch (e) {
+        console.error(e);
+        setProfileData(null);
+      } finally {
         setIsLoading(false);
-      }, 500);
+      }
     };
 
     loadProfile();

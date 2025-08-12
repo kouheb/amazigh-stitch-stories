@@ -30,67 +30,16 @@ export const RecommendationEngine = () => {
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const mockRecommendations: Recommendation[] = [
-    {
-      id: "1",
-      type: "artisan",
-      title: "Aicha Ben Ahmed",
-      description: "Master weaver specializing in traditional Berber patterns",
-      image: "/api/placeholder/60/60",
-      score: 95,
-      reason: "Based on your interest in traditional crafts",
-      metadata: { location: "Marrakech", rating: 4.9, followers: 1250 }
-    },
-    {
-      id: "2",
-      type: "course",
-      title: "Advanced Zellij Mosaic Techniques",
-      description: "Learn the intricate art of geometric Islamic tile work",
-      image: "/api/placeholder/60/60",
-      score: 92,
-      reason: "Recommended for your skill level",
-      metadata: { duration: "6 weeks", students: 340, rating: 4.8 }
-    },
-    {
-      id: "3",
-      type: "event",
-      title: "Fez Artisan Festival 2024",
-      description: "Annual celebration of Moroccan traditional crafts",
-      image: "/api/placeholder/60/60",
-      score: 88,
-      reason: "Popular in your area",
-      metadata: { date: "March 15-17", attendees: 2500, location: "Fez" }
-    },
-    {
-      id: "4",
-      type: "service",
-      title: "Custom Kaftan Embroidery",
-      description: "Personalized traditional garment decoration",
-      image: "/api/placeholder/60/60",
-      score: 85,
-      reason: "Trending in your network",
-      metadata: { price: "$150-300", duration: "2-3 weeks", provider: "Zahra El Fassi" }
-    }
-  ];
-
+  // Disable mock data in production: start empty and wait for real backend integration
   useEffect(() => {
-    // Simulate AI recommendation loading
-    const timer = setTimeout(() => {
-      setRecommendations(mockRecommendations);
-      setLoading(false);
-    }, 1500);
-
-    return () => clearTimeout(timer);
+    setLoading(false);
   }, []);
 
   const refreshRecommendations = () => {
     setLoading(true);
     setTimeout(() => {
-      // Shuffle recommendations to simulate new AI suggestions
-      const shuffled = [...mockRecommendations].sort(() => Math.random() - 0.5);
-      setRecommendations(shuffled);
       setLoading(false);
-    }, 1000);
+    }, 400);
   };
 
   const getIcon = (type: string) => {
