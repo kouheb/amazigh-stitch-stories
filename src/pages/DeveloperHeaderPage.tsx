@@ -126,6 +126,5 @@ export const DeveloperHeaderPage = () => {
           </div>
         </Card>
       </div>
-    </div>
   );
 };
