@@ -50,7 +50,7 @@ export const DeveloperHeaderPage = () => {
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
-          <Button variant="ghost" onClick={handleBack} className="inline-flex items-center text-orange-600 hover:text-orange-700 mb-4">
+          <Button variant="ghost" onClick={handleBack} className="inline-flex items-center mb-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>

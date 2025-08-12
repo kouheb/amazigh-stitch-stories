@@ -30,7 +30,8 @@ import { CourseDetailPage } from "./pages/CourseDetailPage";
 import { LearningCreatorDashboard } from "./pages/LearningCreatorDashboard";
 import { LearningStudentDashboard } from "./pages/LearningStudentDashboard";
 import { RealtimeMessageToaster } from "./components/notifications/RealtimeMessageToaster";
-
+import { MarketplaceProductsPage } from "./pages/MarketplaceProductsPage";
+import { ProductDetailPage } from "./pages/ProductDetailPage";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -80,6 +81,9 @@ const App = () => (
                 {/* Learning public browse and detail */}
                 <Route path="/learning" element={<LearningPage />} />
                 <Route path="/learning/course/:id" element={<CourseDetailPage />} />
+                {/* Marketplace public browse and product details */}
+                <Route path="/marketplace" element={<MarketplaceProductsPage />} />
+                <Route path="/marketplace/product/:id" element={<ProductDetailPage />} />
                 {/* Creator and Student dashboards */}
                 <Route path="/learning/creator" element={
                   <ProtectedRoute>

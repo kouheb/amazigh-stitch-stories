@@ -526,6 +526,105 @@ export type Database = {
           },
         ]
       }
+      marketplace_listing_images: {
+        Row: {
+          created_at: string
+          id: string
+          is_primary: boolean | null
+          listing_id: string
+          position: number | null
+          thumbnail_url: string | null
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean | null
+          listing_id: string
+          position?: number | null
+          thumbnail_url?: string | null
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean | null
+          listing_id?: string
+          position?: number | null
+          thumbnail_url?: string | null
+          url?: string
+        }
+        Relationships: []
+      }
+      marketplace_listings: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          category: string
+          condition: string
+          created_at: string
+          description: string | null
+          featured: boolean | null
+          id: string
+          location_city: string | null
+          location_country: string | null
+          price_cents: number
+          primary_image_url: string | null
+          primary_thumbnail_url: string | null
+          rejection_reason: string | null
+          seller_id: string
+          status: string
+          tags: string[] | null
+          title: string
+          updated_at: string
+          views: number | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          category: string
+          condition: string
+          created_at?: string
+          description?: string | null
+          featured?: boolean | null
+          id?: string
+          location_city?: string | null
+          location_country?: string | null
+          price_cents: number
+          primary_image_url?: string | null
+          primary_thumbnail_url?: string | null
+          rejection_reason?: string | null
+          seller_id: string
+          status?: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          views?: number | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          category?: string
+          condition?: string
+          created_at?: string
+          description?: string | null
+          featured?: boolean | null
+          id?: string
+          location_city?: string | null
+          location_country?: string | null
+          price_cents?: number
+          primary_image_url?: string | null
+          primary_thumbnail_url?: string | null
+          rejection_reason?: string | null
+          seller_id?: string
+          status?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          views?: number | null
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string

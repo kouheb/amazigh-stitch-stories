@@ -62,8 +62,8 @@ export const MainNavbar = ({ onMenuToggle, onCreateClick, onTabChange }: MainNav
 
         {/* Right side */}
         <div className="flex items-center gap-3">
+          <Button variant="ghost" onClick={() => navigate('/marketplace')} className="text-gray-700 hover:text-black">Marketplace</Button>
           <LanguageSelector />
-          
           {isAuthenticated ? (
             <UserDropdown onCreateClick={onCreateClick} onTabChange={onTabChange} />
           ) : (
