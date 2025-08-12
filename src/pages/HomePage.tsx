@@ -82,82 +82,9 @@ export const HomePage = () => {
     alert("Notification settings functionality - this would open notification preferences");
   };
 
-  const featuredWork = [
-    {
-      id: 1,
-      title: "Traditional Berber Carpet",
-      artist: "Aicha Berber",
-      image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
-      likes: 127,
-      views: 1840,
-      price: "$450"
-    },
-    {
-      id: 2,
-      title: "Hand-Forged Silver Jewelry",
-      artist: "Youssef Al-Maghribi",
-      image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=300&fit=crop",
-      likes: 89,
-      views: 1240,
-      price: "$280"
-    },
-    {
-      id: 3,
-      title: "Ceramic Tagine Set",
-      artist: "Fatima El-Alami",
-      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
-      likes: 156,
-      views: 2100,
-      price: "$85"
-    }
-  ];
+  // Removed demo featuredWork
 
-  const recentActivity = [
-    {
-      id: 1,
-      user: "Fatima El Mansouri",
-      action: "shared a new embroidery technique",
-      time: "2 hours ago",
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616c163f505?w=40&h=40&fit=crop&crop=face",
-      image: "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=300&h=200&fit=crop",
-      likes: 24,
-      comments: 8,
-      type: "technique"
-    },
-    {
-      id: 2,
-      user: "Ahmed Benali",
-      action: "completed the Advanced Weaving course",
-      time: "4 hours ago",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face",
-      likes: 18,
-      comments: 3,
-      type: "achievement",
-      badge: "Course Completed"
-    },
-    {
-      id: 3,
-      user: "Zahra Oudghiri",
-      action: "posted a new jewelry design",
-      time: "6 hours ago",
-      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face",
-      image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=300&h=200&fit=crop",
-      likes: 35,
-      comments: 12,
-      type: "creation"
-    },
-    {
-      id: 4,
-      user: "Hassan Amrani",
-      action: "started teaching pottery basics",
-      time: "1 day ago",
-      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face",
-      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=200&fit=crop",
-      likes: 42,
-      comments: 15,
-      type: "teaching"
-    }
-  ];
+  // Removed demo recentActivity
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -191,9 +118,6 @@ export const HomePage = () => {
                 >
                   <Bell className="h-4 w-4 mr-2" />
                   Notifications
-                  <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
-                    3
-                  </Badge>
                 </Button>
                 <Button 
                   variant="outline" 
@@ -208,189 +132,13 @@ export const HomePage = () => {
           </div>
         </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="p-4 hover:shadow-lg transition-shadow border-gray-300">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                <Users className="h-5 w-5 text-black" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">1,247</p>
-                <p className="text-sm text-gray-600">Network</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-1 mt-2 text-gray-600">
-              <TrendingUp className="h-3 w-3" />
-              <span className="text-xs">+12% this week</span>
-            </div>
-          </Card>
-
-          <Card className="p-4 hover:shadow-lg transition-shadow border-gray-300">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                <BookOpen className="h-5 w-5 text-black" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">23</p>
-                <p className="text-sm text-gray-600">Courses</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-1 mt-2 text-gray-600">
-              <TrendingUp className="h-3 w-3" />
-              <span className="text-xs">3 in progress</span>
-            </div>
-          </Card>
-
-          <Card className="p-4 hover:shadow-lg transition-shadow border-gray-300">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                <Calendar className="h-5 w-5 text-black" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">8</p>
-                <p className="text-sm text-gray-600">Events</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-1 mt-2 text-gray-600">
-              <Clock className="h-3 w-3" />
-              <span className="text-xs">2 upcoming</span>
-            </div>
-          </Card>
-
-          <Card className="p-4 hover:shadow-lg transition-shadow border-gray-300">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                <MessageSquare className="h-5 w-5 text-black" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">156</p>
-                <p className="text-sm text-gray-600">Messages</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-1 mt-2 text-gray-600">
-              <Bell className="h-3 w-3" />
-              <span className="text-xs">5 unread</span>
-            </div>
-          </Card>
-        </div>
+        {/* Quick Stats removed to avoid fake numbers */}
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Featured Artwork */}
-            <Card className="p-6 border-gray-300">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="font-semibold flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-black" />
-                  Featured Artwork
-                </h3>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="border-gray-400 text-gray-600 hover:bg-gray-100 hover:text-black"
-                  onClick={handleExploreAll}
-                >
-                  Explore All
-                </Button>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {featuredWork.map((work) => (
-                  <div key={work.id} className="group cursor-pointer">
-                    <div className="relative overflow-hidden rounded-lg mb-3">
-                      <img 
-                        src={work.image} 
-                        alt={work.title}
-                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <div className="absolute top-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-sm">
-                        {work.price}
-                      </div>
-                    </div>
-                    <h4 className="font-medium mb-1">{work.title}</h4>
-                    <p className="text-sm text-gray-600 mb-2">by {work.artist}</p>
-                    <div className="flex items-center gap-4 text-sm text-gray-500">
-                      <div className="flex items-center gap-1">
-                        <Heart className="h-3 w-3" />
-                        {work.likes}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Eye className="h-3 w-3" />
-                        {work.views}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Card>
 
-            {/* Recent Activity Feed */}
-            <Card className="p-6 border-gray-300">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="font-semibold">Recent Activity</h3>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-gray-600 hover:bg-gray-100 hover:text-black"
-                  onClick={handleViewAllActivity}
-                >
-                  View All
-                </Button>
-              </div>
-              
-              <div className="space-y-6">
-                {recentActivity.map((activity) => (
-                  <div key={activity.id} className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                    <Avatar className="h-10 w-10 flex-shrink-0">
-                      <AvatarImage src={activity.avatar} />
-                      <AvatarFallback>
-                        {activity.user.split(' ').map(n => n[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                    
-                    <div className="flex-1">
-                      <p className="text-sm mb-2">
-                        <span className="font-medium">{activity.user}</span> {activity.action}
-                      </p>
-                      
-                      {activity.image && (
-                        <div className="mb-3">
-                          <img 
-                            src={activity.image} 
-                            alt="Activity content"
-                            className="w-full max-w-sm h-32 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-                          />
-                        </div>
-                      )}
-                      
-                      {activity.badge && (
-                        <Badge className="mb-2 bg-gray-100 text-gray-800 border-gray-300">
-                          <Star className="h-3 w-3 mr-1" />
-                          {activity.badge}
-                        </Badge>
-                      )}
-                      
-                      <div className="flex items-center gap-4 text-sm text-gray-500">
-                        <span>{activity.time}</span>
-                        <Button variant="ghost" size="sm" className="h-auto p-1 hover:text-gray-700 hover:bg-gray-100">
-                          <Heart className="h-3 w-3 mr-1" />
-                          {activity.likes}
-                        </Button>
-                        <Button variant="ghost" size="sm" className="h-auto p-1 hover:text-gray-700 hover:bg-gray-100">
-                          <MessageSquare className="h-3 w-3 mr-1" />
-                          {activity.comments}
-                        </Button>
-                        <Button variant="ghost" size="sm" className="h-auto p-1 hover:text-gray-700 hover:bg-gray-100">
-                          <Share2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Card>
 
             {/* Collaboration Hub */}
             <CollaborationHub />

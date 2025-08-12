@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import {
   Eye
 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export const NetworkPage = () => {
   const navigate = useNavigate();
@@ -53,56 +54,36 @@ export const NetworkPage = () => {
     toast.success(`Opening ${artisanName}'s profile...`);
   };
 
-  const artisans = [
-    {
-      id: 1,
-      name: "Fatima Al-Zahra",
-      skill: "Traditional Embroidery",
-      location: "Fez, Morocco",
-      rating: 4.9,
-      reviews: 127,
-      image: "FA",
-      isOnline: true,
-      description: "Master of Moroccan embroidery with 15+ years experience",
-      specialties: ["Zardozi", "Goldwork", "Silk Threading"]
-    },
-    {
-      id: 2,
-      name: "Ahmed Ben Ali",
-      skill: "Leather Crafting",
-      location: "Marrakech, Morocco",
-      rating: 4.8,
-      reviews: 89,
-      image: "AB",
-      isOnline: false,
-      description: "Traditional leather artisan specializing in bags and accessories",
-      specialties: ["Handbags", "Belts", "Decorative Items"]
-    },
-    {
-      id: 3,
-      name: "Yasmin Berber",
-      skill: "Ceramic Arts",
-      location: "Tunis, Tunisia",
-      rating: 5.0,
-      reviews: 203,
-      image: "YB",
-      isOnline: true,
-      description: "Contemporary ceramic artist blending traditional and modern techniques",
-      specialties: ["Pottery", "Glazing", "Sculptural Ceramics"]
-    },
-    {
-      id: 4,
-      name: "Omar Tuareg",
-      skill: "Silver Jewelry",
-      location: "Algiers, Algeria",
-      rating: 4.7,
-      reviews: 156,
-      image: "OT",
-      isOnline: true,
-      description: "Traditional Tuareg silversmith creating authentic jewelry pieces",
-      specialties: ["Rings", "Necklaces", "Bracelets"]
-    }
-  ];
+  const [profiles, setProfiles] = useState<any[]>([]);
+
+  // Load real profiles from Supabase
+  useEffect(() => {
+    const load = async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, display_name, full_name, username, region, bio');
+      if (!error) setProfiles(data || []);
+      else console.error('Failed to load profiles', error);
+    };
+    load();
+  }, []);
+
+  const artisans = profiles.map((p: any) => ({
+    id: p.id,
+    name: p.display_name || p.full_name || p.username || 'Unknown',
+    skill: p.username ? `@${p.username}` : '—',
+    location: p.region || '—',
+    rating: 0,
+    reviews: 0,
+    image: (p.display_name || p.full_name || p.username || 'U')
+      .split(' ')
+      .map((n: string) => n[0])
+      .join('')
+      .slice(0, 2),
+    isOnline: false,
+    description: p.bio || '',
+    specialties: [] as string[],
+  }));
 
   const filterOptions = [
     { value: "all", label: "All Artisans" },

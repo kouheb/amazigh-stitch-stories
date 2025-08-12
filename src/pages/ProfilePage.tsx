@@ -63,10 +63,10 @@ export const ProfilePage = () => {
     bio: user?.user_metadata?.bio || "Welcome to my profile! I'm passionate about creative work and looking forward to connecting with fellow artists and designers.",
     avatar: user?.user_metadata?.avatar_url || "https://images.unsplash.com/photo-1494790108755-2616c163f505?w=150&h=150&fit=crop&crop=face",
     coverImage: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=300&fit=crop",
-    followers: 2847,
-    following: 456,
-    likes: 15420,
-    experience: "15+ Years",
+    followers: 0,
+    following: 0,
+    likes: 0,
+    experience: "—",
     skills: ["Creative Design", "Digital Arts", "Traditional Crafts", "Pattern Making", "Cultural Research", "Teaching"],
     specialties: ["Traditional Arts", "Contemporary Fusion", "Cultural Preservation", "Artisan Training"],
     verified: true,
@@ -134,6 +134,28 @@ export const ProfilePage = () => {
       }));
     }
   }, [user]);
+
+  // Load counts from user_stats (real data)
+  useEffect(() => {
+    const loadStats = async () => {
+      if (!viewedUserId) return;
+      const { data: stats, error } = await supabase
+        .from('user_stats')
+        .select('followers_count, following_count, likes_received, experience_years')
+        .eq('user_id', viewedUserId)
+        .maybeSingle();
+      if (!error && stats) {
+        setProfileData(prev => ({
+          ...prev,
+          followers: stats.followers_count || 0,
+          following: stats.following_count || 0,
+          likes: stats.likes_received || 0,
+          experience: stats.experience_years != null ? `${stats.experience_years}+ Years` : prev.experience,
+        }));
+      }
+    };
+    loadStats();
+  }, [viewedUserId]);
 
   const handleEditProfile = () => {
     console.log("Edit Profile clicked");

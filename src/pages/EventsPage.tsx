@@ -28,78 +28,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-const initialEvents = [
-  {
-    id: 1,
-    title: "Amazigh Cultural Festival",
-    date: "March 15-17, 2024",
-    time: "10:00 AM - 8:00 PM",
-    location: "Marrakech Cultural Center",
-    category: "cultural",
-    attendees: 245,
-    price: "Free",
-    image: "🎭",
-    description: "Celebrate Amazigh heritage with traditional music, dance, and crafts",
-    organizer: "Cultural Heritage Foundation",
-    tags: ["Traditional", "Music", "Dance", "Crafts"]
-  },
-  {
-    id: 2,
-    title: "Zardozi Embroidery Workshop",
-    date: "March 22, 2024",
-    time: "2:00 PM - 6:00 PM",
-    location: "Artisan Studio, Fez",
-    category: "workshop",
-    attendees: 18,
-    price: "$85",
-    image: "✨",
-    description: "Learn traditional Zardozi techniques from master artisan Fatima Al-Maghribi",
-    organizer: "Fatima Al-Maghribi",
-    tags: ["Hands-on", "Traditional", "Embroidery"]
-  },
-  {
-    id: 3,
-    title: "Moroccan Textile Exhibition",
-    date: "April 1-15, 2024",
-    time: "9:00 AM - 6:00 PM",
-    location: "National Museum, Rabat",
-    category: "exhibition",
-    attendees: 156,
-    price: "$12",
-    image: "🧵",
-    description: "Explore centuries of Moroccan textile traditions and contemporary innovations",
-    organizer: "National Museum",
-    tags: ["Historical", "Contemporary", "Textiles"]
-  },
-  {
-    id: 4,
-    title: "Artisan Market Pop-up",
-    date: "April 5, 2024",
-    time: "10:00 AM - 7:00 PM",
-    location: "Jemaa el-Fnaa, Marrakech",
-    category: "market",
-    attendees: 89,
-    price: "Free",
-    image: "🛍️",
-    description: "Shop directly from local artisans and discover unique handmade pieces",
-    organizer: "Artisan Collective",
-    tags: ["Shopping", "Local", "Handmade"]
-  },
-  {
-    id: 5,
-    title: "Fashion Designer Networking",
-    date: "April 12, 2024",
-    time: "7:00 PM - 10:00 PM",
-    location: "Design Hub, Casablanca",
-    category: "networking",
-    attendees: 67,
-    price: "$25",
-    image: "👥",
-    description: "Connect with fellow designers, share ideas, and build partnerships",
-    organizer: "Fashion Network Morocco",
-    tags: ["Networking", "Fashion", "Business"]
-  }
-];
+const initialEvents: any[] = [];
 
 export const EventsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -110,7 +39,7 @@ export const EventsPage = () => {
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [currentCalendarDate, setCurrentCalendarDate] = useState(new Date());
   const [isAddEventModalOpen, setIsAddEventModalOpen] = useState(false);
-  const [eventsList, setEventsList] = useState(initialEvents);
+  const [eventsList, setEventsList] = useState<any[]>([]);
 
   const categories = [
     { id: "all", label: "All Events" },
@@ -204,32 +133,7 @@ export const EventsPage = () => {
     };
   }, []);
 
-  const forumTopics = [
-    {
-      id: 1,
-      title: "Best thread types for Zardozi work?",
-      author: "Amina Hassan",
-      replies: 12,
-      lastActivity: "2 hours ago",
-      category: "Techniques"
-    },
-    {
-      id: 2,
-      title: "Looking for silk suppliers in Fez",
-      author: "Omar Berber",
-      replies: 8,
-      lastActivity: "4 hours ago",
-      category: "Materials"
-    },
-    {
-      id: 3,
-      title: "Traditional vs Modern Dabka methods",
-      author: "Yasmin Tuareg",
-      replies: 15,
-      lastActivity: "1 day ago",
-      category: "Discussion"
-    }
-  ];
+  const forumTopics: any[] = [];
 
   const getDateFromString = (dateStr: string) => {
     // Parse date strings like "March 15-17, 2024" or "March 22, 2024"
@@ -431,71 +335,6 @@ export const EventsPage = () => {
             ))}
           </div>
 
-          {/* Featured Event */}
-          <Card className="p-8 bg-gradient-to-r from-gray-100 to-gray-200 border-gray-200">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-              <div>
-                <Badge className="mb-4 bg-black">Featured Event</Badge>
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                  International Craft Symposium 2024
-                </h2>
-                <p className="text-gray-600 mb-6">
-                  Join artisans from around the world for a week-long celebration of traditional crafts, 
-                  featuring workshops, exhibitions, and cultural performances.
-                </p>
-                <div className="flex items-center gap-6 mb-6">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm text-gray-600">May 15-22, 2024</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm text-gray-600">Marrakech</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm text-gray-600">500+ attendees</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <Button 
-                    className="bg-black hover:bg-gray-800"
-                    onClick={() => handleEventRegistration({
-                      title: "International Craft Symposium 2024",
-                      date: "May 15-22, 2024",
-                      location: "Marrakech",
-                      price: "$299",
-                      attendees: 500
-                    })}
-                  >
-                    Register Now - $299
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    onClick={() => {
-                      setSelectedEvent({
-                        id: "featured",
-                        title: "Global Artisan Festival 2024",
-                        description: "Connect with artisans worldwide in our biggest celebration of traditional crafts and modern innovation.",
-                        date: "March 15-17, 2024",
-                        location: "Marrakech Cultural Center",
-                        price: 299,
-                        attendees: 500
-                      });
-                      setIsRegistrationModalOpen(true);
-                    }}
-                  >
-                    Learn More
-                  </Button>
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="w-48 h-48 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full mx-auto flex items-center justify-center text-6xl text-white">
-                  🌍
-                </div>
-              </div>
-            </div>
-          </Card>
 
           {/* Events Grid */}
           <div>

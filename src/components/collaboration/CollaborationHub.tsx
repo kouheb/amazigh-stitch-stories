@@ -51,7 +51,7 @@ export const CollaborationHub = () => {
         {
           id: "1",
           name: "You",
-          avatar: "/api/placeholder/32/32",
+          avatar: undefined,
           role: "owner",
           status: "online"
         }
