@@ -33,6 +33,7 @@ import { RealtimeMessageToaster } from "./components/notifications/RealtimeMessa
 import { MarketplaceProductsPage } from "./pages/MarketplaceProductsPage";
 import { ProductDetailPage } from "./pages/ProductDetailPage";
 import { queryClient } from "@/lib/queryClient";
+import AnalyticsDashboard from "./pages/AnalyticsDashboard";
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -93,6 +94,12 @@ const App = () => (
                 <Route path="/learning/my" element={
                   <ProtectedRoute>
                     <LearningStudentDashboard />
+                  </ProtectedRoute>
+                } />
+                {/* Analytics Dashboard */}
+                <Route path="/analytics" element={
+                  <ProtectedRoute>
+                    <AnalyticsDashboard />
                   </ProtectedRoute>
                 } />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
