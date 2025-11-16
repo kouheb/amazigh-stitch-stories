@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -990,27 +990,18 @@ export type Database = {
       }
     }
     Functions: {
-      _generate_certificate_code: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      can_access_course: {
-        Args: { _course_id: string }
-        Returns: boolean
-      }
-      can_edit_course: {
-        Args: { _course_id: string }
-        Returns: boolean
-      }
+      _generate_certificate_code: { Args: never; Returns: string }
+      can_access_course: { Args: { _course_id: string }; Returns: boolean }
+      can_edit_course: { Args: { _course_id: string }; Returns: boolean }
       has_role: {
         Args: {
-          _user_id: string
           _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
         }
         Returns: boolean
       }
       search_profiles: {
-        Args: { q: string; limit_count?: number }
+        Args: { limit_count?: number; q: string }
         Returns: {
           avatar_url: string | null
           bio: string | null
@@ -1026,33 +1017,39 @@ export type Database = {
           username: string | null
           website: string | null
         }[]
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       search_user_messages: {
-        Args: { q: string; limit_count?: number; offset_count?: number }
+        Args: { limit_count?: number; offset_count?: number; q: string }
         Returns: {
-          id: string
-          conversation_id: string
-          sender_id: string
-          is_read: boolean
-          created_at: string
           content: string
-          message_type: string
-          file_url: string
+          conversation_id: string
+          created_at: string
           file_name: string
+          file_url: string
+          id: string
+          is_read: boolean
+          message_type: string
+          sender_id: string
         }[]
       }
       verify_certificate: {
         Args: { _code: string }
         Returns: {
-          id: string
           code: string
+          course_id: string
+          course_title: string
+          id: string
+          instructor_id: string
+          instructor_name: string
           issued_at: string
           student_id: string
           student_name: string
-          course_id: string
-          course_title: string
-          instructor_id: string
-          instructor_name: string
         }[]
       }
     }
