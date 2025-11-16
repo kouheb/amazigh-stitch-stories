@@ -988,11 +988,61 @@ export type Database = {
         }
         Relationships: []
       }
+      event_registrations_public: {
+        Row: {
+          event_id: string | null
+          full_name: string | null
+          id: string | null
+          registration_date: string | null
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          event_id?: string | null
+          full_name?: string | null
+          id?: string | null
+          registration_date?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          event_id?: string | null
+          full_name?: string | null
+          id?: string | null
+          registration_date?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_registrations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       _generate_certificate_code: { Args: never; Returns: string }
       can_access_course: { Args: { _course_id: string }; Returns: boolean }
       can_edit_course: { Args: { _course_id: string }; Returns: boolean }
+      get_public_profile: {
+        Args: { profile_id: string }
+        Returns: {
+          avatar_url: string
+          bio: string
+          display_name: string
+          experience_level: string
+          full_name: string
+          id: string
+          region: string
+          social_handle: string
+          username: string
+          website: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
